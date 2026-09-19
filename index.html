@@ -156,7 +156,11 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
        background:var(--bg);font-size:14.5px;cursor:pointer;text-align:left}
 #sheet .ico{flex:0 0 20px;width:20px;height:20px;line-height:0}
 #sheet .ico svg{width:20px;height:20px;display:block}
-#sheet .ico svg path{fill:none;stroke:var(--dim);stroke-width:1.7}
+#sheet .ico svg path,
+#sheet .ico svg circle{fill:none;stroke:var(--dim);stroke-width:1.7}
+/* 있다·없다는 색으로도 갈려야 한 눈에 들어온다. */
+#sheet .ico.yes svg circle{stroke:var(--good);stroke-width:2.3}
+#sheet .ico.no svg path{stroke:var(--bad);stroke-width:2.6}
 #sheet .ico.on svg path{fill:#ca210c;stroke:#ca210c}
 /* 세 줄의 글자가 같은 자리에서 시작해야 눈이 편하다. 값 넣는 줄에는
    원화 표시를 같은 크기의 칸에 넣어 자리를 맞춘다. */
@@ -716,6 +720,9 @@ addEventListener("hashchange", () => {
 /* 폰으로 보다가 '이건 쿠팡에서 확인해 보자' 싶은 것을 담아 두는 곳이다.
    이 기기의 브라우저에만 남는다. 지우면 사라진다. */
 /* 하트 하나를 만들어 두고 카드마다 같은 것을 쓴다. */
+const OMARK = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+  '<circle cx="12" cy="12" r="7.6"/></svg>';
+
 const XMARK = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
   '<path d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"/></svg>';
 
@@ -823,8 +830,10 @@ function askApp(){
   openSheet("<h3>쿠팡을 처음 엽니다</h3>" +
     '<p class="note">이 브라우저로 쿠팡에 가는 게 처음입니다.<br>' +
     "쿠팡 앱이 없으면 <b>사용권한이 없습니다</b> 가 뜰 수 있어 한 번만 여쭙니다.</p>" +
-    '<button class="go" data-act="hasapp">쿠팡 앱 있음</button>' +
-    '<button data-act="hasnoapp">쿠팡 앱 없음</button>');
+    '<button class="go" data-act="hasapp"><i class="ico yes">' + OMARK +
+      "</i>쿠팡 앱 있음</button>" +
+    '<button data-act="hasnoapp"><i class="ico no">' + XMARK +
+      "</i>쿠팡 앱 없음</button>");
 }
 
 function coupang(name, link){
