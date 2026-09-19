@@ -142,7 +142,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 #sheet button.go{background:var(--accent);border-color:var(--accent);color:#fff;
        font-weight:600}
 #sheet button.off{color:var(--dim)}
-#cartbtn{position:relative}
+#cartbtn{position:relative;color:#f0a500;font-size:16px;line-height:1.25}
 #cartn{position:absolute;top:-6px;right:-6px;min-width:17px;height:17px;padding:0 4px;
        border-radius:9px;background:var(--bad);color:#fff;font-size:10.5px;
        line-height:17px;text-align:center;display:none}
@@ -169,14 +169,15 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 #cartbar{display:none;gap:6px;padding:8px 12px 0}
 #cartbar button{flex:1;padding:8px;border:1px solid var(--line);border-radius:9px;
      background:var(--card);font-size:13px;cursor:pointer}
-/* 장바구니는 카드에서 바로 넣고 빼는 게 빠르다. 담겼는지도 한눈에 보여야 한다. */
+/* 카드에서 바로 눌러 쓰는 것 둘. 담겼는지는 별이 차 있는지로 안다. */
 .item{position:relative}
-.item .cart{position:absolute;top:7px;right:7px;width:30px;height:30px;
-     border-radius:15px;border:1px solid var(--line);background:var(--bg);
-     font-size:14px;line-height:28px;text-align:center;cursor:pointer;
-     opacity:.45;user-select:none}
-.item .cart.on{background:var(--accent);border-color:var(--accent);opacity:1}
-.item .nm{padding-right:32px}
+.item .cart{position:absolute;top:4px;right:6px;font-size:21px;line-height:1;
+     padding:2px 3px;color:var(--dim);opacity:.5;cursor:pointer;user-select:none}
+.item .cart.on{color:#f0a500;opacity:1}
+.item .cpg{position:absolute;top:8px;right:34px;padding:3px 7px;border-radius:8px;
+     background:#cf2d2d;color:#fff;font-size:10.5px;font-weight:700;
+     letter-spacing:-.3px;cursor:pointer;user-select:none;line-height:1.5}
+.item .nm{padding-right:76px}
 </style>
 </head>
 <body>
@@ -197,7 +198,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
   <header>
     <div class="top">
       <h1 id="title"></h1>
-      <button class="iconbtn" id="cartbtn" title="장바구니">🛒<span id="cartn"></span></button>
+      <button class="iconbtn" id="cartbtn" title="찜한 것">★<span id="cartn"></span></button>
       <button class="iconbtn" id="theme" title="밝게/어둡게">◐</button>
     </div>
     <div class="searchwrap">
@@ -529,7 +530,9 @@ function card(it, raw){
       ($("#view").value === "cart" ? '<button class="goc">쿠팡이동</button>' : "") +
       "</div>";
   return '<article class="item" data-p="' + it.p + '">' +
-    '<i class="cart' + (inCart(it.p) ? " on" : "") + '">🛒</i>' + left +
+    '<i class="cpg">쿠팡</i>' +
+    '<i class="cart' + (inCart(it.p) ? " on" : "") + '">' +
+      (inCart(it.p) ? "★" : "☆") + "</i>" + left +
     '<div class="body"><div class="nm">' + hi(it.name, raw) + "</div>" +
     '<div class="sub">' + esc(it.spec || "") + (it.spec && it.maker ? " · " : "") +
       esc(it.maker || "") + "</div>" +
@@ -860,14 +863,17 @@ $("#list").addEventListener("click", e => {
   const p = card.dataset.p;
   const it = DATA.find(x => x.p === p); if (!it) return;
 
+  if (e.target.closest(".cpg")) return coupang(it.name, it.a);
   const cartIcon = e.target.closest(".cart");
   if (cartIcon){
     if (inCart(p)) CART = CART.filter(x => x !== p);
     else CART.push(p);
     saveCart();
-    // 장바구니 보기에서는 줄이 빠져야 하니 다시 그리고, 아니면 표만 바꾼다
+    // 장바구니 보기에서는 줄이 빠져야 하니 다시 그리고, 아니면 별만 바꾼다
     if ($("#view").value === "cart") return run();
-    cartIcon.classList.toggle("on", inCart(p));
+    const on = inCart(p);
+    cartIcon.classList.toggle("on", on);
+    cartIcon.textContent = on ? "★" : "☆";
     return;
   }
   if (e.target.closest(".goc")) return coupang(it.name, it.a);
