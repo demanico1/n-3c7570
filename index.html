@@ -256,6 +256,7 @@ function toCho(s){
   return out;
 }
 const CHO_ONLY = /^[ㄱ-ㅎ0-9a-z]+$/i;
+const noSpace = s => toJamo(String(s).replace(/\s+/g, ""));
 
 /* ============================ 화면 ============================ */
 let DATA = [], VIEW = [], BIG = "전체", SHOWN = 0, CP = "", WAIT = "", PICS = {};
@@ -276,9 +277,15 @@ function start(d){
       '<option value="' + o[0] + '">' + o[1] + "</option>").join("");
   WAIT = d.wait;
   for (let i = 0; i < 3; i++) $("#c" + (i + 1)).textContent = d.caps[i];
+  // 본문(이름·업체·규격)과 곁들이(분류·상품코드·다른 말)를 따로 둔다.
+  // 둘 다 뒤지되, 본문에 맞은 것을 위로 올린다.
+  //
+  //   '오일' 로 찾으면 중분류가 '오일/소스/양념' 인 것이 120건 걸린다.
+  //   정작 이름이 '올리브오일' 인 것이 그 사이에 파묻혀 있었다.
   for (const it of DATA){
-    it._j = toJamo(it.hay);
-    it._c = toCho(it.hay);
+    const all = it.hb + " " + it.hx;
+    it._b = noSpace(it.hb);   it._x = noSpace(all);
+    it._cb = toCho(it.hb);    it._cx = toCho(all);
   }
   const bigs = ["전체", ...d.bigs];
   $("#chips").innerHTML = bigs.map(b =>
@@ -320,7 +327,7 @@ function run(){
   try { history.replaceState(null, "", raw ? "#" + encodeURIComponent(raw) : " "); } catch(e){}
 
   const toks = raw.split(/\s+/).filter(Boolean).map(t => ({
-    j: toJamo(t.toLowerCase()),
+    j: noSpace(t.toLowerCase()),
     c: toCho(t),
     cho: CHO_ONLY.test(t) && !/[가-힣]/.test(t)
   }));
@@ -331,17 +338,21 @@ function run(){
     if (view === "done" && it.rate == null) return false;
     if (view === "none" && !it.nm) return false;
     if (view === "wait" && (it.rate != null || it.nm)) return false;
+    let score = 0;
     for (const t of toks){
-      const ok = t.cho ? (it._c.includes(t.c) || it._j.includes(t.j))
-                       : it._j.includes(t.j);
-      if (!ok) return false;
+      const inBody = t.cho ? it._cb.includes(t.c) : it._b.includes(t.j);
+      const inAll  = t.cho ? it._cx.includes(t.c) : it._x.includes(t.j);
+      if (!inBody && !inAll) return false;
+      score += inBody ? 2 : 1;          // 이름에 맞으면 두 배로 친다
     }
+    it._s = score;
     return true;
   });
 
   const k = $("#sort").value;
   const big = 1e12;
   VIEW.sort((a, b) => {
+    if (toks.length && b._s !== a._s) return b._s - a._s;   // 잘 맞은 것 먼저
     const A = a.rate == null ? big : a.rate, B = b.rate == null ? big : b.rate;
     switch (k){
       case "rate":    return A - B;
