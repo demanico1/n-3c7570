@@ -156,11 +156,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
        background:var(--bg);font-size:14.5px;cursor:pointer;text-align:left}
 #sheet .ico{flex:0 0 20px;width:20px;height:20px;line-height:0}
 #sheet .ico svg{width:20px;height:20px;display:block}
-#sheet .ico svg path,
-#sheet .ico svg circle{fill:none;stroke:var(--dim);stroke-width:1.7}
-/* 있다·없다는 색으로도 갈려야 한 눈에 들어온다. */
-#sheet .ico.yes svg circle{stroke:var(--good);stroke-width:2.3}
-#sheet .ico.no svg path{stroke:var(--bad);stroke-width:2.6}
+#sheet .ico svg path{fill:none;stroke:var(--dim);stroke-width:1.7}
 #sheet .ico.on svg path{fill:#ca210c;stroke:#ca210c}
 /* 세 줄의 글자가 같은 자리에서 시작해야 눈이 편하다. 값 넣는 줄에는
    원화 표시를 같은 크기의 칸에 넣어 자리를 맞춘다. */
@@ -193,13 +189,6 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 #inapp .tip{display:block;margin-top:9px;padding-top:8px;color:var(--dim);
      border-top:1px solid var(--line)}
 #inapp button{margin-top:8px;margin-right:6px;padding:7px 11px;border-radius:9px;
-     border:1px solid var(--line);background:var(--card);color:var(--ink);
-     font-size:12.5px;cursor:pointer}
-#backbar{display:none;margin:10px 12px 0;padding:11px 13px;border-radius:12px;
-     background:var(--mid-bg);color:var(--mid);font-size:12.5px;line-height:1.6;
-     border:1px solid var(--line)}
-#backbar b{display:block;margin-bottom:5px;font-size:13px}
-#backbar button{margin-right:6px;padding:7px 11px;border-radius:9px;
      border:1px solid var(--line);background:var(--card);color:var(--ink);
      font-size:12.5px;cursor:pointer}
 #cartbar{display:none;gap:6px;padding:8px 12px 0}
@@ -266,13 +255,6 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
     <div id="inappbtns"></div>
     <span class="tip">브라우저에서 연 뒤 메뉴 → <b style="display:inline">홈 화면에 추가</b>
     를 해 두면 앱처럼 바로 열리고, 넣은 값도 한곳에 쌓입니다.</span>
-  </div>
-
-  <div id="backbar">
-    <b>쿠팡이 제대로 열렸나요?</b>
-    <span id="backmsg">'사용권한이 없습니다' 가 떴다면 앱이 없는 것입니다.
-    쿠팡 홈을 한 번 열면 그다음부터 괜찮습니다.</span>
-    <div><button data-b="ok">잘 열렸어요</button><button data-b="no">오류가 떴어요</button></div>
   </div>
 
   <div class="rows" id="cartbar">
@@ -475,7 +457,6 @@ function start(d){
     $("#q").focus({preventScroll:true});
   }
   loadPics();
-  askBack();
 }
 
 $("#q").addEventListener("input", run);
@@ -735,9 +716,6 @@ addEventListener("hashchange", () => {
 /* 폰으로 보다가 '이건 쿠팡에서 확인해 보자' 싶은 것을 담아 두는 곳이다.
    이 기기의 브라우저에만 남는다. 지우면 사라진다. */
 /* 하트 하나를 만들어 두고 카드마다 같은 것을 쓴다. */
-const OMARK = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
-  '<circle cx="12" cy="12" r="7.6"/></svg>';
-
 const XMARK = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
   '<path d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"/></svg>';
 
@@ -829,54 +807,13 @@ const STATE_KEY = "gmpx-state";
 
    틀(iframe) 안에 쿠팡을 띄우는 건 안 된다. 쿠키가 안 따라 들어가서
    '사용권한이 없습니다' 가 뜬다. 홈을 먼저 거쳐도 마찬가지였다. */
-/* 앱이 깔려 있는지는 웹에서 알 수 없다. 브라우저가 알려 주지 않는다.
- * 그래서 **처음 한 번만 물어본다.** 대답은 이 기기에 적어 두고 다시 안 묻는다.
+/* 앱이 깔려 있는지 물어보는 단계를 뒀다가 걷어냈다.
  *
- *   앱 있음   바로 보낸다. 안드로이드가 가로채 앱을 띄운다
- *   앱 없음   쿠팡 홈을 먼저 연다. 쿠키가 생겨 그다음부터 웹으로도 멀쩡하다
- *
- * 앱이 없고 쿠키도 없는 브라우저만 '사용권한이 없습니다' 를 만난다.
- * 그 한 경우를 막으려고 모두에게 한 번 묻는 값이면 싸다.
- */
-const APP_KEY = "gmpx-app";
-let PENDING = null;
-
-function askApp(){
-  openSheet("<h3>쿠팡을 처음 엽니다</h3>" +
-    '<p class="note">이 브라우저로 쿠팡에 가는 게 처음입니다.<br>' +
-    "쿠팡 앱이 없으면 <b>사용권한이 없습니다</b> 가 뜰 수 있어 한 번만 여쭙니다.</p>" +
-    '<button class="go" data-act="hasapp"><i class="ico yes">' + OMARK +
-      "</i>쿠팡 앱 있음</button>" +
-    '<button data-act="hasnoapp"><i class="ico no">' + XMARK +
-      "</i>쿠팡 앱 없음</button>");
-}
-
+ * 그 장치가 쓸모 있는 경우는 '앱도 없고 + 그 브라우저로 쿠팡이 처음' 인
+ * 사람뿐인데, 그러자고 모두에게 탭을 한 번 더 시켰다. 게다가 오류를
+ * 만나도 ⋯ 의 '쿠팡이 안 열릴 때' 로 스스로 고칠 수 있다.
+ * 드문 경우를 막으려고 늘 쓰는 길을 불편하게 만들면 안 된다. */
 function coupang(name, link){
-  let ans = null;
-  try { ans = localStorage.getItem(APP_KEY); } catch(e){}
-  if (!ans){ PENDING = {name, link}; return askApp(); }
-  goCoupang(name, link);
-}
-
-/* 쿠팡에 다녀온 뒤 한 번만 물어본다. '앱 있음' 이 틀린 대답이었어도
-   여기서 빠져나올 수 있다. 확정되면 다시는 안 나온다. */
-function askBack(){
-  let v = null;
-  try { v = localStorage.getItem(APP_KEY); } catch(e){}
-  $("#backbar").style.display = (v === "y?") ? "block" : "none";
-}
-$("#backbar").addEventListener("click", e => {
-  const b = e.target.closest("button"); if (!b) return;
-  try {
-    localStorage.setItem(APP_KEY, b.dataset.b === "ok" ? "y" : "n");
-  } catch(err){}
-  $("#backbar").style.display = "none";
-  if (b.dataset.b === "no") location.href = "https://www.coupang.com/";
-});
-// 되살아나서 돌아온 경우(bfcache)에도 보이게
-addEventListener("pageshow", () => { if (DATA.length) askBack(); });
-
-function goCoupang(name, link){
   hideOverlays();                       // 덮개는 그냥 감춘다 (뒤로가기 말고)
   try { history.replaceState({}, ""); } catch(e){}   // 덮개 발자국을 지운다
   try {
@@ -904,8 +841,7 @@ function openNoApp(){
     "처음이면 <b>사용권한이 없습니다</b> 가 뜹니다.<br>" +
     "아래 둘 중 하나만 하면 그다음부터 괜찮습니다.</p>" +
     '<button class="go" data-act="cpghome">쿠팡 홈 한 번 열기</button>' +
-    '<button data-act="cpginstall">쿠팡 앱 설치하기</button>' +
-    '<button class="off" data-act="askagain">앱 여부 다시 묻기</button>');
+    '<button data-act="cpginstall">쿠팡 앱 설치하기</button>');
 }
 
 /* 폰의 뒤로가기는 덮개(확대·고르기)가 떠 있으면 **그것만** 닫아야 한다.
@@ -955,31 +891,8 @@ $("#sheet").addEventListener("click", e => {
     CART = CART.filter(x => x !== p);
     saveCart(); closeSheet(); return run();
   }
-  if (act === "hasapp"){
-    // 아직 '아마 있음' 이다. 돌아왔을 때 한 번 확인하고 나서 확정한다.
-    // 앱이 없는 사람이 잘못 고르면 계속 오류만 보게 되기 때문이다.
-    try { localStorage.setItem(APP_KEY, "y?"); } catch(e){}
-    const w = PENDING; PENDING = null;
-    return goCoupang(w ? w.name : "", w ? w.link : null);
-  }
-  if (act === "hasnoapp"){
-    try { localStorage.setItem(APP_KEY, "n"); } catch(e){}
-    PENDING = null;
-    // 홈을 먼저 열어 쿠키를 만든다. 돌아와서 다시 누르면 검색이 바로 열린다.
-    location.href = "https://www.coupang.com/";
-    return;
-  }
-  if (act === "askagain"){
-    try { localStorage.removeItem(APP_KEY); } catch(e){}
-    b.textContent = "다음에 쿠팡 열 때 다시 여쭙니다";
-    return;
-  }
   if (act === "noapp") return openNoApp();
-  if (act === "cpghome"){
-    try { localStorage.setItem(APP_KEY, "n"); } catch(e){}
-    location.href = "https://www.coupang.com/";
-    return;
-  }
+  if (act === "cpghome"){ location.href = "https://www.coupang.com/"; return; }
   if (act === "cpginstall"){
     location.href = IOS
       ? "https://apps.apple.com/kr/app/id454434967"
