@@ -164,9 +164,14 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 #cartbar{display:none;gap:6px;padding:8px 12px 0}
 #cartbar button{flex:1;padding:8px;border:1px solid var(--line);border-radius:9px;
      background:var(--card);font-size:13px;cursor:pointer}
-.item .del{position:absolute;top:6px;right:8px;color:var(--dim);font-size:15px;
-     cursor:pointer;padding:2px 6px;line-height:1}
+/* 장바구니는 카드에서 바로 넣고 빼는 게 빠르다. 담겼는지도 한눈에 보여야 한다. */
 .item{position:relative}
+.item .cart{position:absolute;top:7px;right:7px;width:30px;height:30px;
+     border-radius:15px;border:1px solid var(--line);background:var(--bg);
+     font-size:14px;line-height:28px;text-align:center;cursor:pointer;
+     opacity:.45;user-select:none}
+.item .cart.on{background:var(--accent);border-color:var(--accent);opacity:1}
+.item .nm{padding-right:32px}
 </style>
 </head>
 <body>
@@ -496,7 +501,7 @@ function hi(name, raw){
   return out;
 }
 
-function card(it, raw, cart){
+function card(it, raw){
   // 아직 안 본 줄이 2,000건 넘게 섞여 있다. rate 가 null 인 채로 pct() 에
   // 넘기면 그 자리에서 죽는다. 등급도 값도 없으면 회색으로만 둔다.
   const cls = (it.nm || it.rate == null) ? "b-none"
@@ -513,7 +518,7 @@ function card(it, raw, cart){
       '" data-nm="' + esc(it.name) + '"' +
       (b ? ' src="data:image/jpeg;base64,' + b + '"' : "") + ">";
   return '<article class="item" data-p="' + it.p + '">' +
-    (cart ? '<i class="del" data-act="del" data-p="' + it.p + '">✕</i>' : "") + img +
+    '<i class="cart' + (inCart(it.p) ? " on" : "") + '">🛒</i>' + img +
     '<div class="body"><div class="nm">' + hi(it.name, raw) + "</div>" +
     '<div class="sub">' + esc(it.spec || "") + (it.spec && it.maker ? " · " : "") +
       esc(it.maker || "") + "</div>" +
@@ -528,9 +533,7 @@ function more(){
   const raw = $("#q").value.trim();
   const chunk = VIEW.slice(SHOWN, SHOWN + 60);
   if (!chunk.length) return;
-  const cart = $("#view").value === "cart";
-  $("#list").insertAdjacentHTML("beforeend",
-      chunk.map(i => card(i, raw, cart)).join(""));
+  $("#list").insertAdjacentHTML("beforeend", chunk.map(i => card(i, raw)).join(""));
   SHOWN += chunk.length;
 }
 addEventListener("scroll", () => {
@@ -687,11 +690,6 @@ $("#sheet").addEventListener("click", e => {
   }
   if (act === "nomatch"){ MINE[p] = {nm:1}; saveMine(); closeSheet(); return run(); }
   if (act === "unset"){ delete MINE[p]; saveMine(); closeSheet(); return run(); }
-  if (act === "add") { CART.push(p); saveCart(); closeSheet(); return run(); }
-  if (act === "del") {
-    CART = CART.filter(x => x !== p);
-    saveCart(); closeSheet(); return run();
-  }
 });
 
 /* 장바구니는 따로 만든 창이 아니라 **목록의 한 보기**다. 그래야 사진도
@@ -771,9 +769,15 @@ $("#list").addEventListener("click", e => {
   const p = card.dataset.p;
   const it = DATA.find(x => x.p === p); if (!it) return;
 
-  if (e.target.closest(".del")){
-    CART = CART.filter(x => x !== p);
-    saveCart(); return run();
+  const cartIcon = e.target.closest(".cart");
+  if (cartIcon){
+    if (inCart(p)) CART = CART.filter(x => x !== p);
+    else CART.push(p);
+    saveCart();
+    // 장바구니 보기에서는 줄이 빠져야 하니 다시 그리고, 아니면 표만 바꾼다
+    if ($("#view").value === "cart") return run();
+    cartIcon.classList.toggle("on", inCart(p));
+    return;
   }
   const img = e.target.closest(".thumb");
   if (img){
@@ -792,9 +796,6 @@ $("#list").addEventListener("click", e => {
       CP + "에서 검색</button>" +
     '<button data-act="price" data-p="' + p + '">' +
       (it.mine ? "넣은 값 고치기" : "가격 입력") + "</button>" +
-    (inCart(p)
-      ? '<button data-act="del" data-p="' + p + '">장바구니에서 빼기</button>'
-      : '<button data-act="add" data-p="' + p + '">장바구니에 담기</button>') +
     '<button data-act="copy" data-q="' + esc(it.name) + '">이름 복사</button>' +
     '<button data-act="close">닫기</button>');
 });
