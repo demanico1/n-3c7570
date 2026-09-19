@@ -111,11 +111,44 @@ main{padding:10px 12px 28px;display:grid;gap:8px}
 footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:center;line-height:1.7}
 
 /* ---------- 사진 크게 ---------- */
-#zoom{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;z-index:40;
-      align-items:center;justify-content:center;padding:20px}
-#zoom img{max-width:100%;max-height:78vh;border-radius:12px;background:#fff}
-#zoom p{position:absolute;bottom:26px;left:0;right:0;text-align:center;color:#fff;
-        font-size:13px;padding:0 20px}
+/* 작은 그림은 화면에서 68px 이라 확대하면 답답하다. 폭을 꽉 채우되
+   원본이 300px 이므로 거기까지만 키운다. 누르면 원본을 따로 받아 바꿔 끼운다. */
+#zoom{position:fixed;inset:0;background:rgba(0,0,0,.86);display:none;z-index:40;
+      align-items:center;justify-content:center;padding:16px;flex-direction:column}
+#zoom img{width:100%;max-width:440px;max-height:72vh;object-fit:contain;
+      border-radius:14px;background:#fff;padding:10px}
+#zoom p{margin:16px 0 0;text-align:center;color:#fff;font-size:14px;
+        line-height:1.5;max-width:440px}
+#zoom small{color:#b9bec6;font-size:12px;margin-top:8px}
+
+/* ---------- 아래에서 올라오는 고르기 ---------- */
+#sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:45;
+       align-items:flex-end;justify-content:center}
+#sheet .box{width:100%;max-width:460px;background:var(--card);
+       border-radius:18px 18px 0 0;padding:16px 14px calc(16px + env(safe-area-inset-bottom));
+       border:1px solid var(--line);border-bottom:0}
+@media(min-width:520px){
+  #sheet{align-items:center}
+  #sheet .box{border-radius:18px;border-bottom:1px solid var(--line)}
+}
+#sheet h3{margin:0 0 3px;font-size:15px;line-height:1.4}
+#sheet .note{margin:0 0 14px;color:var(--dim);font-size:12.5px}
+#sheet button{display:block;width:100%;margin-top:8px;padding:13px;border-radius:11px;
+       border:1px solid var(--line);background:var(--bg);font-size:14.5px;cursor:pointer;
+       text-align:left;padding-left:16px}
+#sheet button.go{background:var(--accent);border-color:var(--accent);color:#fff;
+       font-weight:600}
+#sheet button.off{color:var(--dim)}
+#cartbtn{position:relative}
+#cartn{position:absolute;top:-6px;right:-6px;min-width:17px;height:17px;padding:0 4px;
+       border-radius:9px;background:var(--bad);color:#fff;font-size:10.5px;
+       line-height:17px;text-align:center;display:none}
+.cartrow{display:flex;gap:8px;align-items:center;padding:9px 2px;
+       border-bottom:1px solid var(--line);font-size:13.5px}
+.cartrow span{flex:1;min-width:0}
+.cartrow b{font-variant-numeric:tabular-nums}
+.cartrow i{color:var(--dim);font-style:normal;cursor:pointer;padding:0 6px}
+#cartlist{max-height:46vh;overflow:auto;margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -136,6 +169,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
   <header>
     <div class="top">
       <h1 id="title"></h1>
+      <button class="iconbtn" id="cartbtn" title="장바구니">🛒<span id="cartn"></span></button>
       <button class="iconbtn" id="theme" title="밝게/어둡게">◐</button>
     </div>
     <div class="searchwrap">
@@ -163,7 +197,9 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
   <footer id="foot"></footer>
 </div>
 
-<div id="zoom"><img alt=""><p></p></div>
+<div id="zoom"><img alt=""><p></p><small>아무 데나 누르면 닫힙니다</small></div>
+
+<div id="sheet"><div class="box" id="sheetbox"></div></div>
 
 <script>
 /* ============================ 잠금 풀기 ============================ */
@@ -301,8 +337,30 @@ function start(d){
   $("#app").hidden = false;
   const h = decodeURIComponent(location.hash.slice(1));
   if (h) $("#q").value = h;
+  // 쿠팡에 다녀온 뒤라면 보던 자리로 되돌린다
+  let back = null;
+  try {
+    back = JSON.parse(sessionStorage.getItem(STATE_KEY) || "null");
+    sessionStorage.removeItem(STATE_KEY);
+  } catch(e){}
+  if (back){
+    $("#q").value = back.q || "";
+    BIG = back.big || "전체";
+    $("#chips").querySelectorAll(".chip").forEach(
+        c => c.classList.toggle("on", c.dataset.b === BIG));
+    $("#view").value = back.view || "all";
+    $("#sort").value = back.sort || "rate";
+  }
   run();
-  $("#q").focus({preventScroll:true});
+  if (back && back.y){
+    // 60개씩 그리므로, 보던 높이까지 먼저 채운 뒤에 내려야 한다
+    let guard = 0;
+    while (document.body.offsetHeight < back.y + innerHeight && SHOWN < VIEW.length
+           && guard++ < 80) more();
+    window.scrollTo(0, back.y);
+  } else {
+    $("#q").focus({preventScroll:true});
+  }
   loadPics();
 }
 
@@ -324,7 +382,9 @@ try {
 function run(){
   const raw = $("#q").value.trim();
   $("#clr").style.display = raw ? "block" : "none";
-  try { history.replaceState(null, "", raw ? "#" + encodeURIComponent(raw) : " "); } catch(e){}
+  try {
+    history.replaceState(history.state, "", raw ? "#" + encodeURIComponent(raw) : " ");
+  } catch(e){}
 
   const toks = raw.split(/\s+/).filter(Boolean).map(t => ({
     j: noSpace(t.toLowerCase()),
@@ -411,7 +471,7 @@ function card(it, raw){
   const img = '<img class="thumb" loading="lazy" alt="" data-p="' + it.p +
       '" data-nm="' + esc(it.name) + '"' +
       (b ? ' src="data:image/jpeg;base64,' + b + '"' : "") + ">";
-  return '<article class="item">' + img +
+  return '<article class="item" data-p="' + it.p + '">' + img +
     '<div class="body"><div class="nm">' + hi(it.name, raw) + "</div>" +
     '<div class="sub">' + esc(it.spec || "") + (it.spec && it.maker ? " · " : "") +
       esc(it.maker || "") + "</div>" +
@@ -434,13 +494,150 @@ addEventListener("scroll", () => {
       innerHeight + scrollY > document.body.offsetHeight - 700) more();
 }, {passive:true});
 
-$("#list").addEventListener("click", e => {
-  const img = e.target.closest(".thumb"); if (!img || !img.src) return;
-  $("#zoom img").src = img.src;
-  $("#zoom p").textContent = img.dataset.nm || "";
-  $("#zoom").style.display = "flex";
+/* ========================= 사진 크게 보기 ========================= */
+/* 작은 그림을 먼저 띄워 기다림이 없게 하고, 원본이 오면 조용히 바꿔 끼운다. */
+const BIGPIC = {};
+async function showBig(p){
+  if (BIGPIC[p]) { $("#zoom img").src = BIGPIC[p]; return; }
+  try {
+    const raw = new Uint8Array(await (await fetch("big/" + p + ".bin")).arrayBuffer());
+    const plain = await crypto.subtle.decrypt(
+      {name:"AES-GCM", iv: raw.slice(5, 17)}, KEY, raw.slice(17));
+    BIGPIC[p] = URL.createObjectURL(new Blob([plain], {type:"image/jpeg"}));
+    if ($("#zoom").style.display === "flex") $("#zoom img").src = BIGPIC[p];
+  } catch (e) { /* 작은 그림 그대로 둔다 */ }
+}
+
+/* ========================= 장바구니 ========================= */
+/* 폰으로 보다가 '이건 쿠팡에서 확인해 보자' 싶은 것을 담아 두는 곳이다.
+   이 기기의 브라우저에만 남는다. 지우면 사라진다. */
+const CART_KEY = "gmpx-cart";
+let CART = [];
+try { CART = JSON.parse(localStorage.getItem(CART_KEY) || "[]"); } catch(e){}
+
+function saveCart(){
+  try { localStorage.setItem(CART_KEY, JSON.stringify(CART)); } catch(e){}
+  const n = $("#cartn");
+  n.textContent = CART.length;
+  n.style.display = CART.length ? "block" : "none";
+}
+/* 쿠팡은 **같은 창에서** 연다.
+   새 탭으로 띄우면 폰에서 뒤로가기를 눌러도 이 목록으로 안 돌아온다.
+   돌아올 때를 대비해 보고 있던 자리를 적어 둔다. 브라우저가 화면을
+   통째로 기억해 두면(bfcache) 이건 쓰이지 않고, 아니면 이걸로 되살린다. */
+const STATE_KEY = "gmpx-state";
+function coupang(name){
+  try {
+    sessionStorage.setItem(STATE_KEY, JSON.stringify({
+      q: $("#q").value, big: BIG, view: $("#view").value,
+      sort: $("#sort").value, y: window.scrollY,
+    }));
+  } catch(e){}
+  location.href = "https://www.coupang.com/np/search?q=" + encodeURIComponent(name);
+}
+
+/* 폰의 뒤로가기는 덮개(확대·고르기)가 떠 있으면 **그것만** 닫아야 한다.
+   그냥 두면 페이지를 통째로 떠나 버려서 보던 목록이 사라진다.
+   덮개를 열 때 발자국을 하나 남기고, 뒤로가기가 오면 그걸 닫는 데 쓴다. */
+function markOverlay(){
+  if (!(history.state && history.state.ov)) {
+    try { history.pushState({ov:1}, ""); } catch(e){}
+  }
+}
+function hideOverlays(){
+  $("#zoom").style.display = "none";
+  $("#sheet").style.display = "none";
+}
+function dismiss(){
+  if (history.state && history.state.ov) history.back();   // popstate 가 닫는다
+  else hideOverlays();
+}
+addEventListener("popstate", hideOverlays);
+
+function openSheet(html){
+  $("#sheetbox").innerHTML = html;
+  $("#sheet").style.display = "flex";
+  markOverlay();
+}
+function closeSheet(){ dismiss(); }
+
+$("#sheet").addEventListener("click", e => {
+  if (e.target.id === "sheet") closeSheet();
+  const b = e.target.closest("button"); if (!b) return;
+  const p = b.dataset.p, act = b.dataset.act;
+  if (act === "close") return closeSheet();
+  if (act === "coupang") { coupang(b.dataset.q); return closeSheet(); }
+  if (act === "copy") {
+    try { navigator.clipboard.writeText(b.dataset.q); } catch(e){}
+    b.textContent = "복사했습니다";
+    return;
+  }
+  if (act === "add") {
+    const it = DATA.find(x => x.p === p);
+    CART.push({p, name: it.name, g: it.g});
+    saveCart(); return closeSheet();
+  }
+  if (act === "del") {
+    CART = CART.filter(x => x.p !== p);
+    saveCart(); return openCart();
+  }
+  if (act === "clear") { CART = []; saveCart(); return closeSheet(); }
+  if (act === "copyall") {
+    try { navigator.clipboard.writeText(CART.map(x => x.name).join("\n")); } catch(e){}
+    b.textContent = "복사했습니다";
+    return;
+  }
 });
-$("#zoom").addEventListener("click", () => { $("#zoom").style.display = "none"; });
+
+function openCart(){
+  if (!CART.length){
+    return openSheet('<h3>장바구니가 비어 있습니다</h3>' +
+      '<p class="note">상품 이름을 누르면 담을 수 있습니다.</p>' +
+      '<button data-act="close">닫기</button>');
+  }
+  const sum = CART.reduce((a, x) => a + (x.g || 0), 0);
+  openSheet('<h3>장바구니 ' + CART.length + '건</h3>' +
+    '<p class="note">군마트 기준 ' + won(sum) + ' · 이 기기에만 남습니다</p>' +
+    '<div id="cartlist">' + CART.map(x =>
+      '<div class="cartrow"><span>' + esc(x.name) + "</span>" +
+      "<b>" + won(x.g) + "</b>" +
+      '<i data-act="del" data-p="' + x.p + '">✕</i></div>').join("") + "</div>" +
+    '<button class="go" data-act="copyall">이름 전부 복사</button>' +
+    '<button class="off" data-act="clear">비우기</button>' +
+    '<button data-act="close">닫기</button>');
+}
+$("#cartbtn").addEventListener("click", openCart);
+saveCart();
+
+/* ========================= 목록에서 누를 때 ========================= */
+$("#list").addEventListener("click", e => {
+  const card = e.target.closest(".item"); if (!card) return;
+  const p = card.dataset.p;
+  const it = DATA.find(x => x.p === p); if (!it) return;
+
+  const img = e.target.closest(".thumb");
+  if (img){
+    $("#zoom img").src = img.src || "";
+    $("#zoom p").textContent = it.name;
+    $("#zoom").style.display = "flex";
+    markOverlay();
+    showBig(p);
+    return;
+  }
+  // 상품명 쪽을 누르면 무엇을 할지 고르게 한다
+  const inCart = CART.some(x => x.p === p);
+  openSheet("<h3>" + esc(it.name) + "</h3>" +
+    '<p class="note">군마트 ' + won(it.g) +
+      (it.c != null ? " · " + CP + " " + won(it.c) : "") + "</p>" +
+    '<button class="go" data-act="coupang" data-q="' + esc(it.name) + '">' +
+      CP + "에서 검색</button>" +
+    (inCart
+      ? '<button data-act="del" data-p="' + p + '">장바구니에서 빼기</button>'
+      : '<button data-act="add" data-p="' + p + '">장바구니에 담기</button>') +
+    '<button data-act="copy" data-q="' + esc(it.name) + '">이름 복사</button>' +
+    '<button data-act="close">닫기</button>');
+});
+$("#zoom").addEventListener("click", dismiss);
 </script>
 </body>
 </html>
