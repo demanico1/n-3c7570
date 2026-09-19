@@ -136,9 +136,13 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 }
 #sheet h3{margin:0 0 3px;font-size:15px;line-height:1.4}
 #sheet .note{margin:0 0 14px;color:var(--dim);font-size:12.5px}
-#sheet button{display:block;width:100%;margin-top:8px;padding:13px;border-radius:11px;
-       border:1px solid var(--line);background:var(--bg);font-size:14.5px;cursor:pointer;
-       text-align:left;padding-left:16px}
+#sheet button{display:flex;align-items:center;gap:10px;width:100%;margin-top:8px;
+       padding:13px 16px;border-radius:11px;border:1px solid var(--line);
+       background:var(--bg);font-size:14.5px;cursor:pointer;text-align:left}
+#sheet .ico{flex:0 0 20px;width:20px;height:20px;line-height:0}
+#sheet .ico svg{width:20px;height:20px;display:block}
+#sheet .ico svg path{fill:none;stroke:var(--dim);stroke-width:1.7}
+#sheet .ico.on svg path{fill:#ca210c;stroke:#ca210c}
 #sheet button.go{background:var(--accent);border-color:var(--accent);color:#fff;
        font-weight:600}
 #sheet button.off{color:var(--dim)}
@@ -182,10 +186,11 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 .item .cart.on svg path{fill:#ca210c;stroke:#ca210c;opacity:1}
 /* 쿠팡 앱 아이콘을 동그랗게 다듬어 넣었다. 글자로 적어 두었더니 눌린
    단추처럼 보여서 오해를 샀다. 그림은 페이지 안에 박아 두어 따로 받아
-   오지 않는다(2KB 남짓). */
-.item .cpg{position:absolute;top:6px;right:33px;width:24px;height:24px;
-     border-radius:12px;cursor:pointer;background-size:cover;
+   오지 않는다(2KB 남짓). 카드와 고르기 메뉴가 같은 그림을 쓴다. */
+.cpg-img{background-size:cover;border-radius:50%;
      background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAK7UlEQVR4nO1bC3BVxRn+ds8593Jzk1yS8DKEQCAmyKOCQitTUfGBBV8gCJVpsTijtEytOsNI0bYWHWFUEC2UUawySrWFUauoQ9ECdUQBMbxfAcIjBMSEkOQ+ktx7Xp1/79lwiLlJkIfcpN8QkrNnd8///fv//9k9+y/DeQIDGGdQTBuGLFMY1F4a79tb4/0LvXxwoUe5Kp2zjFyNFfg5S7cBW7aNWHawVLf3BS27qjhmbi6OWlsO6tauw7q1t3Gflg1Ttj0Pcp8bSHgGcAsw6ZoDSn+v8uMb/MqYYT51VK7GCzwM3u/Td8xGtFS39q2vM1b+N2K+vytqfuV+jg1Y56oIdi6NaTTk6GQqrOttqdrkUanqL/M9fKC7niX+CUGZS2lnPJuIuMiIulzwPI0DMWvHyrCx9OOw/uYp0/62sQwXTQEc4FLgDIV1GZ+uTRuXpv2alCDJkJkyBt4U2dZCPsO2YZF7yX6I/Lsh/eV3gvqiKtMul89wFH1WYGfbwK3xO9O0+6dmeJ7urLBsuqZyIt145M4XiCApg2Sg6wrTPv5KVeyPK0L6641luyAKUJwHkF9Pz/L+5RqfciuVU5l7hC40pIVJRWyoM1fNrYz+juLF2SqBtbJSg4nd7FcnzOjkXRTgLOtiE29OETWWXfnsyei0/0SM5W4XbakPdjbkH83yzr83XXuEyikaUyTGJQC3LP8I6i/Or4w+2lolsNa+4h7v5F08Jk17gP6msh9q1BPBIWuRIt4P6a/OPhl9sDWvSrUVI99A3rChqwwaLkE48iokI8lKZY4SREBOpASeqDPybTJ7SZ78/VIl7wbJSLKSzCQ7cWguTvEmC50pLfm8HHkZcZMBJKu0BOIgg3WrFMARJ3+TXx1PAS/ZyDdWAnEgLkIJTQRt5r4gfyGTydF4nzeyfZv8nAXOZSb3Q0O+BSKWXXPf8bqhZbpVIjkmsgBGFWZmeV9J4yyD+khW8gRHdpu4ECcnIDYe9DjIPCji02JmqE+5KZHJJBukSxMn4tZ4/sKc/4SZk6b+mZOykxY4TuMLMqe/2JAmTwunn5fVDghZdpV0D043nMmONSGgPZSlsG5i9dVGyBPErNCGRdyII3ElziDu0sc7Kqzz8pyU3emcZYobSez7TUFOhIKWfWpCWW2/atOuoGtOrwu6eVuqOpkWOGId38bIE8Ss1oZJHIkrcVYYVE6FGoPnjjRtChXSeh5tFMSNOBJX4mzZMIXvF3iUQXka7+cEhTarALlCJK7E2YovnoARfuVu+k2BAm0ckqPkzMkUrvWpt9NFWzZ/CcmROGsMHp6j8vwcjedTYVs2fwnJkTjnqDyf04YFfbf/Pl9UkxXElTgXevlgtY/GBzjlCb+aeLrnIn3YcFEj+MVaxE4cF+VqZicErr0RvEMHhIo2oL5knyj3DxoCM1iD+oP7xbXWqQt8Bf0Q2rgOvr79Yes6GOfwX3m1qBPa9CXoWzL3doCv4Ar4BwyCbZqoXvNv6OUnwBQFqUOGIVp6GL78QniycxDe/BXq9u8R7WBZ8ObkIu2a4eKFF1y3FrZtIXXQUFStWtEUJcG1j8YHsAXdfJ/8xKfc4kTE77hA5h33IG/OAhjB6jiZzt2w/4EJiB07isK3PwZjDGYkAk92d5TOegzlf38Vg4sOI/jlZyh56D7RJmvsveg9bzG2DMlDr9kLELj+ZugV5XHBc3uhYtkbODzzt+h482j0nrsY9UdKoKQFoAYysO/+u1G7cxsGfVUiFGFUVYJ5PNC6XIYjf3hYtM28Yzzynl0Eo/qUeB61NU5VInasFHsnjW7SAojrxjrzUx5wZn6J0Hvuywhv3oht1/bD9usG4ti8WaLjXs+8BCsSwbbr+mP79QNQ+f4y9HzqBfAUP6z6ukb6ts/4sQ0DxZNGYfsN1N9T6DzxPjGy1atXYve4G3Fo+lQUT7oN9SXFyP3T87BNA9zrRW3xLuwYOVTIElr/GXo8MUdYTc9ZLyD89XpsHz4A24f3R3jTF1DSA02SdyPAWSbvobHL6SLR7I9pHtR8vkaMFgn/zcvzUbd/Lzr0KUB4y0ZYtbWiHpkrQU0PwNYNYeKnO3GWW7DBfT5ED5cgWlYqbsm+lY6ZSOn3IxQs+Rf6LvtEWJc3L18Qp7ZM0xDa8DlsPSbkIAtTUtPAU1JEn7HyE0JR5Dqx48eEWzJP01uSkmsPjV2u0i5tcwog4egDIVNUIQQ9RAwqKYQEU2hlyeKEqYzAOWxDF78Zc/52K4MswbnH1PjHJvrda84CmOEg9tw9AkzVcPnflsfvO5ZDox1XJMBIMbQpE6zB0dlPoOesefD1LhD7aKmDh+LYS7PjympGAX7O0sU6oNm5P+fw9shztGsgpf+ViB45CCscgje7h9A4wZubJ+padbWCsNatu1AIzTu8OT1PK07XoXbq0nBP69w1rrBoPbzdc1G16kPoJ8tF3drd25F69TXxdoYJ2zLjyiAYcXmIsFFZgdg3ZQgVrRe+X/rn6Yjs2IyWYAN2i9/6vl2yCF2nTGsQtONNo1Dy8BQcfe5J5P91KQrf+ghG5Ulk3j4OlSuWw6ipRsVbr6HHE7NR+OYH4jpz1Jj4iHu8sGoj8HTLxhXvrkH0SAmy7pqI2j07EN5WhIrlS3HZ1EegBjoKYpmjx6L+cEl89pKSAiXFf3pc/KnCKhV/KnrNWSjKtKzOQk6K/uGtm3Bi8YsNA5QIaksrv9KnZyBctAEZP7uL7B4Hpv0C1Z9+JDre96uxIgJzXwoOPfYbnHzvbUH0xGsLEDtxDBm33iki8/4HJ8I/8CqYoRqomVmo3bUNlR8sQ/qw64Spli99VYxs2fNPisAXuGGkGNFDM6aBezxCjrK5sxDZ+nWDXDVrV4lgSxZ1dPbj0LplC2UQTI8X3R+eCSUtHWXPPZmQGyPVru3pr5HZGk0qQ/psa8tbQN9lq0S82HPPLbiQKHj9HXguy8HOUXEXckNyjVh2kB/VbTFbSbh9ZNsi0IkgKH6UBOVqQ4AiNG4jIzLXPMJiRLnHe2Y7EVRP9+d+nqjnfrOQS1GZ+1lOf+k/HYHA9SNxfNG8pik5XI/q9n7aVY3PHppBIj9qzr++c895Q5Q+M1NYgAiK7qAmGtkNwfK7/TUqd4LoGc9y+qvdtRXFk+8Ss9bmUGPZp/jeqFkkn4ELCYcoxRMx9XWVne9nGNVVLZEXFfdGzSJeols7ncI29xmsGQiuJbq1k1M6GmVjtYelsARxJc7FUWsLLzOsA2W6dYButIclseRInMsM6wDXbcTW1RkftbdPYsRZtxETZr82Yr7X3j6JSc6c/GFfzNx6SLd2f99cu2SBsyPEiCtx5sSfEgfIFD4M6UvoZlt2A+JGHImrMH8GhYvkRoB9HDbepFQzKjxficiXEsSeB4NCHIkrcTZpB9yZF3PaOV0e1BfKLSS0McgtP+LopNdK7v/fHodj8ozMY+Gp6O/ldjLaCOR2P3EjjsRVujmXlWTmBKWjb6ozV4uDCU5ufjKDOBAX4kTcZCaMvM8b1bfpVTGnMjqVsijcmkpGSMsmLsTJdW4BTSrAclJNKZtKZllSpExGJZDMTp4TJy5OhphI/nTX44lMZnXEeIcSj2XmJZIMMrOVOBCXRC7NWjoA5U6VTZaESSmrTJpu7qAVa02afDIkS0tIGV0Z482mzbP2ni7PWuq4XR+YkGjXR2bcaLeHptxo18fmJNr1wUk32u3RWTfa9eFpnNlRUh6f/x+vkIUkBhXsAgAAAABJRU5ErkJggg==)}
+.item .cpg{position:absolute;top:6px;right:33px;width:24px;height:24px;
+     cursor:pointer}
 .item .nm{padding-right:66px}
 </style>
 </head>
@@ -226,7 +231,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 
   <div id="inapp">
     <b id="inapptitle">카카오톡 브라우저에서는 쓰지 마세요</b>
-    장바구니 연동 안 됩니다. 홈 화면 고정도 못 합니다.
+    찜하기 연동 안 됩니다. 홈 화면 고정도 못 합니다.
     <div id="inappbtns"></div>
     <span class="tip">브라우저에서 연 뒤 메뉴 → <b style="display:inline">홈 화면에 추가</b>
     를 해 두면 앱처럼 바로 열리고, 넣은 값도 한곳에 쌓입니다.</span>
@@ -533,13 +538,13 @@ function card(it, raw){
   const img = '<img class="thumb" loading="lazy" alt="" data-p="' + it.p +
       '" data-nm="' + esc(it.name) + '"' +
       (b ? ' src="data:image/jpeg;base64,' + b + '"' : "") + ">";
-  // 장바구니에서는 사진 아래에 쿠팡으로 바로 가는 단추를 둔다.
+  // 찜한 것 보기에서는 사진 아래에 쿠팡으로 바로 가는 단추를 둔다.
   // 담아 둔 것을 하나씩 확인하러 갈 때 메뉴를 거치지 않아도 된다.
   const left = '<div class="left">' + img +
       ($("#view").value === "cart" ? '<button class="goc">쿠팡이동</button>' : "") +
       "</div>";
   return '<article class="item" data-p="' + it.p + '">' +
-    '<i class="cpg" title="쿠팡에서 보기"></i>' +
+    '<i class="cpg cpg-img" title="쿠팡에서 보기"></i>' +
     '<i class="cart' + (inCart(it.p) ? " on" : "") + '" title="찜하기">' +
       HEART + "</i>" + left +
     '<div class="body"><div class="nm">' + hi(it.name, raw) + "</div>" +
@@ -578,7 +583,7 @@ async function showBig(p){
   } catch (e) { /* 작은 그림 그대로 둔다 */ }
 }
 
-/* ========================= 장바구니 ========================= */
+/* ========================= 찜하기 ========================= */
 /* 폰으로 보다가 '이건 쿠팡에서 확인해 보자' 싶은 것을 담아 두는 곳이다.
    이 기기의 브라우저에만 남는다. 지우면 사라진다. */
 /* 하트 하나를 만들어 두고 카드마다 같은 것을 쓴다. */
@@ -729,6 +734,11 @@ $("#sheet").addEventListener("click", e => {
     b.textContent = "복사했습니다";
     return;
   }
+  if (act === "add"){ CART.push(p); saveCart(); closeSheet(); return run(); }
+  if (act === "del"){
+    CART = CART.filter(x => x !== p);
+    saveCart(); closeSheet(); return run();
+  }
   if (act === "price") return openPrice(p);
   if (act === "save"){
     const c = parseInt(($("#pin").value || "").replace(/[^0-9]/g, ""), 10);
@@ -740,14 +750,14 @@ $("#sheet").addEventListener("click", e => {
   if (act === "unset"){ delete MINE[p]; saveMine(); closeSheet(); return run(); }
 });
 
-/* 장바구니는 따로 만든 창이 아니라 **목록의 한 보기**다. 그래야 사진도
+/* 찜한 것은 따로 만든 창이 아니라 **목록의 한 보기**다. 그래야 사진도
    값도 할인율도 목록에서 보던 그대로 나온다. 검색·정렬도 그대로 듣는다. */
 /* 자리는 우리가 되돌린다. 이걸 끄지 않으면 뒤로가기 때 브라우저가 제
    기록대로 스크롤을 다시 맞춰 버려서, 우리가 옮겨 놓은 자리가 0 으로 덮인다. */
 try { history.scrollRestoration = "manual"; } catch(e){}
 
-/* 장바구니를 열면 보던 화면을 적어 둔다. 다시 🛒 를 누르거나 폰 뒤로가기를
-   누르면 그 자리로 되돌아온다. 장바구니는 잠깐 들렀다 오는 곳이기 때문이다. */
+/* 찜한 것을 열면 보던 화면을 적어 둔다. 하트를 한 번 더 누르거나 폰
+   뒤로가기를 누르면 그 자리로 되돌아온다. 잠깐 들렀다 오는 곳이라서다. */
 let PREV = null;
 
 function fillTo(y){
@@ -780,8 +790,8 @@ function restorePrev(){
 function openCart(){
   if ($("#view").value === "cart") return backFromCart();   // 한 번 더 누르면 되돌아간다
   if (!CART.length){
-    return openSheet('<h3>장바구니가 비어 있습니다</h3>' +
-      '<p class="note">상품을 눌러 담아 두면 여기 모입니다.</p>' +
+    return openSheet('<h3>찜한 것이 없습니다</h3>' +
+      '<p class="note">하트를 누르면 여기 모입니다.</p>' +
       '<button data-act="close">닫기</button>');
   }
   PREV = {q: $("#q").value, big: BIG, view: $("#view").value,
@@ -885,7 +895,7 @@ $("#list").addEventListener("click", e => {
     if (inCart(p)) CART = CART.filter(x => x !== p);
     else CART.push(p);
     saveCart();
-    // 장바구니 보기에서는 줄이 빠져야 하니 다시 그리고, 아니면 별만 바꾼다
+    // 찜한 것 보기에서는 줄이 빠져야 하니 다시 그리고, 아니면 하트만 바꾼다
     if ($("#view").value === "cart") return run();
     cartIcon.classList.toggle("on", inCart(p));
     return;
@@ -901,13 +911,18 @@ $("#list").addEventListener("click", e => {
     return;
   }
   // 상품명 쪽을 누르면 무엇을 할지 고르게 한다
+  // 이미 한 일인지 아닌지가 글자와 그림에 같이 드러나야 헷갈리지 않는다.
+  const on = inCart(p);
   openSheet("<h3>" + esc(it.name) + "</h3>" +
     '<p class="note">군마트 ' + won(it.g) +
       (it.c != null ? " · " + CP + " " + won(it.c) : "") + "</p>" +
-    '<button class="go" data-act="coupang" data-p="' + p +
-      '" data-q="' + esc(it.name) + '">' + CP + "에서 검색</button>" +
+    '<button class="go" data-act="coupang" data-p="' + p + '" data-q="' +
+      esc(it.name) + '"><i class="ico cpg-img"></i>' + CP + "으로 이동</button>" +
+    '<button data-act="' + (on ? "del" : "add") + '" data-p="' + p + '">' +
+      '<i class="ico' + (on ? " on" : "") + '">' + HEART + "</i>" +
+      (on ? "찜하기 취소" : "찜하기") + "</button>" +
     '<button data-act="price" data-p="' + p + '">' +
-      (it.mine ? "넣은 값 고치기" : "가격 입력") + "</button>" +
+      (it.mine ? "가격 수정하기" : "가격 입력") + "</button>" +
     '<button data-act="copy" data-q="' + esc(it.name) + '">이름 복사</button>' +
     '<button data-act="close">닫기</button>');
 });
