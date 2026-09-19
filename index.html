@@ -219,6 +219,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
     <div class="top">
       <h1 id="title"></h1>
       <button class="iconbtn" id="cartbtn" title="찜한 것"><span id="cartn"></span></button>
+      <button class="iconbtn" id="more" title="옮기기·백업">⋯</button>
       <button class="iconbtn" id="theme" title="밝게/어둡게">◐</button>
     </div>
     <div class="searchwrap">
@@ -401,8 +402,20 @@ function start(d){
   });
   $("#lock").remove();
   $("#app").hidden = false;
-  const h = decodeURIComponent(location.hash.slice(1));
-  if (h) $("#q").value = h;
+  // 주소 뒤에 짐이 실려 왔으면 먼저 푼다
+  const raw = location.hash.slice(1);
+  if (raw.indexOf("import=") === 0){
+    let msg = "가져오지 못했습니다";
+    try {
+      const [a, m] = unpack(raw.slice(7));
+      msg = "가져왔습니다 — 찜 " + a + "건, 넣은 값 " + m + "건";
+    } catch (e) {}
+    try { history.replaceState({}, "", location.pathname); } catch(e){}
+    setTimeout(() => alert(msg), 300);
+  } else {
+    const h = decodeURIComponent(raw);
+    if (h) $("#q").value = h;
+  }
   // 쿠팡에 다녀온 뒤라면 보던 자리로 되돌린다
   let back = null;
   try {
@@ -598,6 +611,70 @@ async function showBig(p){
   } catch (e) { /* 작은 그림 그대로 둔다 */ }
 }
 
+/* ================== 다른 주소로 옮기기 · 백업 ==================
+ *
+ * 찜한 것과 넣은 값은 **주소마다 따로** 쌓인다. 브라우저가 그렇게 막아 둔
+ * 것이라 `gunmart.netlify.app` 으로 옮기면 `demanico1.github.io` 것이
+ * 안 보인다. 우회할 수 있는 성질이 아니다.
+ *
+ * 대신 통째로 싸서 옮기는 길을 낸다. 짐을 주소 뒤에 실어 보내고, 받는 쪽이
+ * 열리자마자 풀어 넣는다. 브라우저를 갈아탈 때도, 실수로 사이트 데이터를
+ * 지웠을 때도 같은 길로 되살린다.
+ */
+function b64enc(str){
+  const bytes = new TextEncoder().encode(str);
+  let out = "";
+  for (let i = 0; i < bytes.length; i += 4096)
+    out += String.fromCharCode.apply(null, bytes.subarray(i, i + 4096));
+  return btoa(out).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function b64dec(t){
+  const raw = atob(t.replace(/-/g, "+").replace(/_/g, "/"));
+  return new TextDecoder().decode(
+      Uint8Array.from(raw, c => c.charCodeAt(0)));
+}
+function packed(){
+  return b64enc(JSON.stringify({v: 1, c: CART, m: MINE}));
+}
+function unpack(text){
+  const t = String(text || "").trim();
+  const at = t.indexOf("#import=");
+  const data = JSON.parse(b64dec(at >= 0 ? t.slice(at + 8) : t));
+  if (!data || data.v !== 1) throw new Error("모양이 다릅니다");
+  // 두 번 가져와도 겹치지 않게 넣고, 알릴 때는 '받은 짐' 전체를 센다.
+  // 이미 있던 것만 들어왔을 때 '0건' 이라고 하면 실패한 줄 안다.
+  for (const p of (data.c || [])) if (!inCart(p)) CART.push(p);
+  for (const p of Object.keys(data.m || {})) MINE[p] = data.m[p];
+  saveCart(); saveMine();
+  return [(data.c || []).length, Object.keys(data.m || {}).length];
+}
+
+function openMove(){
+  const n1 = CART.length, n2 = Object.keys(MINE).length;
+  openSheet("<h3>옮기기 · 백업</h3>" +
+    '<p class="note">찜한 것 ' + n1 + "건 · 넣은 값 " + n2 + "건<br>" +
+    "주소가 바뀌면 저장한 것이 따라오지 않습니다. 링크로 옮기세요.</p>" +
+    '<button class="go" data-act="movelink">옮길 링크 복사</button>' +
+    '<button data-act="movein">붙여넣어 가져오기</button>');
+}
+$("#more").addEventListener("click", openMove);
+
+/* 이미 이 페이지를 보고 있는데 주소창에 옮길 링크를 붙여 넣으면 `#` 뒤만
+   바뀐다. 그때는 페이지가 다시 열리지 않아 아래 풀어 넣는 자리를 지나치지
+   않는다. 그래서 주소가 바뀌는 것도 따로 지켜본다. */
+addEventListener("hashchange", () => {
+  const raw = location.hash.slice(1);
+  if (raw.indexOf("import=") !== 0) return;
+  let msg = "가져오지 못했습니다";
+  try {
+    const [a, m] = unpack(raw.slice(7));
+    msg = "가져왔습니다 — 찜 " + a + "건, 넣은 값 " + m + "건";
+    run();
+  } catch (e) {}
+  try { history.replaceState({}, "", location.pathname); } catch(e){}
+  alert(msg);
+});
+
 /* ========================= 찜하기 ========================= */
 /* 폰으로 보다가 '이건 쿠팡에서 확인해 보자' 싶은 것을 담아 두는 곳이다.
    이 기기의 브라우저에만 남는다. 지우면 사라진다. */
@@ -748,6 +825,22 @@ $("#sheet").addEventListener("click", e => {
   if (act === "del"){
     CART = CART.filter(x => x !== p);
     saveCart(); closeSheet(); return run();
+  }
+  if (act === "movelink"){
+    const url = location.origin + location.pathname + "#import=" + packed();
+    try { navigator.clipboard.writeText(url); } catch(e){}
+    b.textContent = "복사했습니다 — 새 주소에서 여세요";
+    return;
+  }
+  if (act === "movein"){
+    const t = prompt("옮길 링크나 글을 붙여 넣으세요");
+    if (!t) return;
+    try {
+      const [a, m] = unpack(t);
+      closeSheet(); run();
+      alert("가져왔습니다 — 찜 " + a + "건, 넣은 값 " + m + "건");
+    } catch (e) { alert("읽지 못했습니다. 링크를 통째로 붙여 넣어 주세요."); }
+    return;
   }
   if (act === "price") return openPrice(p);
   if (act === "save"){
