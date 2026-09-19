@@ -629,6 +629,8 @@ function saveCart(){
    통째로 기억해 두면(bfcache) 이건 쓰이지 않고, 아니면 이걸로 되살린다. */
 const STATE_KEY = "gmpx-state";
 function coupang(name){
+  hideOverlays();                       // 덮개는 그냥 감춘다 (뒤로가기 말고)
+  try { history.replaceState({}, ""); } catch(e){}   // 덮개 발자국을 지운다
   try {
     sessionStorage.setItem(STATE_KEY, JSON.stringify({
       q: $("#q").value, big: BIG, view: $("#view").value,
@@ -668,7 +670,9 @@ $("#sheet").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const p = b.dataset.p, act = b.dataset.act;
   if (act === "close") return closeSheet();
-  if (act === "coupang") { coupang(b.dataset.q); return closeSheet(); }
+  // 여기서 closeSheet() 를 부르면 안 된다. 그건 history.back() 이라서
+  // 방금 시킨 쿠팡 이동을 취소해 버린다. 실제로 그래서 안 넘어갔다.
+  if (act === "coupang") return coupang(b.dataset.q);
   if (act === "copy") {
     try { navigator.clipboard.writeText(b.dataset.q); } catch(e){}
     b.textContent = "복사했습니다";
