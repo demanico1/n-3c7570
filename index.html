@@ -154,6 +154,13 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 .pricebox input:focus{outline:2px solid var(--accent);outline-offset:-1px}
 .pricebox label{flex:0 0 74px}
 .tag-mine{background:var(--accent);border-color:var(--accent);color:#fff}
+#inapp{display:none;margin:10px 12px 0;padding:11px 12px;border-radius:12px;
+     background:var(--mid-bg);color:var(--mid);font-size:12.5px;line-height:1.6;
+     border:1px solid var(--line)}
+#inapp b{display:block;margin-bottom:3px;font-size:13px}
+#inapp button{margin-top:8px;margin-right:6px;padding:7px 11px;border-radius:9px;
+     border:1px solid var(--line);background:var(--card);color:var(--ink);
+     font-size:12.5px;cursor:pointer}
 #cartbar{display:none;gap:6px;padding:8px 12px 0}
 #cartbar button{flex:1;padding:8px;border:1px solid var(--line);border-radius:9px;
      background:var(--card);font-size:13px;cursor:pointer}
@@ -196,6 +203,13 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
       <select id="view"></select>
     </div>
   </header>
+
+  <div id="inapp">
+    <b>카카오톡 안에서 열렸습니다</b>
+    여기서 넣은 값과 장바구니는 <u>이 화면에만</u> 남습니다.
+    크롬·사파리에서 열면 안 보입니다.
+    <br><button id="openchrome">크롬에서 열기</button><button id="copyurl">주소 복사</button>
+  </div>
 
   <div class="rows" id="cartbar">
     <button data-act="copyall">이름 전부 복사</button>
@@ -712,6 +726,23 @@ function openPrice(p){
     '<button data-act="close">닫기</button>');
   setTimeout(() => { const el = $("#pin"); if (el) el.focus(); }, 60);
 }
+
+/* 카톡·인스타 같은 앱 안의 브라우저는 저장하는 곳이 따로다. 거기서 넣은 값은
+   크롬을 열면 안 보인다. 모르고 하루치를 날리지 않도록 미리 알려 준다. */
+const IN_APP = /KAKAOTALK|Instagram|FBAN|FBAV|NAVER\(inapp|Line\/|DaumApps|;wv\)/i
+    .test(navigator.userAgent);
+if (IN_APP) $("#inapp").style.display = "block";
+$("#copyurl").addEventListener("click", e => {
+  try { navigator.clipboard.writeText(location.href); } catch(err){}
+  e.target.textContent = "복사했습니다";
+});
+$("#openchrome").addEventListener("click", () => {
+  // 안드로이드는 이 주소로 크롬을 바로 띄울 수 있다. 아이폰은 크롬 앱 주소로.
+  const bare = location.href.replace(/^https?:\/\//, "");
+  location.href = /iPhone|iPad/i.test(navigator.userAgent)
+      ? "googlechrome://" + bare
+      : "intent://" + bare + "#Intent;scheme=https;package=com.android.chrome;end";
+});
 
 $("#cartbtn").addEventListener("click", openCart);
 $("#cartbar").addEventListener("click", e => {
