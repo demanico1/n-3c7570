@@ -732,11 +732,6 @@ $("#sheet").addEventListener("click", e => {
     const it = DATA.find(x => x.p === b.dataset.p);
     return coupang(b.dataset.q, it && it.a);
   }
-  if (act === "copy") {
-    try { navigator.clipboard.writeText(b.dataset.q); } catch(e){}
-    b.textContent = "복사했습니다";
-    return;
-  }
   if (act === "add"){ CART.push(p); saveCart(); closeSheet(); return run(); }
   if (act === "del"){
     CART = CART.filter(x => x !== p);
@@ -923,8 +918,7 @@ $("#list").addEventListener("click", e => {
       '<i class="ico' + (on ? " on" : "") + '">' + HEART + "</i>" +
       (on ? "찜하기 취소" : "찜하기") + "</button>" +
     '<button data-act="price" data-p="' + p + '">' +
-      (it.mine ? CP + " 비교 가격 수정하기" : CP + " 비교 가격 입력") + "</button>" +
-    '<button data-act="copy" data-q="' + esc(it.name) + '">이름 복사</button>');
+      (it.mine ? CP + " 비교 가격 수정하기" : CP + " 비교 가격 입력") + "</button>");
 });
 $("#zoom").addEventListener("click", dismiss);
 </script>
