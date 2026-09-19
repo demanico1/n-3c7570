@@ -148,7 +148,18 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 .cartrow span{flex:1;min-width:0}
 .cartrow b{font-variant-numeric:tabular-nums}
 .cartrow i{color:var(--dim);font-style:normal;cursor:pointer;padding:0 6px}
-#cartlist{max-height:46vh;overflow:auto;margin-bottom:6px}
+.pricebox{display:flex;gap:8px;margin:12px 0 4px}
+.pricebox input{flex:1;min-width:0;padding:13px;border:1px solid var(--line);
+     border-radius:11px;background:var(--bg);font-size:16px;text-align:center}
+.pricebox input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.pricebox label{flex:0 0 74px}
+.tag-mine{background:var(--accent);border-color:var(--accent);color:#fff}
+#cartbar{display:none;gap:6px;padding:8px 12px 0}
+#cartbar button{flex:1;padding:8px;border:1px solid var(--line);border-radius:9px;
+     background:var(--card);font-size:13px;cursor:pointer}
+.item .del{position:absolute;top:6px;right:8px;color:var(--dim);font-size:15px;
+     cursor:pointer;padding:2px 6px;line-height:1}
+.item{position:relative}
 </style>
 </head>
 <body>
@@ -185,6 +196,11 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
       <select id="view"></select>
     </div>
   </header>
+
+  <div class="rows" id="cartbar">
+    <button data-act="copyall">이름 전부 복사</button>
+    <button data-act="clear">비우기</button>
+  </div>
 
   <div class="sum">
     <div><b id="s1">–</b><span id="c1"></span></div>
@@ -250,7 +266,7 @@ $("#go").addEventListener("click", async () => {
   $("#go").disabled = true; $("#err").textContent = "여는 중…";
   try { start(await unlock(pw, $("#keep").checked)); }
   catch (e) { $("#err").textContent = "비밀번호가 다릅니다"; $("#pw").select(); }
-  finally { $("#go").disabled = false; }
+  finally { if ($("#go")) $("#go").disabled = false; }
 });
 $("#pw").addEventListener("keydown", e => { if (e.key === "Enter") $("#go").click(); });
 
@@ -323,7 +339,9 @@ function start(d){
     it._b = noSpace(it.hb);   it._x = noSpace(all);
     it._cb = toCho(it.hb);    it._cx = toCho(all);
   }
+  applyMine();
   const bigs = ["전체", ...d.bigs];
+  setTimeout(markMine, 0);
   $("#chips").innerHTML = bigs.map(b =>
     '<button class="chip' + (b === "전체" ? " on" : "") + '" data-b="' + b + '">' +
     b + "</button>").join("");
@@ -398,6 +416,8 @@ function run(){
     if (view === "done" && it.rate == null) return false;
     if (view === "none" && !it.nm) return false;
     if (view === "wait" && (it.rate != null || it.nm)) return false;
+    if (view === "cart" && !inCart(it.p)) return false;
+    if (view === "mine" && !it.mine) return false;
     let score = 0;
     for (const t of toks){
       const inBody = t.cho ? it._cb.includes(t.c) : it._b.includes(t.j);
@@ -424,6 +444,12 @@ function run(){
     }
   });
 
+  const bar = $("#cartbar");
+  bar.style.display = (view === "cart" || view === "mine") ? "flex" : "none";
+  bar.dataset.mode = view;
+  bar.children[0].textContent = view === "mine" ? "프로그램에 넣을 글 복사"
+                                                : "이름 전부 복사";
+  bar.children[1].textContent = view === "mine" ? "넣은 값 모두 지우기" : "비우기";
   $("#hits").textContent = VIEW.length.toLocaleString("ko-KR") + "건";
   const rates = VIEW.map(i => i.rate).filter(r => r != null).sort((x, y) => x - y);
   $("#s1").textContent = VIEW.length.toLocaleString("ko-KR");
@@ -456,7 +482,7 @@ function hi(name, raw){
   return out;
 }
 
-function card(it, raw){
+function card(it, raw, cart){
   // 아직 안 본 줄이 2,000건 넘게 섞여 있다. rate 가 null 인 채로 pct() 에
   // 넘기면 그 자리에서 죽는다. 등급도 값도 없으면 회색으로만 둔다.
   const cls = (it.nm || it.rate == null) ? "b-none"
@@ -465,13 +491,15 @@ function card(it, raw){
   const badge = it.nm ? "비교군 없음" : it.rate == null ? WAIT : pct(it.rate);
   const tags = [];
   if (it.conv) tags.push('<span class="tag" title="' + esc(it.conv) + '">환산</span>');
+  if (it.mine) tags.push('<span class="tag tag-mine">폰에서 넣음</span>');
   if (it.q > 1) tags.push('<span class="tag">' + it.q + "개들이에서 낱개</span>");
   if (it.sub) tags.push('<span class="tag">' + esc(it.sub) + "</span>");
   const b = PICS[it.p];
   const img = '<img class="thumb" loading="lazy" alt="" data-p="' + it.p +
       '" data-nm="' + esc(it.name) + '"' +
       (b ? ' src="data:image/jpeg;base64,' + b + '"' : "") + ">";
-  return '<article class="item" data-p="' + it.p + '">' + img +
+  return '<article class="item" data-p="' + it.p + '">' +
+    (cart ? '<i class="del" data-act="del" data-p="' + it.p + '">✕</i>' : "") + img +
     '<div class="body"><div class="nm">' + hi(it.name, raw) + "</div>" +
     '<div class="sub">' + esc(it.spec || "") + (it.spec && it.maker ? " · " : "") +
       esc(it.maker || "") + "</div>" +
@@ -486,7 +514,9 @@ function more(){
   const raw = $("#q").value.trim();
   const chunk = VIEW.slice(SHOWN, SHOWN + 60);
   if (!chunk.length) return;
-  $("#list").insertAdjacentHTML("beforeend", chunk.map(i => card(i, raw)).join(""));
+  const cart = $("#view").value === "cart";
+  $("#list").insertAdjacentHTML("beforeend",
+      chunk.map(i => card(i, raw, cart)).join(""));
   SHOWN += chunk.length;
 }
 addEventListener("scroll", () => {
@@ -513,8 +543,66 @@ async function showBig(p){
    이 기기의 브라우저에만 남는다. 지우면 사라진다. */
 const CART_KEY = "gmpx-cart";
 let CART = [];
-try { CART = JSON.parse(localStorage.getItem(CART_KEY) || "[]"); } catch(e){}
+try {
+  // 예전에는 {p, name, g} 를 통째로 담았다. 상품코드만 남기고 나머지는
+  // 그릴 때 원래 줄에서 가져온다. 그래야 사진도 값도 목록과 똑같이 나온다.
+  CART = (JSON.parse(localStorage.getItem(CART_KEY) || "[]") || [])
+      .map(x => (x && x.p) ? x.p : x).filter(Boolean);
+} catch(e){}
 
+function inCart(p){ return CART.indexOf(p) >= 0; }
+
+/* ===================== 폰에서 넣은 값 =====================
+   서버가 없으므로 이 기기의 브라우저에만 쌓인다. 화면에는 바로 반영되고,
+   나중에 한 번 복사해서 프로그램의 `여러 건 넣기`(Ctrl+B)에 붙이면 DB 로 간다. */
+const MINE_KEY = "gmpx-mine";
+let MINE = {};
+try { MINE = JSON.parse(localStorage.getItem(MINE_KEY) || "{}") || {}; } catch(e){}
+
+function saveMine(){
+  try { localStorage.setItem(MINE_KEY, JSON.stringify(MINE)); } catch(e){}
+  applyMine();
+  markMine();
+}
+
+/* 폰에 쌓인 것은 이 브라우저에만 있다. 프로그램으로 옮기기 전까지는
+   몇 건이 기다리고 있는지 눈에 보여야 잊지 않는다. */
+function markMine(){
+  const n = Object.keys(MINE).length;
+  const opt = $("#view").querySelector('option[value="mine"]');
+  if (opt) opt.textContent = n ? "폰에서 넣은 것 " + n + "건" : "폰에서 넣은 것";
+}
+
+/* 넣은 값을 줄에 덮어씌운다. 원래 값은 c0·r0… 에 따로 둬서 지우면 되돌아간다.
+   셈은 프로그램의 calc() 과 똑같다 — 낱개 = 금액 ÷ 수량, 할인율은 쿠팡 기준. */
+function applyMine(){
+  for (const it of DATA){
+    if (it.c0 === undefined){
+      it.c0 = it.c; it.r0 = it.rate; it.d0 = it.diff; it.q0 = it.q; it.n0 = it.nm;
+    }
+    const m = MINE[it.p];
+    if (!m){
+      it.c = it.c0; it.rate = it.r0; it.diff = it.d0;
+      it.q = it.q0; it.nm = it.n0; it.mine = 0;
+      continue;
+    }
+    it.mine = 1;
+    if (m.nm){ it.c = null; it.rate = null; it.diff = null; it.nm = 1; continue; }
+    it.nm = 0;
+    it.q = m.q || 1;
+    it.c = Math.round(m.c / it.q);
+    it.diff = it.c ? it.g - it.c : null;
+    it.rate = it.c ? Math.round((it.g - it.c) / it.c * 1000) / 10 : null;
+  }
+}
+
+/* 프로그램의 `여러 건 넣기` 가 그대로 알아듣는 글로 만든다. */
+function mineText(){
+  return Object.keys(MINE).map(p => {
+    const m = MINE[p];
+    return m.nm ? p + ", 없음" : p + ", " + m.c + ", " + (m.q || 1);
+  }).join("\n");
+}
 function saveCart(){
   try { localStorage.setItem(CART_KEY, JSON.stringify(CART)); } catch(e){}
   const n = $("#cartn");
@@ -572,41 +660,74 @@ $("#sheet").addEventListener("click", e => {
     b.textContent = "복사했습니다";
     return;
   }
-  if (act === "add") {
-    const it = DATA.find(x => x.p === p);
-    CART.push({p, name: it.name, g: it.g});
-    saveCart(); return closeSheet();
+  if (act === "price") return openPrice(p);
+  if (act === "save"){
+    const c = parseInt(($("#pin").value || "").replace(/[^0-9]/g, ""), 10);
+    const q = Math.max(1, parseInt($("#qin").value, 10) || 1);
+    if (!c) { $("#pin").focus(); return; }
+    MINE[p] = {c, q}; saveMine(); closeSheet(); return run();
   }
+  if (act === "nomatch"){ MINE[p] = {nm:1}; saveMine(); closeSheet(); return run(); }
+  if (act === "unset"){ delete MINE[p]; saveMine(); closeSheet(); return run(); }
+  if (act === "add") { CART.push(p); saveCart(); closeSheet(); return run(); }
   if (act === "del") {
-    CART = CART.filter(x => x.p !== p);
-    saveCart(); return openCart();
-  }
-  if (act === "clear") { CART = []; saveCart(); return closeSheet(); }
-  if (act === "copyall") {
-    try { navigator.clipboard.writeText(CART.map(x => x.name).join("\n")); } catch(e){}
-    b.textContent = "복사했습니다";
-    return;
+    CART = CART.filter(x => x !== p);
+    saveCart(); closeSheet(); return run();
   }
 });
 
+/* 장바구니는 따로 만든 창이 아니라 **목록의 한 보기**다. 그래야 사진도
+   값도 할인율도 목록에서 보던 그대로 나온다. 검색·정렬도 그대로 듣는다. */
 function openCart(){
   if (!CART.length){
     return openSheet('<h3>장바구니가 비어 있습니다</h3>' +
-      '<p class="note">상품 이름을 누르면 담을 수 있습니다.</p>' +
+      '<p class="note">상품을 눌러 담아 두면 여기 모입니다.</p>' +
       '<button data-act="close">닫기</button>');
   }
-  const sum = CART.reduce((a, x) => a + (x.g || 0), 0);
-  openSheet('<h3>장바구니 ' + CART.length + '건</h3>' +
-    '<p class="note">군마트 기준 ' + won(sum) + ' · 이 기기에만 남습니다</p>' +
-    '<div id="cartlist">' + CART.map(x =>
-      '<div class="cartrow"><span>' + esc(x.name) + "</span>" +
-      "<b>" + won(x.g) + "</b>" +
-      '<i data-act="del" data-p="' + x.p + '">✕</i></div>').join("") + "</div>" +
-    '<button class="go" data-act="copyall">이름 전부 복사</button>' +
-    '<button class="off" data-act="clear">비우기</button>' +
-    '<button data-act="close">닫기</button>');
+  $("#view").value = "cart";
+  $("#q").value = "";
+  BIG = "전체";
+  $("#chips").querySelectorAll(".chip").forEach(
+      c => c.classList.toggle("on", c.dataset.b === "전체"));
+  run();
+  scrollTo(0, 0);
 }
+/* 쿠팡에서 값을 보고 온 참에 바로 넣는 자리. 두 칸이면 충분하다. */
+function openPrice(p){
+  const it = DATA.find(x => x.p === p); if (!it) return;
+  const m = MINE[p] || {};
+  openSheet("<h3>" + esc(it.name) + "</h3>" +
+    '<p class="note">군마트 ' + won(it.g) + " · " + CP + "에 적힌 금액을 그대로</p>" +
+    '<div class="pricebox">' +
+      '<input id="pin" type="number" inputmode="numeric" placeholder="' + CP +
+        ' 금액" value="' + (m.c || "") + '">' +
+      '<input id="qin" class="qty" type="number" inputmode="numeric" ' +
+        'placeholder="수량" value="' + (m.q || 1) + '">' +
+    "</div>" +
+    '<p class="note">2개 9,800원이면 9800 과 2 를 넣으세요</p>' +
+    '<button class="go" data-act="save" data-p="' + p + '">넣기</button>' +
+    '<button data-act="nomatch" data-p="' + p + '">비교군 없음</button>' +
+    (MINE[p] ? '<button class="off" data-act="unset" data-p="' + p +
+               '">넣은 값 지우기</button>' : "") +
+    '<button data-act="close">닫기</button>');
+  setTimeout(() => { const el = $("#pin"); if (el) el.focus(); }, 60);
+}
+
 $("#cartbtn").addEventListener("click", openCart);
+$("#cartbar").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const mine = $("#cartbar").dataset.mode === "mine";
+  if (b.dataset.act === "clear"){
+    if (mine){ MINE = {}; saveMine(); }
+    else { CART = []; saveCart(); }
+    return run();
+  }
+  const text = mine ? mineText() : VIEW.map(i => i.name).join("\n");
+  try { navigator.clipboard.writeText(text); } catch(e){}
+  const was = b.textContent;
+  b.textContent = "복사했습니다";
+  setTimeout(() => { b.textContent = was; }, 1500);
+});
 saveCart();
 
 /* ========================= 목록에서 누를 때 ========================= */
@@ -615,6 +736,10 @@ $("#list").addEventListener("click", e => {
   const p = card.dataset.p;
   const it = DATA.find(x => x.p === p); if (!it) return;
 
+  if (e.target.closest(".del")){
+    CART = CART.filter(x => x !== p);
+    saveCart(); return run();
+  }
   const img = e.target.closest(".thumb");
   if (img){
     $("#zoom img").src = img.src || "";
@@ -625,13 +750,14 @@ $("#list").addEventListener("click", e => {
     return;
   }
   // 상품명 쪽을 누르면 무엇을 할지 고르게 한다
-  const inCart = CART.some(x => x.p === p);
   openSheet("<h3>" + esc(it.name) + "</h3>" +
     '<p class="note">군마트 ' + won(it.g) +
       (it.c != null ? " · " + CP + " " + won(it.c) : "") + "</p>" +
     '<button class="go" data-act="coupang" data-q="' + esc(it.name) + '">' +
       CP + "에서 검색</button>" +
-    (inCart
+    '<button data-act="price" data-p="' + p + '">' +
+      (it.mine ? "넣은 값 고치기" : "가격 입력") + "</button>" +
+    (inCart(p)
       ? '<button data-act="del" data-p="' + p + '">장바구니에서 빼기</button>'
       : '<button data-act="add" data-p="' + p + '">장바구니에 담기</button>') +
     '<button data-act="copy" data-q="' + esc(it.name) + '">이름 복사</button>' +
