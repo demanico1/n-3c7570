@@ -154,10 +154,12 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 .pricebox input:focus{outline:2px solid var(--accent);outline-offset:-1px}
 .pricebox label{flex:0 0 74px}
 .tag-mine{background:var(--accent);border-color:var(--accent);color:#fff}
-#inapp{display:none;margin:10px 12px 0;padding:11px 12px;border-radius:12px;
-     background:var(--mid-bg);color:var(--mid);font-size:12.5px;line-height:1.6;
-     border:1px solid var(--line)}
-#inapp b{display:block;margin-bottom:3px;font-size:13px}
+#inapp{display:none;margin:10px 12px 0;padding:12px 13px;border-radius:12px;
+     background:var(--bad-bg);color:var(--bad);font-size:12.5px;line-height:1.65;
+     border:1px solid var(--bad)}
+#inapp b{display:block;margin-bottom:4px;font-size:13.5px}
+#inapp .tip{display:block;margin-top:9px;padding-top:8px;color:var(--dim);
+     border-top:1px solid var(--line)}
 #inapp button{margin-top:8px;margin-right:6px;padding:7px 11px;border-radius:9px;
      border:1px solid var(--line);background:var(--card);color:var(--ink);
      font-size:12.5px;cursor:pointer}
@@ -210,10 +212,12 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
   </header>
 
   <div id="inapp">
-    <b>카카오톡 안에서 열렸습니다</b>
-    여기서 넣은 값과 장바구니는 <u>이 화면에만</u> 남습니다.
-    크롬·사파리에서 열면 안 보입니다.
-    <br><button id="openchrome">크롬에서 열기</button><button id="copyurl">주소 복사</button>
+    <b id="inapptitle">카카오톡 브라우저에서는 쓰지 마세요</b>
+    여기서 넣은 가격과 장바구니는 <u>카카오톡 안에만</u> 저장됩니다.
+    나중에 크롬이나 삼성 인터넷으로 열면 <u>하나도 안 보입니다.</u>
+    <div id="inappbtns"></div>
+    <span class="tip">브라우저에서 연 뒤 메뉴 → <b style="display:inline">홈 화면에 추가</b>
+    를 해 두면 앱처럼 바로 열리고, 넣은 값도 한곳에 쌓입니다.</span>
   </div>
 
   <div class="rows" id="cartbar">
@@ -744,20 +748,42 @@ function openPrice(p){
 }
 
 /* 카톡·인스타 같은 앱 안의 브라우저는 저장하는 곳이 따로다. 거기서 넣은 값은
-   크롬을 열면 안 보인다. 모르고 하루치를 날리지 않도록 미리 알려 준다. */
-const IN_APP = /KAKAOTALK|Instagram|FBAN|FBAV|NAVER\(inapp|Line\/|DaumApps|;wv\)/i
-    .test(navigator.userAgent);
-if (IN_APP) $("#inapp").style.display = "block";
-$("#copyurl").addEventListener("click", e => {
-  try { navigator.clipboard.writeText(location.href); } catch(err){}
-  e.target.textContent = "복사했습니다";
-});
-$("#openchrome").addEventListener("click", () => {
-  // 안드로이드는 이 주소로 크롬을 바로 띄울 수 있다. 아이폰은 크롬 앱 주소로.
-  const bare = location.href.replace(/^https?:\/\//, "");
-  location.href = /iPhone|iPad/i.test(navigator.userAgent)
-      ? "googlechrome://" + bare
-      : "intent://" + bare + "#Intent;scheme=https;package=com.android.chrome;end";
+   크롬을 열면 하나도 안 보인다. 모르고 하루치를 날리지 않도록 막아 준다. */
+const UA = navigator.userAgent;
+const IN_APP = /KAKAOTALK|Instagram|FBAN|FBAV|NAVER\(inapp|Line\/|DaumApps|;wv\)/i.test(UA);
+const IOS = /iPhone|iPad|iPod/i.test(UA);
+
+/* 안드로이드는 `intent://` 로 원하는 브라우저를 지목해 띄울 수 있다.
+   주소에 붙은 `#검색어` 는 떼어내야 한다. intent 주소도 # 로 옵션을 붙이는
+   문법이라, 그대로 두면 서로 엉켜 열리지 않는다. */
+function openIn(pkg){
+  const bare = location.href.split("#")[0].replace(/^https?:\/\//, "");
+  location.href = "intent://" + bare +
+      "#Intent;scheme=https;package=" + pkg + ";end";
+}
+const BROWSERS = IOS
+  ? [["사파리에서 열기", null]]        // 아이폰은 웹에서 사파리를 지목할 수 없다
+  : [["크롬으로 열기", "com.android.chrome"],
+     ["삼성 인터넷으로 열기", "com.sec.android.app.sbrowser"]];
+
+if (IN_APP){
+  if (/Instagram|FBAN|FBAV/i.test(UA)) $("#inapptitle").textContent =
+      "앱 안의 브라우저에서는 쓰지 마세요";
+  $("#inappbtns").innerHTML = BROWSERS.map((b, i) =>
+      '<button data-pkg="' + (b[1] || "") + '">' + b[0] + "</button>").join("") +
+      '<button data-pkg="copy">주소 복사</button>';
+  $("#inapp").style.display = "block";
+}
+$("#inappbtns").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const pkg = b.dataset.pkg;
+  if (pkg && pkg !== "copy") return openIn(pkg);
+  // 아이폰이거나 주소 복사 — 사파리는 손으로 붙여 넣는 수밖에 없다
+  try { navigator.clipboard.writeText(location.href.split("#")[0]); } catch(err){}
+  b.textContent = "주소를 복사했습니다";
+  $("#inapp").insertAdjacentHTML("beforeend",
+      '<span class="tip">복사한 주소를 ' +
+      (IOS ? "사파리" : "브라우저") + ' 주소창에 붙여 넣으세요.</span>');
 });
 
 $("#cartbtn").addEventListener("click", openCart);
