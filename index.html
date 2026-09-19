@@ -103,7 +103,9 @@ main{padding:10px 12px 28px;display:grid;gap:8px}
 .pr .g{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
 .pr .c{font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
 .badge{margin-left:auto;padding:4px 9px;border-radius:9px;font-size:13px;font-weight:700;
-       font-variant-numeric:tabular-nums;white-space:nowrap}
+       font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+/* 퍼센트만으로는 얼마나 차이 나는지 감이 안 온다. 액수를 같이 적는다. */
+.badge small{display:block;font-size:11px;font-weight:600;opacity:.8;margin-top:1px}
 .b-good{background:var(--good-bg);color:var(--good)}
 .b-mid{background:var(--mid-bg);color:var(--mid)}
 .b-bad{background:var(--bad-bg);color:var(--bad)}
@@ -358,6 +360,8 @@ const noSpace = s => toJamo(String(s).replace(/\s+/g, ""));
 let DATA = [], VIEW = [], BIG = "전체", SHOWN = 0, CP = "", WAIT = "", PICS = {};
 const won = n => n == null ? "–" : n.toLocaleString("ko-KR") + "원";
 const pct = n => (n > 0 ? "+" : "") + n.toFixed(1) + "%";
+/* 군마트가 싸면 음수다. 기준이 쿠팡가이기 때문(프로그램의 calc() 과 같다). */
+const wonDiff = n => (n > 0 ? "+" : "") + n.toLocaleString("ko-KR") + "원";
 
 function start(d){
   // 페이지를 열기 전에는 제목조차 알 수 없어야 한다. 잠긴 자료에서 꺼내 온다.
@@ -537,7 +541,9 @@ function card(it, raw){
   const cls = (it.nm || it.rate == null) ? "b-none"
             : it.rate < 0 ? "b-good"
             : it.rate === 0 ? "b-mid" : "b-bad";
-  const badge = it.nm ? "비교군 없음" : it.rate == null ? WAIT : pct(it.rate);
+  const badge = it.nm ? "비교군 없음"
+              : it.rate == null ? WAIT
+              : pct(it.rate) + "<small>" + wonDiff(it.diff) + "</small>";
   const tags = [];
   if (it.conv) tags.push('<span class="tag" title="' + esc(it.conv) + '">환산</span>');
   if (it.mine) tags.push('<span class="tag tag-mine">폰에서 넣음</span>');
