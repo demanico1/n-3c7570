@@ -25,6 +25,10 @@
   --mid:#e6c455; --mid-bg:#2a2412; --accent:#6fb0ff; --shadow:none;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* 아이콘은 전부 <i> 로 넣는데, <i> 의 기본값이 기울임이다. 그 바람에
+   별·엑스·원화 표시가 차례로 기울어 보였다. 세 번 같은 데서 났다.
+   여기서 한 번에 막는다. 그림(SVG)은 글자가 아니라 영향이 없었다. */
+i{font-style:normal}
 html,body{margin:0;padding:0}
 body{
   background:var(--bg); color:var(--ink);
