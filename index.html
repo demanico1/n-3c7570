@@ -417,7 +417,10 @@ function start(d){
   $("#app").hidden = false;
   // 주소 뒤에 짐이 실려 왔으면 먼저 푼다
   const raw = location.hash.slice(1);
-  if (raw.indexOf("import=") === 0){
+  if (raw === "noapp"){
+    try { history.replaceState({}, "", location.pathname); } catch(e){}
+    setTimeout(openNoApp, 400);
+  } else if (raw.indexOf("import=") === 0){
     let msg = "가져오지 못했습니다";
     try {
       const [a, m] = unpack(raw.slice(7));
@@ -688,7 +691,8 @@ function openMove(){
     '<p class="note">찜한 것 ' + n1 + "건 · 넣은 값 " + n2 + "건<br>" +
     "주소가 바뀌면 저장한 것이 따라오지 않습니다. 링크로 옮기세요.</p>" +
     '<button class="go" data-act="movelink">옮길 링크 복사</button>' +
-    '<button data-act="movein">붙여넣어 가져오기</button>');
+    '<button data-act="movein">붙여넣어 가져오기</button>' +
+    '<button data-act="noapp">쿠팡이 안 열릴 때</button>');
 }
 $("#more").addEventListener("click", openMove);
 
@@ -812,8 +816,37 @@ function coupang(name, link){
       sort: $("#sort").value, y: window.scrollY,
     }));
   } catch(e){}
-  location.href = link || ("https://www.coupang.com/np/search?q="
-                           + encodeURIComponent(name));
+  const url = link || ("https://www.coupang.com/np/search?q="
+                       + encodeURIComponent(name));
+
+  /* 앱이 없는 안드로이드에서는 브라우저가 실제로 쿠팡 웹을 부르는데,
+     그 브라우저로 쿠팡이 처음이면 '사용권한이 없습니다' 가 뜬다.
+     (앱이 있으면 웹을 아예 안 부르니 그럴 일이 없다.)
+
+     안드로이드에는 이럴 때 쓰라고 만든 장치가 있다. 앱을 지목하되 없으면
+     갈 곳을 같이 적어 두는 것이다. 앱이 있으면 앱으로, 없으면 우리 안내
+     화면으로 간다. 감지할 필요가 없다.
+
+     아이폰에는 같은 장치가 없다. 사파리가 알아서 앱을 열거나 웹으로 간다. */
+  if (!IOS && /Android/i.test(UA) && url.indexOf("https://") === 0){
+    const help = location.origin + location.pathname + "#noapp";
+    location.href = "intent://" + url.slice(8) +
+        "#Intent;scheme=https;package=com.coupang.mobile" +
+        ";S.browser_fallback_url=" + encodeURIComponent(help) + ";end";
+    return;
+  }
+  location.href = url;
+}
+
+/* 앱이 없어 되돌아왔을 때. 쿠키만 생기면 웹으로도 멀쩡히 보이므로
+   '쿠팡 홈 한 번 열기' 가 사실상의 해결책이다. */
+function openNoApp(){
+  openSheet("<h3>쿠팡 앱이 없습니다</h3>" +
+    '<p class="note">앱이 없으면 쿠팡 웹으로 가는데, 이 브라우저로 쿠팡이 ' +
+    "처음이면 <b>사용권한이 없습니다</b> 가 뜹니다.<br>" +
+    "아래 둘 중 하나만 하면 그다음부터 괜찮습니다.</p>" +
+    '<button class="go" data-act="cpghome">쿠팡 홈 한 번 열기</button>' +
+    '<button data-act="cpginstall">쿠팡 앱 설치하기</button>');
 }
 
 /* 폰의 뒤로가기는 덮개(확대·고르기)가 떠 있으면 **그것만** 닫아야 한다.
@@ -862,6 +895,14 @@ $("#sheet").addEventListener("click", e => {
   if (act === "del"){
     CART = CART.filter(x => x !== p);
     saveCart(); closeSheet(); return run();
+  }
+  if (act === "noapp") return openNoApp();
+  if (act === "cpghome"){ location.href = "https://www.coupang.com/"; return; }
+  if (act === "cpginstall"){
+    location.href = IOS
+      ? "https://apps.apple.com/kr/app/id454434967"
+      : "https://play.google.com/store/apps/details?id=com.coupang.mobile";
+    return;
   }
   if (act === "movelink"){
     const url = location.origin + location.pathname + "#import=" + packed();
