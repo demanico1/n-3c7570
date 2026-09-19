@@ -80,7 +80,8 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 .sum{display:flex;gap:8px;padding:10px 12px 2px}
 .sum div{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;
          padding:9px 6px;text-align:center}
-.sum b{display:block;font-size:17px;font-variant-numeric:tabular-nums}
+.sum b{display:block;font-size:16.5px;font-variant-numeric:tabular-nums;
+       white-space:nowrap}
 .sum span{font-size:11px;color:var(--dim)}
 
 /* ---------- 목록 ---------- */
@@ -494,11 +495,16 @@ function run(){
                                                 : "이름 전부 복사";
   bar.children[1].textContent = view === "mine" ? "넣은 값 모두 지우기" : "비우기";
   $("#hits").textContent = VIEW.length.toLocaleString("ko-KR") + "건";
-  const rates = VIEW.map(i => i.rate).filter(r => r != null).sort((x, y) => x - y);
-  $("#s1").textContent = VIEW.length.toLocaleString("ko-KR");
-  $("#s2").textContent = rates.length ? pct(median(rates)) : "–";
-  $("#s3").textContent = rates.length
-      ? Math.round(100 * rates.filter(r => r < 0).length / rates.length) + "%" : "–";
+  // 값이 들어 있는 줄만으로 센다. 안 본 줄을 섞으면 숫자가 거짓이 된다.
+  const done = VIEW.filter(i => i.rate != null);
+  $("#s1").textContent = done.length.toLocaleString("ko-KR") + " / "
+      + VIEW.length.toLocaleString("ko-KR");
+  // 아낀 돈 = 쿠팡 낱개가와 군마트가의 차이를 다 더한 것.
+  // 군마트가 비싼 줄은 저절로 깎이므로 부풀려지지 않는다.
+  const saved = done.reduce((a, i) => a + (i.c - i.g), 0);
+  $("#s2").textContent = done.length ? won(saved) : "–";
+  $("#s3").textContent = done.length
+      ? Math.round(100 * done.filter(i => i.rate < 0).length / done.length) + "%" : "–";
 
   SHOWN = 0;
   $("#list").innerHTML = "";
