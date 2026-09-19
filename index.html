@@ -73,7 +73,8 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
       background:var(--card);color:var(--dim);font-size:13px;cursor:pointer;white-space:nowrap}
 .chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 .tools{display:flex;gap:6px;margin-top:8px;align-items:center}
-#sort{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--card)}
+#sort,#view{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);
+     border-radius:9px;background:var(--card)}
 
 /* ---------- 요약 ---------- */
 .sum{display:flex;gap:8px;padding:10px 12px 2px}
@@ -147,7 +148,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
     <div class="rows" id="chips"></div>
     <div class="tools">
       <select id="sort"></select>
-      <button class="iconbtn" id="nomatch"></button>
+      <select id="view"></select>
     </div>
   </header>
 
@@ -177,16 +178,34 @@ async function derive(pw, salt){
     base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
 }
 
+let KEY = null;
+
 async function unlock(pw, remember){
   const buf = await (await fetch("data.bin", {cache:"no-cache"})).arrayBuffer();
   const raw = new Uint8Array(buf);
   const salt = raw.slice(5, 21), iv = raw.slice(21, 33), body = raw.slice(33);
-  const key = await derive(pw, salt);
-  const plain = await crypto.subtle.decrypt({name:"AES-GCM", iv}, key, body);
+  KEY = await derive(pw, salt);
+  const plain = await crypto.subtle.decrypt({name:"AES-GCM", iv}, KEY, body);
   const data = JSON.parse(new TextDecoder().decode(plain));
   if (remember) { try { localStorage.setItem(KEY_NAME, pw); } catch(e){} }
   else { try { sessionStorage.setItem(KEY_NAME, pw); } catch(e){} }
   return data;
+}
+
+/* 사진은 목록이 뜬 뒤에 받는다. 전 품목이면 8MB 가 넘어서, 같이 기다리면
+   폰에서는 흰 화면만 한참 본다. 실패해도 목록은 멀쩡해야 하므로 조용히 넘어간다. */
+async function loadPics(){
+  try {
+    const raw = new Uint8Array(await (await fetch("pics.bin", {cache:"no-cache"})).arrayBuffer());
+    const plain = await crypto.subtle.decrypt(
+      {name:"AES-GCM", iv: raw.slice(5, 17)}, KEY, raw.slice(17));
+    PICS = JSON.parse(new TextDecoder().decode(plain));
+    for (const el of document.querySelectorAll("img.thumb:not([src])")) paint(el);
+  } catch (e) { /* 사진 없이 그냥 쓴다 */ }
+}
+function paint(el){
+  const b = PICS[el.dataset.p];
+  if (b) el.src = "data:image/jpeg;base64," + b;
 }
 
 $("#go").addEventListener("click", async () => {
@@ -239,7 +258,7 @@ function toCho(s){
 const CHO_ONLY = /^[ㄱ-ㅎ0-9a-z]+$/i;
 
 /* ============================ 화면 ============================ */
-let DATA = [], VIEW = [], BIG = "전체", SHOW_NONE = false, SHOWN = 0, CP = "";
+let DATA = [], VIEW = [], BIG = "전체", SHOWN = 0, CP = "", WAIT = "", PICS = {};
 const won = n => n == null ? "–" : n.toLocaleString("ko-KR") + "원";
 const pct = n => (n > 0 ? "+" : "") + n.toFixed(1) + "%";
 
@@ -253,7 +272,9 @@ function start(d){
   CP = d.cp;
   $("#sort").innerHTML = d.sorts.map(o =>
       '<option value="' + o[0] + '">' + o[1] + "</option>").join("");
-  $("#nomatch").textContent = d.caps[3];
+  $("#view").innerHTML = d.views.map(o =>
+      '<option value="' + o[0] + '">' + o[1] + "</option>").join("");
+  WAIT = d.wait;
   for (let i = 0; i < 3; i++) $("#c" + (i + 1)).textContent = d.caps[i];
   for (const it of DATA){
     it._j = toJamo(it.hay);
@@ -275,18 +296,13 @@ function start(d){
   if (h) $("#q").value = h;
   run();
   $("#q").focus({preventScroll:true});
+  loadPics();
 }
 
 $("#q").addEventListener("input", run);
 $("#sort").addEventListener("change", run);
+$("#view").addEventListener("change", run);
 $("#clr").addEventListener("click", () => { $("#q").value = ""; run(); $("#q").focus(); });
-$("#nomatch").addEventListener("click", e => {
-  SHOW_NONE = !SHOW_NONE;
-  e.target.classList.toggle("on", SHOW_NONE);
-  e.target.style.background = SHOW_NONE ? "var(--accent)" : "";
-  e.target.style.color = SHOW_NONE ? "#fff" : "";
-  run();
-});
 $("#theme").addEventListener("click", () => {
   const now = document.documentElement.getAttribute("data-theme");
   const next = now === "dark" ? "light" : "dark";
@@ -309,9 +325,12 @@ function run(){
     cho: CHO_ONLY.test(t) && !/[가-힣]/.test(t)
   }));
 
+  const view = $("#view").value || "all";
   VIEW = DATA.filter(it => {
     if (BIG !== "전체" && it.big !== BIG) return false;
-    if (!SHOW_NONE && it.nm) return false;
+    if (view === "done" && it.rate == null) return false;
+    if (view === "none" && !it.nm) return false;
+    if (view === "wait" && (it.rate != null || it.nm)) return false;
     for (const t of toks){
       const ok = t.cho ? (it._c.includes(t.c) || it._j.includes(t.j))
                        : it._j.includes(t.j);
@@ -367,25 +386,26 @@ function hi(name, raw){
 }
 
 function card(it, raw){
-  const cls = it.nm ? "b-none"
-            : it.rate <= -50 ? "b-good"
+  // 아직 안 본 줄이 2,000건 넘게 섞여 있다. rate 가 null 인 채로 pct() 에
+  // 넘기면 그 자리에서 죽는다. 등급도 값도 없으면 회색으로만 둔다.
+  const cls = (it.nm || it.rate == null) ? "b-none"
             : it.rate < 0 ? "b-good"
             : it.rate === 0 ? "b-mid" : "b-bad";
-  const badge = it.nm ? "비교군 없음" : pct(it.rate);
+  const badge = it.nm ? "비교군 없음" : it.rate == null ? WAIT : pct(it.rate);
   const tags = [];
   if (it.conv) tags.push('<span class="tag" title="' + esc(it.conv) + '">환산</span>');
   if (it.q > 1) tags.push('<span class="tag">' + it.q + "개들이에서 낱개</span>");
   if (it.sub) tags.push('<span class="tag">' + esc(it.sub) + "</span>");
-  const img = it.img
-      ? '<img class="thumb" loading="lazy" src="data:image/jpeg;base64,' + it.img +
-        '" alt="" data-nm="' + esc(it.name) + '">'
-      : '<div class="thumb"></div>';
+  const b = PICS[it.p];
+  const img = '<img class="thumb" loading="lazy" alt="" data-p="' + it.p +
+      '" data-nm="' + esc(it.name) + '"' +
+      (b ? ' src="data:image/jpeg;base64,' + b + '"' : "") + ">";
   return '<article class="item">' + img +
     '<div class="body"><div class="nm">' + hi(it.name, raw) + "</div>" +
     '<div class="sub">' + esc(it.spec || "") + (it.spec && it.maker ? " · " : "") +
       esc(it.maker || "") + "</div>" +
     '<div class="pr"><span class="g">' + won(it.g) + "</span>" +
-      '<span class="c">' + CP + " " + won(it.c) + "</span>" +
+      (it.c == null ? "" : '<span class="c">' + CP + " " + won(it.c) + "</span>") +
       '<span class="badge ' + cls + '">' + badge + "</span></div>" +
     (tags.length ? '<div class="tags">' + tags.join("") + "</div>" : "") +
     "</div></article>";
