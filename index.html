@@ -89,8 +89,11 @@ main{padding:10px 12px 28px;display:grid;gap:8px}
 @media(min-width:1100px){main{grid-template-columns:1fr 1fr 1fr}}
 .item{display:flex;gap:10px;background:var(--card);border:1px solid var(--line);
       border-radius:14px;padding:10px;box-shadow:var(--shadow)}
-.thumb{flex:0 0 68px;width:68px;height:68px;border-radius:10px;background:var(--bg);
+.left{flex:0 0 68px;display:flex;flex-direction:column;gap:6px}
+.thumb{width:68px;height:68px;border-radius:10px;background:var(--bg);
        object-fit:contain;cursor:zoom-in}
+.goc{padding:6px 0;border:0;border-radius:9px;background:var(--accent);color:#fff;
+       font-size:11.5px;font-weight:600;cursor:pointer}
 .body{flex:1;min-width:0}
 .nm{font-weight:600;line-height:1.35}
 .nm mark{background:transparent;color:var(--accent);font-weight:700}
@@ -213,8 +216,9 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 
   <div id="inapp">
     <b id="inapptitle">카카오톡 브라우저에서는 쓰지 마세요</b>
-    여기서 넣은 가격과 장바구니는 <u>카카오톡 안에만</u> 저장됩니다.
-    나중에 크롬이나 삼성 인터넷으로 열면 <u>하나도 안 보입니다.</u>
+    <u>여기서는 장바구니와 가격 입력이 제구실을 못 합니다.</u>
+    담아도 카카오톡 안에만 남아서, 나중에 크롬이나 삼성 인터넷으로 열면
+    하나도 안 보입니다. 홈 화면에 고정해 둘 수도 없습니다.
     <div id="inappbtns"></div>
     <span class="tip">브라우저에서 연 뒤 메뉴 → <b style="display:inline">홈 화면에 추가</b>
     를 해 두면 앱처럼 바로 열리고, 넣은 값도 한곳에 쌓입니다.</span>
@@ -521,8 +525,13 @@ function card(it, raw){
   const img = '<img class="thumb" loading="lazy" alt="" data-p="' + it.p +
       '" data-nm="' + esc(it.name) + '"' +
       (b ? ' src="data:image/jpeg;base64,' + b + '"' : "") + ">";
+  // 장바구니에서는 사진 아래에 쿠팡으로 바로 가는 단추를 둔다.
+  // 담아 둔 것을 하나씩 확인하러 갈 때 메뉴를 거치지 않아도 된다.
+  const left = '<div class="left">' + img +
+      ($("#view").value === "cart" ? '<button class="goc">쿠팡이동</button>' : "") +
+      "</div>";
   return '<article class="item" data-p="' + it.p + '">' +
-    '<i class="cart' + (inCart(it.p) ? " on" : "") + '">🛒</i>' + img +
+    '<i class="cart' + (inCart(it.p) ? " on" : "") + '">🛒</i>' + left +
     '<div class="body"><div class="nm">' + hi(it.name, raw) + "</div>" +
     '<div class="sub">' + esc(it.spec || "") + (it.spec && it.maker ? " · " : "") +
       esc(it.maker || "") + "</div>" +
@@ -674,7 +683,12 @@ function dismiss(){
   if (history.state && history.state.ov) history.back();   // popstate 가 닫는다
   else hideOverlays();
 }
-addEventListener("popstate", hideOverlays);
+addEventListener("popstate", () => {
+  const open = $("#zoom").style.display === "flex"
+            || $("#sheet").style.display === "flex";
+  hideOverlays();
+  if (!open && $("#view").value === "cart") restorePrev();
+});
 
 function openSheet(html){
   $("#sheetbox").innerHTML = html;
@@ -712,12 +726,50 @@ $("#sheet").addEventListener("click", e => {
 
 /* 장바구니는 따로 만든 창이 아니라 **목록의 한 보기**다. 그래야 사진도
    값도 할인율도 목록에서 보던 그대로 나온다. 검색·정렬도 그대로 듣는다. */
+/* 자리는 우리가 되돌린다. 이걸 끄지 않으면 뒤로가기 때 브라우저가 제
+   기록대로 스크롤을 다시 맞춰 버려서, 우리가 옮겨 놓은 자리가 0 으로 덮인다. */
+try { history.scrollRestoration = "manual"; } catch(e){}
+
+/* 장바구니를 열면 보던 화면을 적어 둔다. 다시 🛒 를 누르거나 폰 뒤로가기를
+   누르면 그 자리로 되돌아온다. 장바구니는 잠깐 들렀다 오는 곳이기 때문이다. */
+let PREV = null;
+
+function fillTo(y){
+  let guard = 0;
+  while (document.body.offsetHeight < y + innerHeight
+         && SHOWN < VIEW.length && guard++ < 80) more();
+}
+
+function backFromCart(){
+  if (history.state && history.state.cart) return history.back();  // popstate 가 되돌린다
+  restorePrev();
+}
+
+function restorePrev(){
+  const p = PREV; PREV = null;
+  $("#q").value = p ? p.q : "";
+  BIG = p ? p.big : "전체";
+  $("#chips").querySelectorAll(".chip").forEach(
+      c => c.classList.toggle("on", c.dataset.b === BIG));
+  $("#view").value = p ? p.view : "all";
+  $("#sort").value = p ? p.sort : "rate";
+  run();
+  if (p && p.y){
+    fillTo(p.y);
+    scrollTo(0, p.y);
+    setTimeout(() => scrollTo(0, p.y), 60);   // 그림이 실리며 높이가 변할 때를 대비
+  }
+}
+
 function openCart(){
+  if ($("#view").value === "cart") return backFromCart();   // 한 번 더 누르면 되돌아간다
   if (!CART.length){
     return openSheet('<h3>장바구니가 비어 있습니다</h3>' +
       '<p class="note">상품을 눌러 담아 두면 여기 모입니다.</p>' +
       '<button data-act="close">닫기</button>');
   }
+  PREV = {q: $("#q").value, big: BIG, view: $("#view").value,
+          sort: $("#sort").value, y: window.scrollY};
   $("#view").value = "cart";
   $("#q").value = "";
   BIG = "전체";
@@ -725,6 +777,7 @@ function openCart(){
       c => c.classList.toggle("on", c.dataset.b === "전체"));
   run();
   scrollTo(0, 0);
+  try { history.pushState({cart:1}, ""); } catch(e){}
 }
 /* 쿠팡에서 값을 보고 온 참에 바로 넣는 자리. 두 칸이면 충분하다. */
 function openPrice(p){
@@ -819,6 +872,7 @@ $("#list").addEventListener("click", e => {
     cartIcon.classList.toggle("on", inCart(p));
     return;
   }
+  if (e.target.closest(".goc")) return coupang(it.name, it.a);
   const img = e.target.closest(".thumb");
   if (img){
     $("#zoom img").src = img.src || "";
