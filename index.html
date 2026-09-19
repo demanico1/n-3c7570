@@ -330,12 +330,25 @@ $("#go").addEventListener("click", async () => {
 });
 $("#pw").addEventListener("keydown", e => { if (e.key === "Enter") $("#go").click(); });
 
+/* 비밀번호를 기억해 둔 기기에서는 **잠금 화면을 아예 안 보여 준다.**
+ *
+ * 자료를 받아 풀기까지 0.7초쯤 걸리는데, 그동안 잠금 화면이 떠 있다가
+ * 사라졌다. 쿠팡으로 넘어갈 때처럼 페이지가 다시 열리는 순간마다 비밀번호
+ * 창이 번쩍여서, 마치 로그인이 풀린 것처럼 보였다.
+ *
+ * 열쇠가 있으면 곧 열릴 것이 확실하니 빈 화면으로 기다린다.
+ * 풀지 못했을 때만 잠금 화면을 도로 내놓는다. */
 (async function auto(){
   let pw = null;
   try { pw = localStorage.getItem(KEY_NAME) || sessionStorage.getItem(KEY_NAME); } catch(e){}
   if (!pw) return;
+  const lock = $("#lock");
+  if (lock) lock.style.visibility = "hidden";
   try { start(await unlock(pw, true)); }
-  catch(e){ try{ localStorage.removeItem(KEY_NAME); sessionStorage.removeItem(KEY_NAME);}catch(_){} }
+  catch(e){
+    try{ localStorage.removeItem(KEY_NAME); sessionStorage.removeItem(KEY_NAME);}catch(_){}
+    if (lock) lock.style.visibility = "visible";
+  }
 })();
 
 /* ============================ 한글 찾기 ============================ */
