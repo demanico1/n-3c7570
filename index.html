@@ -524,17 +524,7 @@ function run(){
   bar.children[0].textContent = view === "mine" ? "프로그램에 넣을 글 복사"
                                                 : "이름 전부 복사";
   bar.children[1].textContent = view === "mine" ? "넣은 값 모두 지우기" : "비우기";
-  $("#hits").textContent = VIEW.length.toLocaleString("ko-KR") + "건";
-  // 값이 들어 있는 줄만으로 센다. 안 본 줄을 섞으면 숫자가 거짓이 된다.
-  const done = VIEW.filter(i => i.rate != null);
-  $("#s1").textContent = done.length.toLocaleString("ko-KR") + " / "
-      + VIEW.length.toLocaleString("ko-KR");
-  // 아낀 돈 = 쿠팡 낱개가와 군마트가의 차이를 다 더한 것.
-  // 군마트가 비싼 줄은 저절로 깎이므로 부풀려지지 않는다.
-  const saved = done.reduce((a, i) => a + (i.c - i.g), 0);
-  $("#s2").textContent = done.length ? won(saved) : "–";
-  $("#s3").textContent = done.length
-      ? Math.round(100 * done.filter(i => i.rate < 0).length / done.length) + "%" : "–";
+  stats();
 
   SHOWN = 0;
   $("#list").innerHTML = "";
@@ -549,6 +539,36 @@ function median(a){
   const m = a.length >> 1;
   return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
 }
+/* 요약 세 칸. 목록을 다시 그리지 않고 숫자만 고칠 때도 쓴다. */
+function stats(){
+  $("#hits").textContent = VIEW.length.toLocaleString("ko-KR") + "건";
+  // 값이 들어 있는 줄만으로 센다. 안 본 줄을 섞으면 숫자가 거짓이 된다.
+  const done = VIEW.filter(i => i.rate != null);
+  $("#s1").textContent = done.length.toLocaleString("ko-KR") + " / "
+      + VIEW.length.toLocaleString("ko-KR");
+  // 아낀 돈 = 쿠팡 낱개가와 군마트가의 차이를 다 더한 것.
+  // 군마트가 비싼 줄은 저절로 깎이므로 부풀려지지 않는다.
+  const saved = done.reduce((a, i) => a + (i.c - i.g), 0);
+  $("#s2").textContent = done.length ? won(saved) : "–";
+  $("#s3").textContent = done.length
+      ? Math.round(100 * done.filter(i => i.rate < 0).length / done.length) + "%" : "–";
+}
+
+/* 값을 넣은 그 줄만 다시 그린다.
+ *
+ * `아직 안 본 것` 으로 걸러 놓고 값을 넣으면, 목록을 다시 거르는 순간 그
+ * 줄이 조건에서 벗어나 눈앞에서 사라진다. 얼마나 싼지 확인할 새가 없다.
+ * 그래서 거르지도 줄 세우지도 않고 그 칸만 갈아 끼운다. 자리도 그대로다.
+ * 다음에 검색어·분류·보기를 건드리면 그때 정리된다.
+ */
+function refreshCard(p){
+  const it = DATA.find(x => x.p === p);
+  const el = document.querySelector('.item[data-p="' + p + '"]');
+  if (!it || !el) return run();
+  el.outerHTML = card(it, $("#q").value.trim());
+  stats();
+}
+
 function esc(s){ return s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function hi(name, raw){
   const safe = esc(name);
@@ -864,10 +884,14 @@ $("#sheet").addEventListener("click", e => {
     const c = parseInt(($("#pin").value || "").replace(/[^0-9]/g, ""), 10);
     const q = Math.max(1, parseInt($("#qin").value, 10) || 1);
     if (!c) { $("#pin").focus(); return; }
-    MINE[p] = {c, q}; saveMine(); closeSheet(); return run();
+    MINE[p] = {c, q}; saveMine(); closeSheet(); return refreshCard(p);
   }
-  if (act === "nomatch"){ MINE[p] = {nm:1}; saveMine(); closeSheet(); return run(); }
-  if (act === "unset"){ delete MINE[p]; saveMine(); closeSheet(); return run(); }
+  if (act === "nomatch"){
+    MINE[p] = {nm:1}; saveMine(); closeSheet(); return refreshCard(p);
+  }
+  if (act === "unset"){
+    delete MINE[p]; saveMine(); closeSheet(); return refreshCard(p);
+  }
 });
 
 /* 찜한 것은 따로 만든 창이 아니라 **목록의 한 보기**다. 그래야 사진도
