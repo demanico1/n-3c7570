@@ -819,22 +819,11 @@ function coupang(name, link){
   const url = link || ("https://www.coupang.com/np/search?q="
                        + encodeURIComponent(name));
 
-  /* 앱이 없는 안드로이드에서는 브라우저가 실제로 쿠팡 웹을 부르는데,
-     그 브라우저로 쿠팡이 처음이면 '사용권한이 없습니다' 가 뜬다.
-     (앱이 있으면 웹을 아예 안 부르니 그럴 일이 없다.)
+  /* `intent://` 로 앱을 지목해 보냈더니 **앱이 깔려 있는데도** 안내 화면으로
+     떨어졌다. 쿠팡 앱이 그 모양의 주소를 안 받는 것이다. 폰에서 확인하고
+     되돌렸다. 평범한 주소로 보내면 안드로이드가 알아서 앱을 띄운다.
 
-     안드로이드에는 이럴 때 쓰라고 만든 장치가 있다. 앱을 지목하되 없으면
-     갈 곳을 같이 적어 두는 것이다. 앱이 있으면 앱으로, 없으면 우리 안내
-     화면으로 간다. 감지할 필요가 없다.
-
-     아이폰에는 같은 장치가 없다. 사파리가 알아서 앱을 열거나 웹으로 간다. */
-  if (!IOS && /Android/i.test(UA) && url.indexOf("https://") === 0){
-    const help = location.origin + location.pathname + "#noapp";
-    location.href = "intent://" + url.slice(8) +
-        "#Intent;scheme=https;package=com.coupang.mobile" +
-        ";S.browser_fallback_url=" + encodeURIComponent(help) + ";end";
-    return;
-  }
+     앱이 없는 사람은 ⋯ 메뉴의 '쿠팡이 안 열릴 때' 로 안내를 볼 수 있다. */
   location.href = url;
 }
 
