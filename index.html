@@ -411,7 +411,7 @@ function start(d){
     const b = e.target.closest(".chip"); if (!b) return;
     BIG = b.dataset.b;
     $("#chips").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === b));
-    run();
+    runFresh();
   });
   $("#lock").remove();
   $("#app").hidden = false;
@@ -459,9 +459,9 @@ function start(d){
   loadPics();
 }
 
-$("#q").addEventListener("input", run);
-$("#sort").addEventListener("change", run);
-$("#view").addEventListener("change", run);
+$("#q").addEventListener("input", runFresh);
+$("#sort").addEventListener("change", run);      // 줄 세우기만 바뀐다
+$("#view").addEventListener("change", runFresh);
 $("#clr").addEventListener("click", () => { $("#q").value = ""; run(); $("#q").focus(); });
 $("#theme").addEventListener("click", () => {
   const now = document.documentElement.getAttribute("data-theme");
@@ -490,11 +490,15 @@ function run(){
   const view = $("#view").value || "all";
   VIEW = DATA.filter(it => {
     if (BIG !== "전체" && it.big !== BIG) return false;
-    if (view === "done" && it.rate == null) return false;
-    if (view === "none" && !it.nm) return false;
-    if (view === "wait" && (it.rate != null || it.nm)) return false;
+    // 찜한 것 보기는 빼고(거기서 빼면 바로 사라지는 게 맞다),
+    // 나머지 보기에서는 방금 손댄 줄을 남겨 둔다.
+    if (view !== "cart" && !KEEP.has(it.p)){
+      if (view === "done" && it.rate == null) return false;
+      if (view === "none" && !it.nm) return false;
+      if (view === "wait" && (it.rate != null || it.nm)) return false;
+      if (view === "mine" && !it.mine) return false;
+    }
     if (view === "cart" && !inCart(it.p)) return false;
-    if (view === "mine" && !it.mine) return false;
     let score = 0;
     for (const t of toks){
       const inBody = t.cho ? it._cb.includes(t.c) : it._b.includes(t.j);
@@ -590,9 +594,11 @@ function card(it, raw){
   const cls = (it.nm || it.rate == null) ? "b-none"
             : it.rate < 0 ? "b-good"
             : it.rate === 0 ? "b-mid" : "b-bad";
-  const badge = it.nm ? "비교군 없음"
-              : it.rate == null ? WAIT
-              : pct(it.rate) + "<small>" + wonDiff(it.diff) + "</small>";
+  // 아랫줄(차액)은 값이 없어도 자리를 비워 둔다. 값을 넣는 순간 줄이 하나
+  // 늘어나면 카드가 17px 커지고, 아래 있던 것들이 그만큼 밀려 내려간다.
+  // 보던 자리가 흔들리는 것보다 빈 줄이 낫다.
+  const badge = (it.nm ? "비교군 없음" : it.rate == null ? WAIT : pct(it.rate)) +
+      "<small>" + (it.rate == null ? "&nbsp;" : wonDiff(it.diff)) + "</small>";
   const tags = [];
   if (it.conv) tags.push('<span class="tag" title="' + esc(it.conv) + '">환산</span>');
   if (it.mine) tags.push('<span class="tag tag-mine">폰에서 넣음</span>');
@@ -738,6 +744,31 @@ function inCart(p){ return CART.indexOf(p) >= 0; }
 /* ===================== 폰에서 넣은 값 =====================
    서버가 없으므로 이 기기의 브라우저에만 쌓인다. 화면에는 바로 반영되고,
    나중에 한 번 복사해서 프로그램의 `여러 건 넣기`(Ctrl+B)에 붙이면 DB 로 간다. */
+/* 방금 값을 넣은 줄은 보기 조건에서 벗어나도 남겨 둔다.
+ *
+ * `아직 안 본 것` 으로 걸러 놓고 값을 넣으면 그 줄은 더 이상 '안 본 것' 이
+ * 아니다. 거르는 순간 눈앞에서 사라져 얼마나 싼지 볼 새가 없다.
+ * 그 칸만 갈아 끼우는 것으로는 부족했다 — 쿠팡에 다녀오면 목록을 처음부터
+ * 다시 그리므로 그때 사라졌다. 그래서 **어느 줄을 남겨 둘지 따로 적어 둔다.**
+ *
+ * sessionStorage 에 두는 이유가 있다. 쿠팡에 다녀오는 동안 살아남아야 하고,
+ * 창을 닫으면 없어지는 게 맞다. 검색어·분류·보기를 건드리면 그때 비운다.
+ */
+const KEEP_KEY = "gmpx-keep";
+let KEEP = new Set();
+try { KEEP = new Set(JSON.parse(sessionStorage.getItem(KEEP_KEY) || "[]")); } catch(e){}
+
+function keepAdd(p){
+  KEEP.add(p);
+  try { sessionStorage.setItem(KEEP_KEY, JSON.stringify([...KEEP])); } catch(e){}
+}
+function keepClear(){
+  KEEP.clear();
+  try { sessionStorage.removeItem(KEEP_KEY); } catch(e){}
+}
+/* 목록을 처음부터 다시 볼 때. 남겨 둔 것을 비우고 그린다. */
+function runFresh(){ keepClear(); run(); }
+
 const MINE_KEY = "gmpx-mine";
 let MINE = {};
 try { MINE = JSON.parse(localStorage.getItem(MINE_KEY) || "{}") || {}; } catch(e){}
@@ -918,15 +949,15 @@ $("#sheet").addEventListener("click", e => {
   if (act === "price") return openPrice(p);
   if (act === "save"){
     const c = parseInt(($("#pin").value || "").replace(/[^0-9]/g, ""), 10);
-    const q = Math.max(1, parseInt($("#qin").value, 10) || 1);
+    const q = Math.max(1, parseInt($("#qin").value, 10) || 1);   // 비우면 1
     if (!c) { $("#pin").focus(); return; }
-    MINE[p] = {c, q}; saveMine(); closeSheet(); return refreshCard(p);
+    MINE[p] = {c, q}; keepAdd(p); saveMine(); closeSheet(); return refreshCard(p);
   }
   if (act === "nomatch"){
-    MINE[p] = {nm:1}; saveMine(); closeSheet(); return refreshCard(p);
+    MINE[p] = {nm:1}; keepAdd(p); saveMine(); closeSheet(); return refreshCard(p);
   }
   if (act === "unset"){
-    delete MINE[p]; saveMine(); closeSheet(); return refreshCard(p);
+    delete MINE[p]; keepAdd(p); saveMine(); closeSheet(); return refreshCard(p);
   }
 });
 
@@ -994,7 +1025,7 @@ function openPrice(p){
       '<input id="pin" type="number" inputmode="numeric" placeholder="' + CP +
         ' 금액" value="' + (m.c || "") + '">' +
       '<input id="qin" class="qty" type="number" inputmode="numeric" ' +
-        'placeholder="수량" value="' + (m.q || 1) + '">' +
+        'placeholder="수량 1" value="' + (m.q > 1 ? m.q : "") + '">' +
     "</div>" +
     '<p class="note">2개 9,800원이면 9800 과 2 를 넣으세요</p>' +
     '<button class="go" data-act="save" data-p="' + p + '">넣기</button>' +
