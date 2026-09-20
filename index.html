@@ -207,7 +207,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 .item{position:relative;-webkit-touch-callout:none;user-select:none}
 /* 찜하기는 하트다. 이모지(★)는 글꼴에 따라 기울어 보여서 직접 그린다.
    빈 하트는 테두리만, 담으면 쿠팡 빨강으로 채운다. */
-.item .cart{position:absolute;top:5px;right:6px;padding:2px;cursor:pointer;
+.item .cart{position:absolute;top:5px;right:7px;padding:3px;cursor:pointer;
      line-height:0}
 .item .cart svg{width:22px;height:22px;display:block}
 .item .cart svg path{fill:none;stroke:var(--dim);stroke-width:1.7;opacity:.6}
@@ -217,12 +217,22 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
    오지 않는다(2KB 남짓). 카드와 고르기 메뉴가 같은 그림을 쓴다. */
 .cpg-img{background-size:cover;border-radius:50%;
      background-image:url(data:image/png;base64,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)}
-/* 카드에서는 회색으로 둔다. 붉은 채로 두면 옆의 찜하기 하트와 붙어서
-   '이미 찜했나' 하고 오인하게 된다. 고르기 메뉴 안에서는 제 색을 쓴다. */
-.item .cpg{position:absolute;top:6px;right:33px;width:24px;height:24px;
-     cursor:pointer;filter:grayscale(1);opacity:.62}
-.item .cpg:active{filter:none;opacity:1}
-.item .nm{padding-right:66px}
+/* 카드에서는 쿠팡 마크 대신 '밖으로 나간다' 는 화살표를 쓴다.
+ *
+ * 붉은 동그라미는 옆의 하트와 붙어서 '이미 찜했나' 하고 오인하게 됐고,
+ * 회색으로 바꿔도 꽉 찬 원이라 목록을 훑을 때 자꾸 눈에 걸렸다.
+ * 하트와 같은 얇은 선으로 그리니 둘이 한 짝으로 묶여 조용해진다.
+ * 어디로 가는지는 카드 안의 '쿠팡 5,900원' 이 말해 준다.
+ *
+ * 고르기 메뉴 안(.ico.cpg-img)에서는 원래 쿠팡 마크를 그대로 쓴다.
+ * 거기는 하트와 붙어 있지 않고, 무엇인지 분명한 편이 낫다. */
+.item .cpg{position:absolute;top:7px;right:48px;line-height:0;padding:3px;
+     cursor:pointer}
+.item .cpg svg{width:19px;height:19px;display:block}
+.item .cpg svg path{fill:none;stroke:var(--dim);stroke-width:1.9;opacity:.6;
+     stroke-linecap:round;stroke-linejoin:round}
+.item .cpg:active svg path{opacity:1;stroke:var(--accent)}
+.item .nm{padding-right:82px}
 </style>
 </head>
 <body>
@@ -643,7 +653,7 @@ function card(it, raw){
       ($("#view").value === "cart" ? '<button class="goc">쿠팡이동</button>' : "") +
       "</div>";
   return '<article class="item" data-p="' + it.p + '">' +
-    '<i class="cpg cpg-img" title="쿠팡에서 보기"></i>' +
+    '<i class="cpg" title="쿠팡에서 보기">' + OUT + "</i>" +
     '<i class="cart' + (inCart(it.p) ? " on" : "") + '" title="찜하기">' +
       HEART + "</i>" + left +
     '<div class="body"><div class="nm">' + hi(it.name, raw) + "</div>" +
@@ -751,6 +761,11 @@ addEventListener("hashchange", () => {
 /* 폰으로 보다가 '이건 쿠팡에서 확인해 보자' 싶은 것을 담아 두는 곳이다.
    이 기기의 브라우저에만 남는다. 지우면 사라진다. */
 /* 하트 하나를 만들어 두고 카드마다 같은 것을 쓴다. */
+/* 밖으로 나가는 화살표. 링크가 이 페이지를 떠난다는 뜻으로 널리 쓰인다. */
+const OUT = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+  '<path d="M14 5h5v5M19 5l-8 8M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8' +
+  'a2 2 0 0 1 2-2h4"/></svg>';
+
 const XMARK = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
   '<path d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"/></svg>';
 
