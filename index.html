@@ -731,8 +731,8 @@ addEventListener("scroll", () => {
 /* 작은 그림을 먼저 띄워 기다림이 없게 하고, 원본이 오면 조용히 바꿔 끼운다. */
 const BIGPIC = {};
 /* quiet 를 주면 받아만 두고 크게 보기 창은 건드리지 않는다. 갤러리에서
-   사진을 또렷하게 갈아 끼울 때 쓴다. 창이 닫혀 있는데 거기에 그림을 밀어
-   넣으면, 다음에 다른 상품을 눌렀을 때 엉뚱한 사진이 한 번 스친다. */
+   사진을 또렷하게 갈아 끼울 때 쓴다. 닫힌 창에 그림을 밀어 넣을 까닭이
+   없고, 창이 열린 채로 뒤에서 목록이 채워지면 보던 사진이 바뀌어 버린다. */
 async function showBig(p, quiet){
   if (BIGPIC[p]) { if (!quiet) $("#zoom img").src = BIGPIC[p]; return; }
   try {
