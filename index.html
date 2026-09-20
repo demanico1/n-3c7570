@@ -115,10 +115,14 @@ main{padding:10px 12px 28px;display:grid;gap:8px}
 .pr{display:flex;align-items:flex-end;gap:10px;margin-top:7px;flex-wrap:wrap}
 .pr .g{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
 .pr .c{font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
-.badge{margin-left:auto;padding:4px 9px;border-radius:9px;font-size:13px;font-weight:700;
-       font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
-/* 퍼센트만으로는 얼마나 차이 나는지 감이 안 온다. 액수를 같이 적는다. */
-.badge small{display:block;font-size:11px;font-weight:600;opacity:.8;margin-top:1px}
+/* 초록 상자 안에는 **퍼센트만** 둔다. 액수까지 같은 상자에 넣었더니
+   초록 글자 두 줄이 되어 어느 쪽이 할인율인지 한눈에 안 들어왔다.
+   액수는 상자 밖 바로 아래, '쿠팡 5,900원' 과 같은 회색 작은 글자로. */
+.side{margin-left:auto;text-align:right;white-space:nowrap}
+.badge{display:inline-block;padding:4px 9px;border-radius:9px;font-size:13px;
+       font-weight:700;font-variant-numeric:tabular-nums}
+.gap{display:block;margin-top:3px;font-size:12px;color:var(--dim);
+       font-variant-numeric:tabular-nums}
 .b-good{background:var(--good-bg);color:var(--good)}
 .b-mid{background:var(--mid-bg);color:var(--mid)}
 .b-bad{background:var(--bad-bg);color:var(--bad)}
@@ -634,10 +638,12 @@ function card(it, raw){
             : it.rate < 0 ? "b-good"
             : it.rate === 0 ? "b-mid" : "b-bad";
   // 아랫줄(차액)은 값이 없어도 자리를 비워 둔다. 값을 넣는 순간 줄이 하나
-  // 늘어나면 카드가 17px 커지고, 아래 있던 것들이 그만큼 밀려 내려간다.
+  // 늘어나면 카드가 커지고, 아래 있던 것들이 그만큼 밀려 내려간다.
   // 보던 자리가 흔들리는 것보다 빈 줄이 낫다.
-  const badge = (it.nm ? "비교군 없음" : it.rate == null ? WAIT : pct(it.rate)) +
-      "<small>" + (it.rate == null ? "&nbsp;" : wonDiff(it.diff)) + "</small>";
+  const badge = '<span class="badge ' + cls + '">' +
+      (it.nm ? "비교군 없음" : it.rate == null ? WAIT : pct(it.rate)) + "</span>" +
+      '<span class="gap">' +
+      (it.rate == null ? "&nbsp;" : wonDiff(it.diff)) + "</span>";
   const tags = [];
   if (it.conv) tags.push('<span class="tag" title="' + esc(it.conv) + '">환산</span>');
   if (it.mine) tags.push('<span class="tag tag-mine">폰에서 넣음</span>');
@@ -661,7 +667,7 @@ function card(it, raw){
       esc(it.maker || "") + "</div>" +
     '<div class="pr"><span class="g">' + won(it.g) + "</span>" +
       (it.c == null ? "" : '<span class="c">' + CP + " " + won(it.c) + "</span>") +
-      '<span class="badge ' + cls + '">' + badge + "</span></div>" +
+      '<span class="side">' + badge + "</span></div>" +
     (tags.length ? '<div class="tags">' + tags.join("") + "</div>" : "") +
     "</div></article>";
 }
