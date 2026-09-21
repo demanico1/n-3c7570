@@ -378,6 +378,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 <script>
 /* ============================ 잠금 풀기 ============================ */
 const KEY_NAME = "gmpx-key";
+const OPEN = true;   /* --공개 로 구우면 true 가 박힌다 */
 const $ = s => document.querySelector(s);
 
 async function derive(pw, salt){
@@ -391,6 +392,8 @@ async function derive(pw, salt){
 let KEY = null;
 
 async function unlock(pw, remember){
+  /* 공개판은 잠긴 것이 없다. 그냥 받아서 읽는다. */
+  if (OPEN) return await (await fetch("data.json", {cache:"no-cache"})).json();
   const buf = await (await fetch("data.bin", {cache:"no-cache"})).arrayBuffer();
   const raw = new Uint8Array(buf);
   const salt = raw.slice(5, 21), iv = raw.slice(21, 33), body = raw.slice(33);
@@ -406,6 +409,11 @@ async function unlock(pw, remember){
    폰에서는 흰 화면만 한참 본다. 실패해도 목록은 멀쩡해야 하므로 조용히 넘어간다. */
 async function loadPics(){
   try {
+    if (OPEN) {
+      PICS = await (await fetch("pics.json", {cache:"no-cache"})).json();
+      for (const el of document.querySelectorAll("img.thumb:not([src])")) paint(el);
+      return;
+    }
     const raw = new Uint8Array(await (await fetch("pics.bin", {cache:"no-cache"})).arrayBuffer());
     const plain = await crypto.subtle.decrypt(
       {name:"AES-GCM", iv: raw.slice(5, 17)}, KEY, raw.slice(17));
@@ -438,6 +446,26 @@ $("#pw").addEventListener("keydown", e => { if (e.key === "Enter") $("#go").clic
  * 풀지 못했을 때만 잠금 화면을 도로 내놓는다. */
 (async function auto(){
   let pw = null;
+  /* 공개판이면 구울 때 심어 둔 비밀번호로 바로 연다.
+     `--공개` 로 구우면 아래 자리에 값이 박히고, 그냥 구우면 빈 값이라
+     예전처럼 잠금 화면이 뜬다. 되돌리려면 다시 구우면 그만이다.
+     **이러면 자료가 사실상 공개다.** 소스만 보면 열쇠가 보인다. */
+  if (OPEN) {
+    /* 공개판 — 비밀번호를 묻지 않고 바로 연다.
+     *
+     * **`#lock` 을 여기서 지우면 안 된다.** `start()` 끝에 `$("#lock").remove()`
+     * 가 있어서, 먼저 없애 버리면 거기서 `null.remove()` 로 터진다. 그러면
+     * `$("#app").hidden = false` 까지 못 가서 **화면이 빈 채로 남는다.**
+     * 실제로 그렇게 만들었다가 제목만 바뀌고 본문이 안 뜨는 것을 봤다.
+     * 잠금 화면은 숨기기만 하고 치우는 건 `start()` 에 맡긴다. */
+    const box = $("#lock");
+    if (box) box.style.visibility = "hidden";
+    $("#wait").style.display = "flex";
+    try { start(await unlock(null, false)); }
+    catch(e){ if (box) box.style.visibility = "visible"; }
+    $("#wait").style.display = "none";
+    return;
+  }
   try { pw = localStorage.getItem(KEY_NAME) || sessionStorage.getItem(KEY_NAME); } catch(e){}
   if (!pw) return;
   const lock = $("#lock");
@@ -777,6 +805,12 @@ const BIGPIC = {};
 async function showBig(p, quiet){
   if (BIGPIC[p]) { if (!quiet) $("#zoom img").src = BIGPIC[p]; return; }
   try {
+    if (OPEN) {
+      /* 그냥 jpg 라 브라우저가 알아서 받고 캐시한다. 풀 것도 없다. */
+      BIGPIC[p] = "big/" + p + ".jpg";
+      if (!quiet && $("#zoom").style.display === "flex") $("#zoom img").src = BIGPIC[p];
+      return;
+    }
     const raw = new Uint8Array(await (await fetch("big/" + p + ".bin")).arrayBuffer());
     const plain = await crypto.subtle.decrypt(
       {name:"AES-GCM", iv: raw.slice(5, 17)}, KEY, raw.slice(17));
