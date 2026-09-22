@@ -131,6 +131,13 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 #addgo:active{opacity:.8}
 #addno{flex:none;width:26px;height:26px;padding:0;border-radius:7px;cursor:pointer;
        background:rgba(255,255,255,.16);border:0;color:#fff;font-size:12px;line-height:1}
+/* ✕ 를 누른 뒤 6초. 초록을 빼고 조용한 줄로 바꾼다 — 닫겠다고 한 사람에게
+   같은 색으로 계속 말을 거는 것은 닫은 것이 아니다. */
+#addbar.calm{background:var(--card);color:var(--dim);border:1px solid var(--line);
+       box-shadow:none;justify-content:space-between;padding:8px 10px}
+#addbar.calm .ab-msg{font-size:12.5px}
+#addbar.calm button{flex:none;font-size:12px;padding:6px 11px;border-radius:7px;
+       cursor:pointer;background:var(--bg);border:1px solid var(--line);color:var(--dim)}
 
 .sum{display:flex;gap:8px;padding:10px 12px 2px}
 .sum div{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;
@@ -1630,21 +1637,48 @@ const STANDALONE = matchMedia("(display-mode: standalone)").matches
 
 /* 권유 띠를 보일지 정한다.
  *
- * **세 번 물어야 한다.**
+ * **네 번 물어야 한다.**
  *   1) 이미 홈 화면에서 열고 있나 — 그러면 권할 게 없다
- *   2) 한 번 닫았나 — 닫은 사람에게 또 들이대면 그게 광고다
- *   3) 앱 안의 브라우저인가 — 카톡 안에서는 홈 화면 추가가 아예 안 된다
+ *   2) 영영 안 보겠다고 했나 — `localStorage`
+ *   3) 이번에만 닫았나 — `sessionStorage`. 다음에 들어오면 다시 뜬다
+ *   4) 앱 안의 브라우저인가 — 카톡 안에서는 홈 화면 추가가 아예 안 된다
+ *
+ * ★ **✕ 는 '이번만' 이다.** 처음엔 ✕ 를 영영 안 보이게 만들어 뒀는데,
+ * 잘못 눌렀거나 나중에 마음이 바뀐 사람에게 다시 권할 길이 사라진다.
+ * 영영 끄는 것은 사람이 그렇게 말했을 때만 한다 — 닫을 때 한 번 물어본다.
  *
  * 안드로이드 크롬은 `beforeinstallprompt` 가 늦게 온다. 그래서 그 신호를
  * 기다리지 않고 먼저 띄운다 — 눌렀을 때 신호가 없으면 하는 법을 알려 준다.
  * 아이폰은 신호 자체가 없으므로 처음부터 그 길뿐이다.
  */
+function addOff(){
+  try {
+    if (localStorage.getItem("gmpx-add") === "no") return true;
+    if (sessionStorage.getItem("gmpx-add") === "skip") return true;
+  } catch(e){}
+  return false;
+}
+
 function showAdd(){
-  let off = false;
-  try { off = localStorage.getItem("gmpx-add") === "no"; } catch(e){}
   const bar = $("#addbar");
   if (!bar) return;
-  bar.hidden = STANDALONE || off || IN_APP;
+  bar.hidden = STANDALONE || addOff() || IN_APP;
+}
+
+/* ✕ 를 눌렀을 때. 띠를 바로 없애지 않고 **한 줄로 줄여** 물어본다.
+   묻는 자리가 여기여야 한다 — 닫겠다고 마음먹은 그 순간이 아니면
+   '다시 보지 않기' 를 찾아갈 사람이 없다. 6초 뒤 저절로 사라진다. */
+function addLater(){
+  try { sessionStorage.setItem("gmpx-add", "skip"); } catch(e){}
+  const bar = $("#addbar");
+  bar.classList.add("calm");
+  bar.innerHTML = '<span class="ab-msg">다음에 또 알려 드릴게요</span>'
+                + '<button id="addnever">다시 보지 않기</button>';
+  $("#addnever").addEventListener("click", () => {
+    try { localStorage.setItem("gmpx-add", "no"); } catch(e){}
+    bar.hidden = true;
+  });
+  setTimeout(() => { bar.hidden = true; }, 6000);
 }
 
 function openInstall(){
@@ -1667,11 +1701,9 @@ function openInstall(){
 }
 
 $("#addgo").addEventListener("click", openInstall);
-$("#addno").addEventListener("click", () => {
-  $("#addbar").hidden = true;
-  try { localStorage.setItem("gmpx-add", "no"); } catch(e){}
-});
+$("#addno").addEventListener("click", addLater);
 // 설치가 끝나면 띠를 내린다. 이미 넣은 사람에게 계속 권하지 않는다.
+// **이것만 영영 끈다.** 실제로 넣었으니 더 권할 게 없다.
 addEventListener("appinstalled", () => {
   $("#addbar").hidden = true;
   try { localStorage.setItem("gmpx-add", "no"); } catch(e){}
