@@ -1480,8 +1480,29 @@ const IOS = /iPhone|iPad|iPod/i.test(UA);
    문법이라, 그대로 두면 서로 엉켜 열리지 않는다. */
 function openIn(pkg){
   const bare = location.href.split("#")[0].replace(/^https?:\/\//, "");
+  // `browser_fallback_url` 을 붙여 둔다. **그 브라우저가 안 깔려 있으면**
+  // 안드로이드가 오류 화면을 내거나 플레이 스토어로 튄다. 그 대신
+  // 지금 보던 주소로 돌아오게 한다 — 아무 일도 안 일어난 것처럼.
   location.href = "intent://" + bare +
-      "#Intent;scheme=https;package=" + pkg + ";end";
+      "#Intent;scheme=https;package=" + pkg +
+      ";S.browser_fallback_url=" + encodeURIComponent(location.href.split("#")[0]) +
+      ";end";
+}
+
+/* 어느 브라우저인가. **한국은 크롬이 아닌 경우가 많다** — 삼성 인터넷이
+   특히 그렇다. 메뉴 이름과 자리가 브라우저마다 달라서, 한 가지 안내문을
+   모두에게 보여 주면 아무도 못 따라온다.
+   차례가 중요하다 — 삼성·웨일·엣지 UA 에는 `Chrome` 도 같이 들어 있어서
+   크롬을 먼저 보면 전부 크롬으로 읽힌다. */
+function browserKind(){
+  const u = navigator.userAgent;
+  if (/SamsungBrowser/i.test(u)) return "samsung";
+  if (/Whale/i.test(u))          return "whale";
+  if (/EdgA?\//i.test(u))        return "edge";
+  if (/OPR|Opera/i.test(u))      return "opera";
+  if (/FxiOS|Firefox/i.test(u))  return "firefox";
+  if (/Chrome|CriOS/i.test(u))   return "chrome";
+  return "";
 }
 const BROWSERS = IOS
   ? [["사파리에서 열기", null]]        // 아이폰은 웹에서 사파리를 지목할 수 없다
@@ -1704,11 +1725,32 @@ function openInstall(){
       + '<b style="display:inline;font-size:20px">⬆</b> 를 누르고,<br>'
       + '조금 내려서 <b>홈 화면에 추가</b> 를 누르세요.</p>'
       + '<p class="note">사파리에서만 됩니다.</p>');
+  // 브라우저마다 메뉴 이름도 자리도 다르다. 쓰는 그 브라우저의 말로 적는다.
+  const HOW = {
+    samsung: ["아래쪽 가운데 <b>메뉴</b>(≡) 를 누르고,",
+              "<b>현재 페이지 추가</b> → <b>홈 화면</b> 을 누르세요."],
+    whale:   ["아래쪽 <b>메뉴</b>(≡) 를 누르고,",
+              "<b>홈 화면에 추가</b> 를 누르세요."],
+    firefox: ["오른쪽 위 <b>메뉴</b>(⋮) 를 누르고,",
+              "<b>홈 화면에 추가</b> 를 누르세요."],
+    edge:    ["아래쪽 <b>메뉴</b>(…) 를 누르고,",
+              "<b>휴대폰에 추가</b> 를 누르세요."],
+    opera:   ["오른쪽 아래 <b>메뉴</b> 를 누르고,",
+              "<b>홈 화면에 추가</b> 를 누르세요."],
+    chrome:  ["오른쪽 위 <b>메뉴</b>(⋮) 를 누르고,",
+              "<b>홈 화면에 추가</b> 를 누르세요."],
+  };
+  const kind = browserKind();
+  const how = HOW[kind] || ["브라우저 <b>메뉴</b> 를 누르고,",
+                            "<b>홈 화면에 추가</b> 를 누르세요."];
+  // 크롬은 따로 권하지 않는다 — 이미 크롬인데 '크롬에서 열기' 는 헛말이다.
+  const toChrome = kind === "chrome" ? ""
+    : '<button data-act="addchrome">크롬에서 열기</button>';
   openSheet("<h3>홈 화면에 추가</h3>"
-    + '<p class="note">이 브라우저에서는 한 번에 안 됩니다.<br>'
-    + '<b>크롬으로 열면 단추 하나로 끝납니다.</b></p>'
-    + '<button class="go" data-act="addchrome">크롬에서 열기</button>'
-    + '<p class="note">크롬이 없으면 메뉴(⋮) → 홈 화면에 추가</p>');
+    + '<p class="note">' + how[0] + "<br>" + how[1] + "</p>"
+    + toChrome
+    + (toChrome ? '<p class="note">크롬으로 열면 단추 하나로 끝납니다.<br>'
+                + '크롬이 없으면 위 안내대로 하세요.</p>' : ""));
 }
 
 $("#addgo").addEventListener("click", openInstall);
