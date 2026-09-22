@@ -12,6 +12,13 @@
      홈 화면에 추가해 둔 경우가 특히 오래 물고 있다.
      이 표시를 지우면 새로 구운 것이 사람들 폰에 안 닿는다. -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<!-- 홈 화면에 추가(PWA). 제목은 잠긴 판에서도 안 드러나야 하므로
+     manifest 안에만 두고 여기에는 안 적는다(4.19-1). -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b7a4b">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Notes</title>
@@ -144,7 +151,18 @@ main{padding:10px 12px 28px;display:grid;gap:8px}
 .tags{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
 .tag{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--bg);
      border:1px solid var(--line);color:var(--dim)}
-.empty{grid-column:1/-1;text-align:center;color:var(--dim);padding:48px 12px}
+#onlybar{display:none;align-items:center;justify-content:space-between;gap:10px;
+        margin:0 12px 10px;padding:10px 12px;border-radius:10px;
+        background:var(--accent);color:#fff;font-size:13px}
+#onlybar button{font-size:12.5px;padding:6px 12px;border-radius:7px;cursor:pointer;
+        background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.45);color:#fff}
+.empty{grid-column:1/-1;text-align:center;color:var(--dim);padding:44px 12px}
+.e-head{font-size:15px;font-weight:600;color:var(--fg);margin-bottom:6px}
+.e-sub{font-size:12.5px;line-height:1.7;margin-bottom:14px}
+.e-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.e-go{font-size:12.5px;padding:8px 14px;border-radius:8px;cursor:pointer;
+      background:var(--accent);border:1px solid var(--accent);color:#fff}
+.e-go:active{opacity:.75}
 footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:center;line-height:1.7}
 
 /* ---------- 사진 크게 ---------- */
@@ -381,6 +399,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
     <div><b id="s3">–</b><span id="c3"></span></div>
   </div>
 
+  <div id="onlybar"><span id="onlytext"></span><button id="onlyall">전체 보기</button></div>
   <main id="list"></main>
 
   <footer id="foot"></footer>
@@ -528,6 +547,9 @@ const noSpace = s => toJamo(String(s).replace(/\s+/g, ""));
 
 /* ============================ 화면 ============================ */
 let DATA = [], VIEW = [], BIG = "전체", SHOWN = 0, CP = "", WAIT = "", PICS = {};
+/* 공유 주소(#p=코드)로 들어왔을 때 그 한 줄만 보여 준다. 받은 사람이
+   2,263줄 맨 위부터 뒤지게 하면 공유한 뜻이 사라진다. */
+let ONLY = "";
 const won = n => n == null ? "–" : n.toLocaleString("ko-KR") + "원";
 const pct = n => (n > 0 ? "+" : "") + n.toFixed(1) + "%";
 /* 군마트가 싸면 음수다. 기준이 쿠팡가이기 때문(프로그램의 calc() 과 같다). */
@@ -573,6 +595,16 @@ function start(d){
   $("#app").hidden = false;
   // 주소 뒤에 짐이 실려 왔으면 먼저 푼다
   const raw = location.hash.slice(1);
+  // 공유 주소. `#p=32912` 처럼 온다. 검색어 해시와 섞이지 않도록
+  // '문자 p, 등호, 숫자만' 일 때로 못박는다.
+  const shared = /^p=[0-9]+$/.test(raw) ? raw.slice(2) : "";
+  const sIt = shared ? DATA.find(x => x.p === shared) : null;
+  if (sIt){
+    ONLY = shared;
+    $("#onlybar").style.display = "flex";
+    $("#onlytext").textContent = "공유받은 상품입니다";
+    document.title = sIt.name;
+  }
   if (raw === "noapp"){
     try { history.replaceState({}, "", location.pathname); } catch(e){}
     setTimeout(openNoApp, 400);
@@ -584,7 +616,8 @@ function start(d){
     } catch (e) {}
     try { history.replaceState({}, "", location.pathname); } catch(e){}
     setTimeout(() => alert(msg), 300);
-  } else {
+  } else if (!sIt) {
+    // 공유 주소일 때는 넣으면 안 된다. `p=28438` 이 검색어로 들어간다.
     const h = decodeURIComponent(raw);
     if (h) $("#q").value = h;
   }
@@ -635,7 +668,10 @@ function run(){
   const raw = $("#q").value.trim();
   $("#clr").style.display = raw ? "block" : "none";
   try {
-    history.replaceState(history.state, "", raw ? "#" + encodeURIComponent(raw) : " ");
+    // 공유받아 들어온 주소(#p=코드)는 그대로 둔다. 여기서 다시 쓰면
+    // `#p%3D28438` 로 인코딩돼 그 주소를 또 공유하면 안 열린다.
+    if (!ONLY)
+      history.replaceState(history.state, "", raw ? "#" + encodeURIComponent(raw) : " ");
   } catch(e){}
 
   const toks = raw.split(/\s+/).filter(Boolean).map(t => ({
@@ -645,17 +681,22 @@ function run(){
   }));
 
   const view = $("#view").value || "all";
-  VIEW = DATA.filter(it => {
-    if (BIG !== "전체" && it.big !== BIG) return false;
+
+  // **거르는 판단을 함수로 떼어 둔다.** 아무것도 안 걸렸을 때 '분류만
+  // 풀면 몇 건인가' 를 세려면 같은 판단을 조건만 바꿔 다시 돌려야 한다.
+  // 두 벌로 베껴 두면 한쪽만 고쳐져 안내가 거짓말을 하게 된다.
+  const pass = (it, big, vw, scoring) => {
+    if (ONLY) return it.p === ONLY;      // 공유받은 한 줄만
+    if (big !== "전체" && it.big !== big) return false;
     // 찜한 것 보기는 빼고(거기서 빼면 바로 사라지는 게 맞다),
     // 나머지 보기에서는 방금 손댄 줄을 남겨 둔다.
-    if (view !== "cart" && !KEEP.has(it.p)){
-      if (view === "done" && it.rate == null) return false;
-      if (view === "none" && !it.nm) return false;
-      if (view === "wait" && (it.rate != null || it.nm)) return false;
-      if (view === "mine" && !it.mine) return false;
+    if (vw !== "cart" && !KEEP.has(it.p)){
+      if (vw === "done" && it.rate == null) return false;
+      if (vw === "none" && !it.nm) return false;
+      if (vw === "wait" && (it.rate != null || it.nm)) return false;
+      if (vw === "mine" && !it.mine) return false;
     }
-    if (view === "cart" && !inCart(it.p)) return false;
+    if (vw === "cart" && !inCart(it.p)) return false;
     let score = 0;
     for (const t of toks){
       const inBody = t.cho ? it._cb.includes(t.c) : it._b.includes(t.j);
@@ -663,9 +704,10 @@ function run(){
       if (!inBody && !inAll) return false;
       score += inBody ? 2 : 1;          // 이름에 맞으면 두 배로 친다
     }
-    it._s = score;
+    if (scoring) it._s = score;
     return true;
-  });
+  };
+  VIEW = DATA.filter(it => pass(it, BIG, view, true));
 
   const k = $("#sort").value;
   const big = 1e12;
@@ -673,6 +715,14 @@ function run(){
     if (toks.length && b._s !== a._s) return b._s - a._s;   // 잘 맞은 것 먼저
     const A = a.rate == null ? big : a.rate, B = b.rate == null ? big : b.rate;
     switch (k){
+      // 많이 팔린 순. 리뷰수는 그 상품을 몇 사람이 샀는지에 가장 가까운
+      // 숫자다. 첫 화면을 이걸로 여는 건 **처음 들어온 사람이 아는 물건을
+      // 먼저 보게** 하려는 것이다. 할인율로 열면 맨 위가 면세담배와
+      // 리뷰 0짜리 기획세트라 무슨 사이트인지 알기 어렵다.
+      //
+      // 리뷰수가 없는 줄(아직 안 본 것, 예전에 넣은 것)은 0 으로 쳐서
+      // 뒤로 간다. 그게 맞다 — 근거가 없는 줄이 맨 위에 올 이유가 없다.
+      case "rv":      return (b.rv || 0) - (a.rv || 0);
       case "rate":    return A - B;
       case "rate_up": return (a.rate == null ? -big : -a.rate) - (b.rate == null ? -big : -b.rate);
       case "diff":    return (a.diff == null ? big : a.diff) - (b.diff == null ? big : b.diff);
@@ -705,10 +755,78 @@ function run(){
   SHOWN = 0;
   $("#list").innerHTML = "";
   if (!VIEW.length){
-    $("#list").innerHTML = '<div class="empty">찾는 것이 없습니다</div>';
+    $("#list").innerHTML = emptyHTML(raw, view, pass);
     return;
   }
   more();
+}
+
+/* 아무것도 안 걸렸을 때 **왜 없는지와 어디로 가면 되는지**를 말해 준다.
+ *
+ * 그냥 '찾는 것이 없습니다' 만 띄우면 막다른 골목이다. 실제로는 분류나
+ * 보기를 하나 풀면 나오는 경우가 대부분이다. `참기름` 을 치고 분류를
+ * `화장품` 으로 눌러 둔 채라면, 없는 게 아니라 거기에 없는 것뿐이다.
+ *
+ * 세는 방법은 `run()` 의 `pass()` 를 조건만 바꿔 다시 돌리는 것이다.
+ * 판단을 베껴 쓰지 않으므로 한쪽만 고쳐져 안내가 어긋날 일이 없다.
+ */
+function emptyHTML(raw, view, pass){
+  const vName = n => {
+    const o = [...$("#view").options].find(o => o.value === n);
+    return o ? o.textContent : n;
+  };
+  const outs = [];
+  // 1) 분류만 풀면?
+  if (BIG !== "전체"){
+    const n = DATA.filter(it => pass(it, "전체", view, false)).length;
+    if (n) outs.push({n, label: "전체에서 보기 (" + n.toLocaleString("ko-KR") + "건)",
+                      act: "big"});
+  }
+  // 2) 보기만 풀면?
+  if (view !== "all"){
+    const n = DATA.filter(it => pass(it, BIG, "all", false)).length;
+    if (n) outs.push({n, label: vName("all") + " (" + n.toLocaleString("ko-KR") + "건)",
+                      act: "view"});
+  }
+  // 3) 둘 다 풀면?
+  if (BIG !== "전체" && view !== "all"){
+    const n = DATA.filter(it => pass(it, "전체", "all", false)).length;
+    if (n && !outs.some(o => o.n === n)) outs.push({
+      n, label: "둘 다 풀기 (" + n.toLocaleString("ko-KR") + "건)", act: "both"});
+  }
+  // 받침을 보고 조사를 고른다. '참기름 는' 처럼 나오면 읽는 사람이 먼저
+  // 어색함을 느낀다. 한글 음절은 (코드-0xAC00)%28 이 0 이면 받침이 없다.
+  //
+  // **따옴표가 아니라 낱말에서 받침을 읽어야 한다.** `참기름’` 의 끝 글자를
+  // 보면 그건 따옴표라 늘 받침 없는 쪽이 나온다. 한 번 그렇게 틀렸다.
+  //
+  // `으로/로` 는 받침 유무만으로 안 갈린다. **ㄹ 받침은 `로` 다** —
+  // '없는말으로' 가 아니라 '없는말로'. 종성 번호 8 이 ㄹ 이다.
+  const jo = (w, withT, noT, lIsNo) => {
+    const c = w.charCodeAt(w.length - 1);
+    if (c < 0xAC00 || c > 0xD7A3) return noT;
+    const t = (c - 0xAC00) % 28;
+    if (!t) return noT;
+    return (lIsNo && t === 8) ? noT : withT;
+  };
+  const quoted = raw ? "‘" + esc(raw) + "’" : "";
+  let head = raw ? quoted + jo(raw, "으로", "로", true) + " 찾은 것이 없습니다"
+                 : "여기에 보여 줄 것이 없습니다";
+  if (raw && BIG !== "전체")
+    head = quoted + jo(raw, "은", "는") + " " + esc(BIG) + "에 없습니다";
+  let html = '<div class="empty"><div class="e-head">' + head + "</div>";
+  if (outs.length){
+    html += '<div class="e-sub">이렇게 하면 나옵니다</div><div class="e-btns">';
+    for (const o of outs)
+      html += '<button class="e-go" data-act="' + o.act + '">' + o.label + "</button>";
+    html += "</div>";
+  } else if (raw){
+    html += '<div class="e-sub">띄어쓰기를 줄이거나 낱말을 하나만 남겨 보세요.'
+         +  '<br>초성으로도 찾힙니다 — <b>ㅊㄱㄹ</b> 로 참기름</div>'
+         +  '<div class="e-btns"><button class="e-go" data-act="clear">'
+         +  '찾기 지우기</button></div>';
+  }
+  return html + "</div>";
 }
 
 function median(a){
@@ -722,10 +840,14 @@ function stats(){
   const done = VIEW.filter(i => i.rate != null);
   $("#s1").textContent = done.length.toLocaleString("ko-KR") + " / "
       + VIEW.length.toLocaleString("ko-KR");
-  // 아낀 돈 = 쿠팡 낱개가와 군마트가의 차이를 다 더한 것.
-  // 군마트가 비싼 줄은 저절로 깎이므로 부풀려지지 않는다.
-  const saved = done.reduce((a, i) => a + (i.c - i.g), 0);
-  $("#s2").textContent = done.length ? won(saved) : "–";
+  // **합계 금액은 크기만 하고 뜻이 없다.** 2,263건을 한 번에 다 사는 사람은
+  // 없으니 '460만원 아꼈다' 는 아무에게도 해당되지 않는 숫자다.
+  // 가운데 값(중앙 할인율)은 '보통 이만큼 싸다' 로 바로 읽힌다.
+  //
+  // 평균이 아니라 중앙값인 까닭 — -92% 짜리 기획세트 하나가 평균을 통째로
+  // 끌어내린다. 절반이 이보다 싸고 절반이 이보다 비싸다는 말이 정직하다.
+  const rates = done.map(i => i.rate).sort((a, b) => a - b);
+  $("#s2").textContent = rates.length ? pct(median(rates)) : "–";
   $("#s3").textContent = done.length
       ? Math.round(100 * done.filter(i => i.rate < 0).length / done.length) + "%" : "–";
 }
@@ -886,6 +1008,7 @@ function openMove(){
     "주소가 바뀌면 저장한 것이 따라오지 않습니다. 링크로 옮기세요.</p>" +
     '<button class="go" data-act="movelink">옮길 링크 복사</button>' +
     '<button data-act="movein">붙여넣어 가져오기</button>' +
+    (STANDALONE ? "" : '<button data-act="install">홈 화면에 추가</button>') +
     '<button data-act="noapp">쿠팡이 안 열릴 때</button>');
 }
 $("#more").addEventListener("click", openMove);
@@ -1172,6 +1295,25 @@ $("#sheet").addEventListener("click", e => {
     CART = CART.filter(x => x !== p);
     saveCart(); closeSheet(); return run();
   }
+  if (act === "share"){
+    const it = DATA.find(x => x.p === p);
+    if (!it) return;
+    // 받는 사람이 눌렀을 때 그 상품이 바로 뜨도록 주소에 코드를 싣는다.
+    const url = location.origin + location.pathname + "#p=" + p;
+    const line = it.name + " — 군마트 " + won(it.g)
+               + (it.c == null ? "" : " / " + CP + " " + won(it.c)
+                  + " (" + pct(it.rate) + ")");
+    // 안드로이드·아이폰은 navigator.share 로 카톡·문자에 바로 보낸다.
+    // 데스크톱 크롬은 이게 없어서 주소를 복사해 준다.
+    if (navigator.share){
+      navigator.share({title: it.name, text: line, url: url}).catch(() => {});
+      return;
+    }
+    try { navigator.clipboard.writeText(line + "\n" + url); } catch(e){}
+    b.textContent = "주소를 복사했습니다";
+    return;
+  }
+  if (act === "install"){ closeSheet(); return setTimeout(openInstall, 260); }
   if (act === "noapp") return openNoApp();
   if (act === "cpghome"){ location.href = "https://www.coupang.com/"; return; }
   if (act === "cpginstall"){
@@ -1278,6 +1420,7 @@ function openPrice(p){
         'placeholder="수량 1" value="' + (m.q > 1 ? m.q : "") + '">' +
     "</div>" +
     '<p class="note">2개 9,800원이면 9800 과 2 를 넣으세요</p>' +
+    '<button data-act="share" data-p="' + p + '">이 상품 공유하기</button>' +
     '<button class="go" data-act="save" data-p="' + p + '">넣기</button>' +
     '<button data-act="nomatch" data-p="' + p + '">비교군 없음</button>' +
     (MINE[p] ? '<button class="off" data-act="unset" data-p="' + p +
@@ -1348,6 +1491,29 @@ saveCart();
    아이콘 위에서는 안 되게 한다 — 거기는 저마다 할 일이 있다.
    손가락이 10px 넘게 움직이면 목록을 넘기려는 것이므로 그만둔다. */
 const LP = {t: 0, x: 0, y: 0, fired: false};
+$("#onlyall").addEventListener("click", () => {
+  ONLY = "";
+  $("#onlybar").style.display = "none";
+  try { history.replaceState(history.state, "", location.pathname); } catch(e){}
+  run();
+});
+
+/* 빈 화면의 안내 단추. 목록에 위임해 둔다 — 안내는 그릴 때마다 새로
+ * 만들어지므로 단추마다 붙이면 붙인 것이 계속 쌓인다. */
+$("#list").addEventListener("click", e => {
+  const b = e.target.closest(".e-go");
+  if (!b) return;
+  const act = b.dataset.act;
+  if (act === "big" || act === "both"){
+    BIG = "전체";
+    $("#chips").querySelectorAll(".chip").forEach(
+        c => c.classList.toggle("on", c.dataset.b === BIG));
+  }
+  if (act === "view" || act === "both") $("#view").value = "all";
+  if (act === "clear") $("#q").value = "";
+  run();
+});
+
 $("#list").addEventListener("pointerdown", e => {
   clearTimeout(LP.t);
   LP.fired = false;
@@ -1409,6 +1575,39 @@ $("#list").addEventListener("click", e => {
       (it.mine ? CP + " 가격비교 수정하기" : CP + " 가격비교 입력하기") + "</button>");
 });
 $("#zoom").addEventListener("click", dismiss);
+</script>
+<script>
+/* 홈 화면에 추가해 두면 앱처럼 열린다. 그러려면 서비스워커가 하나 있어야
+   한다(크롬의 설치 조건).
+   ★ **캐시를 먼저 보게 하면 안 된다.** 이 화면 파일은 옛것이 남아 사람들
+   폰에서 잠금 화면이 계속 떴던 적이 있다(head 의 주석). 그래서 워커는
+   **늘 네트워크를 먼저** 보고, 못 받을 때만 캐시를 내준다. */
+if ("serviceWorker" in navigator)
+  addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+
+/* 안드로이드·데스크톱 크롬은 설치할 수 있게 되면 이 신호를 준다.
+   아이폰 사파리는 신호가 없어서 직접 알려 줘야 한다. */
+let INSTALL = null;
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); INSTALL = e; });
+const STANDALONE = matchMedia("(display-mode: standalone)").matches
+                || navigator.standalone === true;
+
+function openInstall(){
+  if (INSTALL){
+    INSTALL.prompt();
+    INSTALL.userChoice.finally(() => { INSTALL = null; });
+    return;
+  }
+  const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  openSheet("<h3>홈 화면에 추가</h3>" + (STANDALONE
+    ? '<p class="note">이미 홈 화면에서 열고 있습니다.</p>'
+    : ios
+      ? '<p class="note">사파리 아래쪽 <b>공유</b>(⬆) 를 누르고<br>'
+        + '<b>홈 화면에 추가</b> 를 고르세요.<br><br>'
+        + '다른 브라우저에서는 안 됩니다 — 사파리로 열어 주세요.</p>'
+      : '<p class="note">브라우저 메뉴(⋮)에서<br>'
+        + '<b>홈 화면에 추가</b> 또는 <b>앱 설치</b> 를 고르세요.</p>'));
+}
 </script>
 </body>
 </html>
