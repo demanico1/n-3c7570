@@ -622,6 +622,14 @@ function start(d){
     const all = it.hb + " " + it.hx;
     it._b = noSpace(it.hb);   it._x = noSpace(all);
     it._cb = toCho(it.hb);    it._cx = toCho(all);
+    // ★ 낱말 경계를 살린 것도 따로 둔다 (2026-09-24).
+    //
+    // toCho 는 띄어쓰기를 지운다. 그래서 `농심켈로그 콘푸로스트` 가
+    // `ㄴㅅㅋㄹㄱㅋㅍㄹㅅㅌ` 이 되고 그 안에 `ㅅㅋㄹ` 이 박힌다.
+    // `ㅅㅋㄹ` 로 선크림을 찾으면 선크림이 18번째로 밀렸다.
+    // 낱말마다 따로 두면 첫머리에서 맞았는지 알 수 있다.
+    it._bw  = it.hb.split(/\s+/).map(noSpace).join(" ");
+    it._cbw = it.hb.split(/\s+/).map(toCho).join(" ");
   }
   applyMine();
   const bigs = ["전체", ...d.bigs];
@@ -746,7 +754,11 @@ function run(){
       const inBody = t.cho ? it._cb.includes(t.c) : it._b.includes(t.j);
       const inAll  = t.cho ? it._cx.includes(t.c) : it._x.includes(t.j);
       if (!inBody && !inAll) return false;
-      score += inBody ? 2 : 1;          // 이름에 맞으면 두 배로 친다
+      // 낱말 첫머리에서 맞았으면 두 배를 더 준다. 초성은 짧아서 낱말
+      // 한가운데에도 잘 박히는데, 그러면 정작 찾던 것이 뒤로 밀린다.
+      const head = t.cho ? (" " + it._cbw).includes(" " + t.c)
+                         : (" " + it._bw ).includes(" " + t.j);
+      score += head ? 4 : (inBody ? 2 : 1);
     }
     if (scoring) it._s = score;
     return true;
