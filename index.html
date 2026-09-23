@@ -26,6 +26,8 @@
 <meta property="og:title" content="군마트 쿠팡가 비교">
 <meta property="og:description" content="군마트(PX)에서 파는 2,263건을 쿠팡 가격과 하나씩 견줘 정리했습니다. 그중 2,006건은 직접 확인한 값입니다.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="og/home.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
 :root{
   --bg:#f6f7f9; --card:#fff; --line:#e3e6ea; --ink:#16181d; --dim:#6b7280;
@@ -446,7 +448,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
   <div id="onlybar"><span id="onlytext"></span><button id="onlyall">전체 보기</button></div>
   <main id="list"></main>
 
-  <footer id="foot"></footer>
+  <footer id="foot"></footer><nav class="cats" aria-label="분류별 보기"><div class="cats-t">분류별로 모아 보기</div><a href="c/food/">식품 <b>1,262</b></a><a href="c/living/">생활용품 <b>264</b></a><a href="c/beauty/">화장품 <b>223</b></a><a href="c/apparel/">의류/잡화 <b>143</b></a><a href="c/liquor/">주류 <b>83</b></a><a href="c/etc/">기타 <b>31</b></a></nav><style>.cats{max-width:640px;margin:0 auto;padding:4px 14px 30px;text-align:center}.cats-t{font-size:12px;color:var(--dim);margin-bottom:9px}.cats a{display:inline-block;margin:3px;padding:7px 13px;border:1px solid var(--line);border-radius:99px;font-size:12.5px;color:var(--ink);text-decoration:none;background:var(--card)}.cats a b{color:var(--good,#0F6B46);font-variant-numeric:tabular-nums}</style>
 </div>
 
 <div id="zoom"><img alt=""><p></p><small>아무 데나 누르면 닫힙니다</small></div>
@@ -878,7 +880,7 @@ function emptyHTML(raw, view, pass){
     html += "</div>";
   } else if (raw){
     html += '<div class="e-sub">띄어쓰기를 줄이거나 낱말을 하나만 남겨 보세요.'
-         +  '<br>초성으로도 찾힙니다 — <b>ㅊㄱㄹ</b> 로 참기름</div>'
+         +  '<br>초성으로도 찾힙니다 — <b>ㅅㅋㄹ</b> 로 선크림</div>'
          +  '<div class="e-btns"><button class="e-go" data-act="clear">'
          +  '찾기 지우기</button></div>';
   }
