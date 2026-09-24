@@ -150,7 +150,22 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 .chip{flex:0 0 auto;padding:6px 11px;border:1px solid var(--line);border-radius:999px;
       background:var(--card);color:var(--dim);font-size:13px;cursor:pointer;white-space:nowrap}
 .chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-.tools{display:flex;gap:6px;margin-top:8px;align-items:center}
+/* ★ 목록 위 줄. **붙박이가 아니다** — 내려가면 같이 밀려 올라가서
+   상품이 한 줄이라도 더 보인다 (2026-09-25). */
+.listbar{display:flex;justify-content:flex-end;align-items:center;gap:7px;
+ padding:8px 12px 6px}
+/* ★ 칸 너비는 **가장 긴 항목**(`할인율 높은 순`)에 맞춰진다. 그래서 짧은
+   `랭킹순` 을 한쪽에 붙이면 반대쪽이 휑하게 빈다. 가운데로 둔다.
+   `direction:rtl` 로 오른쪽에 붙여 봤다가 그래서 물렸다 (2026-09-25). */
+.listbar select{border:0;background:transparent;color:var(--ink);font-size:13.5px;
+ font-weight:700;letter-spacing:-.3px;padding:6px 2px;cursor:pointer;
+ -webkit-appearance:none;appearance:none;text-align:center;
+ text-align-last:center}
+.listbar select:focus{outline:none}
+/* 쿠팡처럼 글자 오른쪽에 작은 화살표를 붙인다 */
+.listbar .selwrap{display:inline-flex;align-items:center;gap:3px}
+.listbar .selwrap::after{content:"\25BE";font-size:10px;color:var(--dim);
+ pointer-events:none}
 #sort,#view{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);
      border-radius:9px;background:var(--card)}
 
@@ -433,7 +448,6 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
   <header>
     <div class="top">
       <a class="brand" id="home" href="./" title="처음 화면으로"><img src="logo.svg" alt="" width="30" height="24"><span><b>PX 가격비교</b><i>군마트 vs 온라인</i></span></a>
-      <button class="iconbtn" id="mode" title="보기 바꾸기"><em id="modelb"></em></button>
       <button class="iconbtn" id="cartbtn" title="찜한 것"><span id="cartn"></span><em>찜</em></button>
       <button class="iconbtn" id="theme" title="밝게/어둡게">◐<em id="themelb"></em></button>
       <!-- 메뉴는 **맨 오른쪽**이다 (사장님 결정). 자주 쓰는 것이 왼쪽,
@@ -448,10 +462,6 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
       <button id="clr" aria-label="지우기">×</button>
     </div>
     <div class="rows" id="chips"></div>
-    <div class="tools">
-      <select id="sort"></select>
-      <select id="view"></select>
-    </div>
   </header>
 
   <div id="inapp">
@@ -484,6 +494,18 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
   </div>
 
   <div id="onlybar"><span id="onlytext"></span><button id="onlyall">전체 보기</button></div>
+
+  <!-- ★ 정렬·보기는 **목록 바로 위**다 (2026-09-25 사장님 결정).
+       머리에 붙여 뒀더니 붙박이라 화면 위쪽을 늘 차지했다. 여기로 내리면
+       내려갈 때 같이 밀려 올라가서 **상품이 한 줄이라도 더 보인다.**
+       쿠팡도 이 자리다. 그래서 `position:sticky` 를 주면 안 된다. -->
+  <div class="listbar">
+    <span class="selwrap"><select id="sort" aria-label="줄 세우기"></select></span>
+    <button class="iconbtn" id="mode" title="보기 바꾸기"><em id="modelb"></em></button>
+    <!-- 거르기는 눈에 안 보이지만 그대로 쓴다. 찜 단추와 빈 화면 안내가
+         이걸 건드려서, 없애면 그 둘이 같이 죽는다. -->
+    <select id="view" hidden></select>
+  </div>
   <main id="list"></main>
 
   <footer id="foot"></footer><nav class="cats" aria-label="분류별 보기"><div class="cats-t">분류별로 모아 보기</div><a href="c/food/">식품 <b>1,263</b></a><a href="c/living/">생활용품 <b>289</b></a><a href="c/beauty/">화장품 <b>211</b></a><a href="c/apparel/">의류/잡화 <b>137</b></a><a href="c/liquor/">주류 <b>83</b></a><a href="c/etc/">기타 <b>23</b></a></nav><style>.cats{max-width:640px;margin:0 auto;padding:4px 14px 30px;text-align:center}.cats-t{font-size:12px;color:var(--dim);margin-bottom:9px}.cats a{display:inline-block;margin:3px;padding:7px 13px;border:1px solid var(--line);border-radius:99px;font-size:12.5px;color:var(--ink);text-decoration:none;background:var(--card)}.cats a b{color:var(--good,#0F6B46);font-variant-numeric:tabular-nums}</style>
@@ -764,7 +786,28 @@ function goHome(){
 $("#home").addEventListener("click", e => { e.preventDefault(); goHome(); });
 
 $("#q").addEventListener("input", runFresh);
-$("#sort").addEventListener("change", run);      // 줄 세우기만 바뀐다
+/* ★ 드롭다운 하나가 **줄 세우기와 거르기를 같이** 맡는다 (2026-09-25).
+ *
+ * 앞의 여섯은 줄 세우기고, 마지막 `직접 입력한 것` 만 거르기다. 전에는
+ * 정렬 8개 · 보기 6개로 드롭다운이 둘이었는데, 무엇이 무엇인지 헷갈리고
+ * 머리를 두 줄로 먹었다.
+ *
+ * `#view` 는 숨겨서 그대로 둔다 — 찜 단추와 빈 화면 안내가 그걸 쓴다. */
+let SORTK = "rv";          // `직접 입력한 것` 을 고른 동안 기억해 둘 줄 세우기
+$("#sort").addEventListener("change", () => {
+  const v = $("#sort").value;
+  const was = $("#view").value;
+  if (v === "mine"){
+    $("#view").value = "mine";
+  } else {
+    SORTK = v;
+    // 찜 보기에서 줄만 바꾸는 것은 그대로 둔다. `직접 입력한 것` 에서
+    // 나올 때만 전체로 되돌린다.
+    if (was === "mine") $("#view").value = "all";
+  }
+  // 거르기가 바뀌었으면 처음부터 다시 그린다. 줄 세우기만이면 이어서 그린다.
+  ($("#view").value !== was ? runFresh : run)();
+});
 $("#view").addEventListener("change", runFresh);
 $("#clr").addEventListener("click", () => { $("#q").value = ""; run(); $("#q").focus(); });
 function themeLabel(){
@@ -844,7 +887,8 @@ function run(){
   };
   VIEW = DATA.filter(it => pass(it, BIG, view, true));
 
-  const k = $("#sort").value;
+  // `mine` 은 거르기라 줄 세우기 값이 아니다. 그때는 직전 것을 쓴다.
+  const k = $("#sort").value === "mine" ? SORTK : $("#sort").value;
   const big = 1e12;
   VIEW.sort((a, b) => {
     if (toks.length && b._s !== a._s) return b._s - a._s;   // 잘 맞은 것 먼저
@@ -882,9 +926,10 @@ function run(){
   const bar = $("#cartbar");
   bar.style.display = (view === "cart" || view === "mine") ? "flex" : "none";
   bar.dataset.mode = view;
-  bar.children[0].textContent = view === "mine" ? "프로그램에 넣을 글 복사"
+  bar.children[0].textContent = view === "mine" ? "직접 입력한 값 복사"
                                                 : "이름 전부 복사";
-  bar.children[1].textContent = view === "mine" ? "넣은 값 모두 지우기" : "비우기";
+  bar.children[1].textContent = view === "mine" ? "직접 입력한 값 모두 지우기"
+                                                : "비우기";
   stats();
 
   SHOWN = 0;
@@ -1301,8 +1346,12 @@ function saveMine(){
    몇 건이 기다리고 있는지 눈에 보여야 잊지 않는다. */
 function markMine(){
   const n = Object.keys(MINE).length;
-  const opt = $("#view").querySelector('option[value="mine"]');
-  if (opt) opt.textContent = n ? "폰에서 넣은 것 " + n + "건" : "폰에서 넣은 것";
+  // 드롭다운이 하나로 합쳐졌으니 거기에 적는다. 숨긴 `#view` 쪽도
+  // 같이 맞춰 둔다 — 나중에 되살릴 때 헷갈리지 않게.
+  for (const sel of ["#sort", "#view"]){
+    const opt = $(sel).querySelector('option[value="mine"]');
+    if (opt) opt.textContent = n ? "직접 입력한 것 " + n + "건" : "직접 입력한 것";
+  }
 }
 
 /* 넣은 값을 줄에 덮어씌운다. 원래 값은 c0·r0… 에 따로 둬서 지우면 되돌아간다.
