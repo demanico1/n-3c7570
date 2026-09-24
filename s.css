@@ -1,0 +1,397 @@
+/* PX 가격비교 — 유입 페이지 모양
+ *
+ * 색은 사장님이 주신 브랜드 시안에서 그대로 가져왔다.
+ * 이미지를 쓰지 않고 색·여백·타이포만으로 인상을 잡는다. 0 KB 가 더 안 든다.
+ * 우리 방문자는 모바일이 85~94% 라 무거운 그림은 치명적이다.
+ */
+:root{
+  --px:#0F6B46;        /* 메인 그린 — 신뢰, 안정감 */
+  --px-d:#0a4f34;      /* 진한 쪽 */
+  --px-l:#E8F5EC;      /* 서브 그린 — 부드러움 */
+  --gold:#FFC107;      /* 포인트 옐로우 — 주목, 활력 */
+  --ink:#333333;       /* 텍스트 */
+  --dim:#6b7280;
+  --line:#e3e6ea;
+  --bg:#F5F7FA;        /* 배경 — 깔끔함 */
+  --card:#fff;
+  --bad:#b3261e;
+  --bad-bg:#fdeceb;
+  --hot:#F02D70;      /* 온라인 값·할인율 — 시안의 분홍 */
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6;
+ font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","Noto Sans KR",sans-serif}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px 48px}
+
+/* ── 머리 — 로고가 브랜드를 만든다 */
+header{background:var(--card);border-bottom:1px solid var(--line);padding:11px 0;
+ position:sticky;top:0;z-index:5}
+header .wrap{padding-bottom:0}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink)}
+.brand img{width:30px;height:24px;display:block}
+.brand b{font-weight:800;font-size:16px;letter-spacing:-.4px}
+.brand i{font-style:normal;font-size:11px;color:var(--dim);font-weight:500}
+
+.crumb{font-size:12px;color:var(--dim);margin:15px 0 7px}
+.crumb a{color:var(--dim);text-decoration:none;border-bottom:1px solid var(--line)}
+h1{font-size:21px;line-height:1.35;margin:0 0 5px;letter-spacing:-.5px}
+.sub{color:var(--dim);font-size:13px;margin-bottom:15px}
+
+.hero{background:var(--card);border:1px solid var(--line);border-radius:16px;
+ padding:20px;text-align:center;margin-bottom:13px}
+.hero img{max-width:250px;max-height:250px;width:auto}
+
+/* ── 값 — ★ 이 페이지에서 제일 중요한 자리.
+   시안의 'PX 3,800 / 온라인 4,290' 두 칸을 그대로 옮겼다.
+   전에는 두 값이 작은 글씨로 나란히 있어 어느 쪽이 유리한지 안 보였다. */
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;
+ padding:16px;margin-bottom:13px}
+.duo{display:flex;gap:9px;align-items:stretch}
+.duo>div{flex:1;border-radius:13px;padding:13px 14px}
+.duo .me{background:var(--px);color:#fff}
+.duo .them{background:#fff;border:1.5px solid var(--line)}
+.duo .k{font-size:12px;font-weight:700;opacity:.9;margin-bottom:2px}
+.duo .them .k{color:var(--dim)}
+.duo .v{font-size:25px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.duo .them .v{color:var(--dim);font-weight:700}
+.gap{margin-top:13px;background:var(--px-l);border-radius:11px;padding:11px 13px;
+ display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gap .t{font-size:14.5px;font-weight:700;color:var(--px-d)}
+.gap .t b{font-size:17px}
+.tag{background:var(--px);color:#fff;border-radius:9px;padding:6px 11px;
+ font-weight:800;font-size:16px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tag.b{background:var(--bad)}
+.gap.up{background:var(--bad-bg)} .gap.up .t{color:var(--bad)}
+.note{font-size:12.5px;color:var(--dim);margin:11px 2px 0;line-height:1.7}
+
+table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card);
+ border:1px solid var(--line);border-radius:14px;overflow:hidden}
+td{padding:10px 14px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+td:first-child{color:var(--dim);width:38%;background:#fbfcfd}
+
+h2{font-size:16px;margin:26px 0 10px;letter-spacing:-.3px}
+ul{list-style:none;padding:0;margin:0}
+li{display:flex;justify-content:space-between;gap:10px;align-items:center;
+ background:var(--card);border:1px solid var(--line);border-radius:12px;
+ padding:9px 12px;margin-bottom:7px;font-size:13.5px}
+li a{color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px;min-width:0}
+li .th{width:44px;height:44px;object-fit:contain;background:#fff;border-radius:7px;flex:0 0 44px}
+li span{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;
+ -webkit-line-clamp:2;-webkit-box-orient:vertical}
+li b{font-variant-numeric:tabular-nums;white-space:nowrap;font-size:14px}
+li b.g{color:var(--px)}li b.b{color:var(--bad)}
+
+/* 쿠팡 단추는 조용하게. 값을 한 번 더 보러 가는 길일 뿐이다 */
+.cta{display:flex;align-items:center;justify-content:center;gap:7px;
+ background:var(--card);border:1px solid var(--line);color:var(--dim);
+ text-decoration:none;padding:13px;border-radius:12px;font-weight:600;
+ font-size:14px;margin:20px 0 10px}
+.cta:active{background:var(--bg)}
+
+/* ★ 전체 목록이 주인공이다. 여기로 오게 하는 것이 이 페이지의 목적이라
+   브랜드 그린으로 제일 크게 둔다. 전에는 보라색이라 브랜드와 겉돌았다. */
+.cta2{display:block;text-decoration:none;color:#fff;border-radius:16px;
+ padding:18px;text-align:center;position:relative;overflow:hidden;
+ background:linear-gradient(118deg,var(--px-d) 0%,var(--px) 45%,#149a63 70%,var(--px-d) 100%);
+ background-size:250% 100%;animation:flow 9s ease-in-out infinite;
+ box-shadow:0 8px 20px rgba(15,107,70,.26)}
+.cta2 .t{font-size:17px;font-weight:800;letter-spacing:-.3px;position:relative;z-index:1}
+.cta2 .s{font-size:12.5px;opacity:.9;margin-top:4px;position:relative;z-index:1}
+.cta2 .t em{font-style:normal;color:var(--gold)}
+.cta2::after{content:"";position:absolute;inset:0;z-index:0;
+ background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.3) 50%,transparent 62%);
+ transform:translateX(-120%);animation:shine 4.5s ease-in-out infinite}
+@keyframes flow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes shine{0%,62%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+@media (prefers-reduced-motion: reduce){
+  .cta2{animation:none;background-position:30% 50%}
+  .cta2::after{display:none}
+}
+
+/* 분류 페이지 머리 — 몇 건이 얼마나 싼지 한눈에 */
+.sum{display:flex;gap:9px;margin:4px 0 16px}
+.sum div{flex:1;background:var(--card);border:1px solid var(--line);
+ border-radius:13px;padding:12px;text-align:center}
+.sum .n{font-size:21px;font-weight:800;color:var(--px);letter-spacing:-.6px;
+ font-variant-numeric:tabular-nums}
+.sum .l{font-size:11.5px;color:var(--dim);margin-top:1px}
+
+footer{margin-top:32px;padding-top:17px;border-top:1px solid var(--line);
+ font-size:12px;color:var(--dim);line-height:1.8}
+
+/* ── 소개 영역 — 2026-09-24 3차 지시.
+ *
+ * 검색해서 들어온 사람이 이 서비스를 처음 만나는 자리다. 이끌 흐름은 이것이다.
+ *
+ *   PX에 뭐가 있는지 모르겠다 → 진짜 싼지도 모르겠다 → 비교하기 귀찮다
+ *   → **이 사이트가 이미 비교해 놨네** → 내가 살 것을 검색해 본다
+ *
+ * 그래서 숫자부터 크게 외치지 않는다. 광고가 아니라 **쓸 만한 도구를 발견한
+ * 느낌**이어야 한다. 모바일이 먼저다 — 360px 에서 짜고 넓은 쪽을 덧댄다.
+ *
+ * 색은 앱(`웹틀.html`)과 잇는다. 앱의 `--good:#0f7b3f` 이 우리 `--px:#0F6B46`
+ * 과 거의 같아 초록이 그대로 이어지고, 앱의 파랑 `--accent:#1c6fd0` 은
+ * **앱 화면을 흉내내는 자리**(상세 이동·찜하기 아이콘)에만 보조로 쓴다.
+ */
+.intro{background:var(--card);border:1px solid var(--line);border-radius:20px;
+ padding:22px 16px;margin:24px 0 12px}
+
+.go-badge{display:inline-block;margin:0 0 14px;padding:6px 13px 6px 11px;
+ background:var(--px-l);color:var(--px-d);border-radius:999px;
+ font-size:12.5px;font-weight:700;letter-spacing:-.3px}
+.go-badge::before{content:"\25CE";margin-right:5px;opacity:.75}
+
+/* ① 문제 제기 — 여기가 1순위다 */
+.ih{margin:0 0 12px;font-size:25px;line-height:1.32;font-weight:800;
+ letter-spacing:-1px;color:var(--ink);word-break:keep-all}
+.ih em{font-style:normal;color:var(--px);
+ background:linear-gradient(transparent 60%,var(--gold) 60%,var(--gold) 93%,transparent 93%)}
+.ilead{margin:0 0 6px;font-size:17px;font-weight:800;letter-spacing:-.6px;
+ color:var(--px)}
+.isub{margin:0 0 18px;font-size:13px;line-height:1.65;color:var(--dim);
+ word-break:keep-all}
+
+/* ② 실제로 비교해 둔 것 한 건 — 말보다 이게 세다.
+   앱의 상품 카드 생김새를 그대로 따른다(테두리·모서리·배지). */
+.iprod{background:var(--bg);border:1px solid var(--line);border-radius:16px;
+ padding:13px 12px}
+.iprod>a{display:flex;gap:12px;align-items:center;text-decoration:none;
+ color:var(--ink)}
+.iprod img{width:66px;height:66px;object-fit:contain;flex:0 0 66px;
+ background:#fff;border-radius:11px}
+.ipt{min-width:0;flex:1}
+.ipt>b{display:block;font-size:13.5px;font-weight:700;line-height:1.35;
+ letter-spacing:-.4px;word-break:keep-all}
+.ipp{display:flex;align-items:baseline;gap:14px;margin-top:7px}
+.ipp span{font-size:11px;color:var(--dim)}
+.ipp span b{display:block;font-size:16px;font-weight:800;letter-spacing:-.5px;
+ font-variant-numeric:tabular-nums}
+.ipp .px b{color:var(--px)}
+.ipp .on b{color:var(--ink)}
+.ipb{display:flex;align-items:center;gap:7px;margin-top:7px}
+.ipb .badge{display:inline-block;padding:2px 8px;border-radius:7px;
+ font-size:11.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.ipb .b-good{background:#e7f6ec;color:#0f7b3f}    /* 앱의 `--good` 그대로 */
+.ipb .gap{font-size:11.5px;color:var(--dim)}
+.icap{margin:11px 0 0;font-size:12px;line-height:1.6;color:var(--dim);
+ word-break:keep-all}
+.icap b{color:var(--ink);font-weight:700}
+
+/* ③ 검색 — 이 영역의 핵심 행동이다 */
+.ih3{margin:22px 0 10px;font-size:18px;font-weight:800;letter-spacing:-.7px;
+ line-height:1.4;word-break:keep-all}
+.ih3.c{text-align:center;margin-top:24px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);
+ white-space:nowrap}
+.go-q{display:flex;align-items:center;gap:6px;background:var(--card);
+ border:2px solid var(--px);border-radius:999px;padding:4px 4px 4px 14px}
+.go-q::before{content:"\1F50D";font-size:14px;opacity:.55;flex:0 0 auto}
+.go-q input{flex:1;min-width:0;border:0;outline:0;background:transparent;
+ font:inherit;font-size:13.5px;color:var(--ink);padding:10px 0;
+ -webkit-appearance:none}
+.go-q input::placeholder{color:#9aa1ab}
+.go-q button{flex:0 0 auto;border:0;background:var(--px);color:#fff;
+ border-radius:999px;padding:0 15px;height:40px;font:inherit;font-size:13.5px;
+ font-weight:700;letter-spacing:-.3px;cursor:pointer}
+.go-q button:hover{background:var(--px-d)}
+.ichip{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.ichip a{padding:6px 12px;border:1px solid var(--line);border-radius:999px;
+ background:var(--card);font-size:12.5px;color:var(--ink);text-decoration:none}
+.ichip a:hover{border-color:var(--px);color:var(--px)}
+.go-hint{margin:9px 0 0;font-size:12px;color:var(--dim)}
+.go-hint::before{content:"\1F4A1";margin-right:5px}
+.go-hint b{color:var(--px);font-weight:800;letter-spacing:1px}
+
+/* ④ 얼마나 많이 볼 수 있나 */
+.iscale{margin-top:22px;background:var(--px-l);border-radius:16px;padding:16px 14px}
+.iscale .ns{margin:0 0 11px;font-size:14px;font-weight:700;letter-spacing:-.5px;
+ color:var(--px-d)}
+.iscale .ns span{display:block;font-size:12.5px;font-weight:700;margin-bottom:1px}
+.iscale .ns b{font-size:31px;font-weight:800;letter-spacing:-1.4px;color:var(--px);
+ font-variant-numeric:tabular-nums;margin-right:3px;
+ background:linear-gradient(transparent 72%,rgba(255,193,7,.75) 72%)}
+.icat{display:flex;flex-wrap:wrap;gap:6px}
+.icat a{display:inline-flex;align-items:baseline;gap:5px;padding:6px 11px;
+ background:#fff;border-radius:999px;font-size:12.5px;font-weight:700;
+ color:var(--ink);text-decoration:none;letter-spacing:-.3px}
+.icat a:hover{color:var(--px)}
+.icat i{font-style:normal;font-size:11px;font-weight:600;color:var(--dim);
+ font-variant-numeric:tabular-nums}
+.iscale .icap{margin-top:11px}
+
+/* ⑤ 무엇을 할 수 있나 — 기능은 문제를 말한 **뒤에** 온다 */
+.ift{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px}
+.ift li{display:flex;gap:11px;align-items:flex-start;min-width:0;
+ padding:0;border:0}
+.ift i{flex:0 0 34px;height:34px;border-radius:11px;background:#eaf2fd;
+ color:#1c6fd0;font-style:normal;font-size:15px;font-weight:800;
+ display:flex;align-items:center;justify-content:center}
+.ift li>div{min-width:0;flex:1}
+.ift b{display:block;font-size:13.5px;font-weight:700;letter-spacing:-.4px;
+ white-space:normal;word-break:keep-all}
+.ift span{display:block;margin-top:2px;font-size:12px;color:var(--dim);
+ line-height:1.55;word-break:keep-all}
+
+/* ⑥ 왜 만들었나 — 화려하지 않게. 강조색을 쓰지 않는다. */
+.igift{margin-top:24px;padding:16px 14px;background:#fafbfc;
+ border:1px solid var(--line);border-radius:16px;text-align:center}
+.igift p{margin:0;font-size:13px;line-height:1.7;color:var(--ink);
+ word-break:keep-all}
+.igift p::before{content:"\1F91D";display:block;font-size:19px;margin-bottom:7px}
+.igift .s{margin-top:7px;font-size:12px;color:var(--dim)}
+.igift .s::before{content:none}
+
+/* ⑦ 마지막 단추 */
+.intro .cta2{min-height:56px;display:flex;flex-direction:column;
+ align-items:center;justify-content:center}
+
+@media (min-width:480px){
+  .intro{padding:26px 20px}
+  .ih{font-size:29px}
+  .ift{grid-template-columns:1fr 1fr;gap:14px}
+}
+@media (min-width:720px){
+  .ift{grid-template-columns:repeat(4,1fr)}
+  .iscale{display:grid;grid-template-columns:auto 1fr;gap:4px 20px;
+   align-items:center}
+  .iscale .ns{margin:0}
+  .iscale .icap{grid-column:1/-1}
+}
+
+/* ── 바닥글의 영외마트 길. **129장이 고아가 되지 않게 하는 유일한 줄이다.**
+   지우면 사이트맵 말고는 그 페이지들로 가는 길이 없어진다. */
+footer .fl{color:var(--px);font-weight:700;text-decoration:none}
+footer .fl:hover{text-decoration:underline}
+
+/* ── 영외마트 목록. 시도로 건너뛰는 띠 + 마트 줄 */
+.jump{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px}
+.jump a{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
+ border:1px solid var(--line);border-radius:999px;background:var(--card);
+ font-size:12.5px;color:var(--ink);text-decoration:none}
+.jump a:hover{border-color:var(--px);color:var(--px)}
+.jump i{font-style:normal;font-size:11px;color:var(--dim);
+ font-variant-numeric:tabular-nums}
+h2 small{font-size:12px;font-weight:600;color:var(--dim);margin-left:6px}
+
+ul.mk{list-style:none;padding:0;margin:8px 0 18px}
+ul.mk li{display:flex;align-items:baseline;gap:8px;padding:9px 2px;
+ border-bottom:1px solid var(--line)}
+ul.mk li a{flex:1;min-width:0;text-decoration:none;color:var(--ink)}
+ul.mk li b{font-weight:700}
+ul.mk li a span{font-size:12px;color:var(--dim);margin-left:6px}
+ul.mk li i{font-style:normal;font-size:12px;color:var(--dim);white-space:nowrap;
+ font-variant-numeric:tabular-nums}
+
+/* ── ★ 되살린 것 (2026-09-24). 유도 카드를 갈아 끼우면서 카드와
+   무관한 이 규칙들까지 같이 지웠다. `table.rank` 가 빠지자 375px 에서
+   상품 이름이 한 글자씩 세로로 떨어졌다.
+   **블록을 통째로 바꿀 때는 그 사이에 낀 남의 규칙이 없는지 보라.** */
+table.rank th{background:var(--px-l);color:var(--px-d);font-size:12px;
+ padding:8px 10px;text-align:left;font-weight:700}
+table.rank td{padding:8px 10px;vertical-align:middle}
+table.rank td:first-child{width:auto;background:#fff;color:var(--ink)}
+table.rank td:nth-child(2),table.rank td:nth-child(3),table.rank td:nth-child(4),
+table.rank td:nth-child(5){white-space:nowrap;text-align:right;
+ font-variant-numeric:tabular-nums}
+table.rank td a{color:var(--ink);text-decoration:none}
+table.rank td.g{color:var(--px);font-weight:700}
+table.rank td.b{color:var(--bad);font-weight:700}
+.box.talk p{margin:0 0 8px;font-size:14.5px;line-height:1.65;color:var(--ink)}
+.box.talk p:last-child{margin-bottom:0}
+.box.talk b{color:var(--px-d)}
+ul.pick li a{display:flex;justify-content:space-between;align-items:center;
+ padding:11px 14px;font-size:14.5px;color:var(--ink);text-decoration:none}
+ul.pick li a b{color:var(--px);font-weight:700;font-size:13.5px}
+.note.tiny{font-size:12px;color:var(--dim);margin-top:18px}
+.note.tiny a{color:var(--px)}
+table.rank td.im img{width:40px;height:40px;object-fit:contain;display:block;
+ background:#fff;border-radius:6px}
+table.rank td:nth-child(2){width:auto;background:#fff;color:var(--ink)}
+table.rank td:nth-child(3),table.rank td:nth-child(4),table.rank td:nth-child(5){
+ white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+table.rank{font-size:13px;table-layout:auto}
+.box.talk{padding:15px 17px}
+ul.pick li{display:block;background:var(--card);border:1px solid var(--line);
+ border-radius:12px;padding:0;margin-bottom:7px}
+table.rank td.im{width:52px;padding:6px 0 6px 10px;text-align:left;background:#fff}
+
+/* ── ★ 표가 폰에서 가로로 삐져나온다 (2026-09-24 에 찾음. 전부터 있던 것)
+ *
+ * 숫자 칸이 `nowrap` 이고 상품명에 `레드-블래미쉬클리어크림`(136px)처럼
+ * 안 쪼개지는 토막이 있어 **표의 최소 폭이 375px 를 넘는다.**
+ * `table{width:100%}` 를 줘도 최소 폭이 더 크면 브라우저가 넘겨 버린다.
+ * 닥터지 상표 페이지에서 문서 폭이 578px 이 됐다.
+ *
+ * `anywhere` 는 **더 줄일 데가 없을 때만** 낱말을 쪼갠다. `break-all` 과
+ * 달리 평소에는 띄어쓰기에서 접혀서 읽기가 안 나빠진다. */
+/* ★ 상품명 칸이 `nowrap` 에 오른쪽 정렬이었다.
+ *
+ * 썸네일 칸(`td.im`)이 생기기 **전에** 쓴 규칙이 아직 남아 있어서,
+ * `nth-child(2)` 를 숫자 칸으로 알고 `white-space:nowrap;text-align:right`
+ * 를 건다. 뒤에 온 규칙은 `width/background/color` 만 되돌려서
+ * 정렬과 줄바꿈이 그대로 남았다.
+ *
+ * 그래서 ① 이름이 오른쪽에 붙어 보이고 ② 줄이 안 접혀 표의 최소 폭이
+ * 507px 이 됐다. 폰에서 문서 폭이 523px 로 벌어졌다. */
+table.rank td:nth-child(2){white-space:normal;text-align:left;
+ overflow-wrap:anywhere}
+@media (max-width:420px){
+  table.rank{font-size:12.5px}
+  table.rank th,table.rank td{padding:8px 6px}
+  table.rank td.im{width:46px;padding-left:7px}
+  table.rank td.im img{width:36px;height:36px}
+}
+
+/* ── `어떤 종류가 있나요` 를 여러 칸으로 (2026-09-24)
+ *
+ * 한 줄에 하나씩 놓으니 소분류 13칸이 세로로 길게 늘어져 화장품 페이지가
+ * 그것만으로 한 화면을 먹었다. 칸이 짧은 글자라 나란히 두는 편이 낫다.
+ * `auto-fill` 이라 360px 에서 2칸, 넓어지면 3~4칸이 된다. */
+ul.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));
+ gap:7px;list-style:none;padding:0;margin:10px 0 0}
+ul.pick li{margin:0}
+ul.pick li a{padding:10px 12px;font-size:13.5px;gap:6px}
+ul.pick li a span{min-width:0;overflow:hidden;text-overflow:ellipsis;
+ white-space:nowrap}
+ul.pick li a b{flex:0 0 auto;font-size:12.5px}
+
+/* ── 목록 아래 `나머지 N개도 한곳에서 보기` — 앱으로 가는 길이다 */
+a.more{display:block;margin-top:9px;padding:12px;text-align:center;
+ background:var(--px-l);color:var(--px-d);border-radius:12px;
+ font-size:13.5px;font-weight:700;letter-spacing:-.4px;text-decoration:none}
+a.more:hover{background:var(--px);color:#fff}
+a.more b{display:block;font-size:15px;font-weight:800;letter-spacing:-.5px;
+ font-variant-numeric:tabular-nums;margin-bottom:1px}
+a.more span{display:block;margin-top:3px;font-size:11.5px;font-weight:600;
+ opacity:.72}
+
+/* ── 접어 둔 나머지 목록 (2026-09-24)
+ *
+ * 20에서 그냥 끊었더니 상품 2,006장 중 **801장이 고아**가 됐다. 접어 두면
+ * 링크가 HTML 에 그대로 남아 이어진다. 눈에는 한 줄만 보인다. */
+details.rest{margin-top:9px;border:1px solid var(--line);border-radius:12px;
+ background:var(--card);overflow:hidden}
+details.rest>summary{padding:12px;text-align:center;cursor:pointer;
+ font-size:13.5px;font-weight:700;color:var(--px-d);background:var(--px-l);
+ letter-spacing:-.4px;list-style:none}
+details.rest>summary::-webkit-details-marker{display:none}
+details.rest>summary::after{content:" ▾";font-size:11px}
+details.rest[open]>summary::after{content:" ▴"}
+ul.restl{list-style:none;padding:0;margin:0;border-top:1px solid var(--line)}
+ul.restl li{display:flex;align-items:baseline;gap:8px;padding:9px 12px;
+ border-bottom:1px solid var(--line)}
+ul.restl li a{flex:1;min-width:0;color:var(--ink);text-decoration:none;
+ font-size:13px;line-height:1.4;overflow-wrap:anywhere}
+ul.restl li b{font-size:12.5px;font-weight:700;white-space:nowrap;
+ font-variant-numeric:tabular-nums}
+ul.restl li i{font-style:normal;font-size:12.5px;font-weight:700;
+ white-space:nowrap;font-variant-numeric:tabular-nums;min-width:42px;
+ text-align:right}
+ul.restl li i.g{color:var(--px)}
+ul.restl li i.b{color:var(--bad)}
+/* 펼침 맨 위의 앱 단추 — 목록과 붙여 한 덩이로 보이게 한다 */
+details.rest a.more{margin:0;border-radius:0;border-top:1px solid var(--line);
+ background:#fff;color:var(--px)}
+details.rest a.more:hover{background:var(--px-l);color:var(--px-d)}
+ul.restl{border-top:1px solid var(--line)}

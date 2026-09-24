@@ -1,6 +1,6 @@
 {
- "name": "군마트 쿠팡가 비교",
- "short_name": "군마트 쿠팡가 비교",
+ "name": "PX 가격비교",
+ "short_name": "PX 가격비교",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
