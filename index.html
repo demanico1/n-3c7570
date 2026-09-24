@@ -111,7 +111,22 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 .top h1{margin:0;font-size:16px;font-weight:700;flex:1;min-width:0;
        white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .iconbtn{border:1px solid var(--line);background:var(--card);border-radius:9px;
-       padding:6px 9px;cursor:pointer;font-size:13px}
+ padding:6px 9px;cursor:pointer;font-size:13px}
+/* ★ 아이콘만으로는 무엇인지 모른다 (2026-09-24). 옆에 한글을 아주 작게
+   붙인다. 자리가 빠듯해서 9px 이고, 이름표까지 누르는 자리에 넣는다. */
+.iconbtn{display:inline-flex;align-items:center;gap:3px;padding:6px 7px}
+.iconbtn em{font-style:normal;font-size:9px;font-weight:700;color:var(--dim);
+ letter-spacing:-.5px;line-height:1;white-space:nowrap}
+/* 좁은 화면에서는 `메뉴` 이름표를 뺀다. 안 빼면 상표가 `PX 가격…` 으로
+   잘린다 — 이름이 잘리는 것보다 이름표 하나 없는 편이 낫다.
+   `⋯` 은 그것만으로 알아본다. */
+@media(max-width:400px){ #more em{display:none} }
+
+/* ── 사용방법 창. 글이 많으니 읽기 좋게만 한다 */
+.help{text-align:left;margin:4px 0 2px}
+.help p{margin:0 0 11px;font-size:13px;line-height:1.65;color:var(--ink)}
+.help p:last-child{margin-bottom:0}
+.help b{font-weight:700}
 @media(max-width:370px){
   .top{gap:5px}
   .brand{gap:6px}
@@ -418,10 +433,12 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
   <header>
     <div class="top">
       <a class="brand" id="home" href="./" title="처음 화면으로"><img src="logo.svg" alt="" width="30" height="24"><span><b>PX 가격비교</b><i>군마트 vs 온라인</i></span></a>
-      <button class="iconbtn" id="mode" title="갤러리로 보기"></button>
-      <button class="iconbtn" id="cartbtn" title="찜한 것"><span id="cartn"></span></button>
-      <button class="iconbtn" id="more" title="옮기기·백업">⋯</button>
-      <button class="iconbtn" id="theme" title="밝게/어둡게">◐</button>
+      <button class="iconbtn" id="mode" title="보기 바꾸기"><em id="modelb"></em></button>
+      <button class="iconbtn" id="cartbtn" title="찜한 것"><span id="cartn"></span><em>찜</em></button>
+      <button class="iconbtn" id="theme" title="밝게/어둡게">◐<em id="themelb"></em></button>
+      <!-- 메뉴는 **맨 오른쪽**이다 (사장님 결정). 자주 쓰는 것이 왼쪽,
+           가끔 여는 것이 오른쪽 끝. -->
+      <button class="iconbtn" id="more" title="메뉴">⋯<em>메뉴</em></button>
     </div>
     <div class="searchwrap">
       <span class="mag">🔍</span>
@@ -750,16 +767,33 @@ $("#q").addEventListener("input", runFresh);
 $("#sort").addEventListener("change", run);      // 줄 세우기만 바뀐다
 $("#view").addEventListener("change", runFresh);
 $("#clr").addEventListener("click", () => { $("#q").value = ""; run(); $("#q").focus(); });
+function themeLabel(){
+  const el = $("#themelb");
+  if (!el) return;
+  // 바뀔 쪽을 적는다 — 지금 모습을 적으면 무엇이 눌리는지 모른다.
+  el.textContent =
+      document.documentElement.getAttribute("data-theme") === "dark"
+      ? "라이트" : "다크";
+}
 $("#theme").addEventListener("click", () => {
   const now = document.documentElement.getAttribute("data-theme");
   const next = now === "dark" ? "light" : "dark";
   document.documentElement.setAttribute("data-theme", next);
   try { localStorage.setItem("gmpx-theme", next); } catch(e){}
+  themeLabel();
 });
+/* ★ 처음 열면 **무조건 밝게** (2026-09-24).
+ *
+ * 전에는 정해 둔 것이 없으면 폰 설정(`prefers-color-scheme`)을 따랐다.
+ * 그러면 어두운 폰에서 처음 들어온 사람이 **까만 화면**을 만난다. 상품
+ * 사진이 흰 바탕이라 따로 놀고, 값 비교표도 첫인상이 무겁다.
+ *
+ * 한 번이라도 바꾸면 그다음부터는 그 사람 것을 따른다. */
 try {
   const t = localStorage.getItem("gmpx-theme");
-  if (t) document.documentElement.setAttribute("data-theme", t);
-} catch(e){}
+  document.documentElement.setAttribute("data-theme", t || "light");
+} catch(e){ document.documentElement.setAttribute("data-theme", "light"); }
+addEventListener("DOMContentLoaded", themeLabel);
 
 function run(){
   const raw = $("#q").value.trim();
@@ -1104,13 +1138,16 @@ function unpack(text){
 
 function openMove(){
   const n1 = CART.length, n2 = Object.keys(MINE).length;
-  openSheet("<h3>옮기기 · 백업</h3>" +
-    '<p class="note">찜한 것 ' + n1 + "건 · 넣은 값 " + n2 + "건<br>" +
-    "주소가 바뀌면 저장한 것이 따라오지 않습니다. 링크로 옮기세요.</p>" +
-    '<button class="go" data-act="movelink">옮길 링크 복사</button>' +
-    '<button data-act="movein">붙여넣어 가져오기</button>' +
-    (STANDALONE ? "" : '<button data-act="install">홈 화면에 추가</button>') +
-    '<button data-act="noapp">쿠팡이 안 열릴 때</button>');
+  /* ★ 2026-09-24 — 메뉴를 둘로 줄였다.
+   *
+   * `옮길 링크 복사`·`붙여넣어 가져오기`·`쿠팡이 안 열릴 때` 는 **한 번도
+   * 안 쓰이면서 처음 온 사람을 겁줬다.** 대신 `사용방법` 을 넣는다.
+   * 지운 것은 동작(`movelink`·`movein`·`noapp`)이 그대로 남아 있으니
+   * 단추만 되살리면 다시 쓸 수 있다. */
+  openSheet("<h3>메뉴</h3>" +
+    '<p class="note">찜한 것 ' + n1 + "건 · 넣은 값 " + n2 + "건</p>" +
+    '<button class="go" data-act="help"><i class="ico">?</i>사용방법</button>' +
+    (STANDALONE ? "" : '<button data-act="install">홈 화면에 추가</button>'));
 }
 $("#more").addEventListener("click", openMove);
 
@@ -1153,8 +1190,13 @@ const HEART = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
  * **카드의 겉모양만** 바뀐다(`#list.gal`). 어느 쪽으로 봤는지는 기억해 둔다.
  */
 const GAL_KEY = "gmpx-gal";
-let GAL = false;
-try { GAL = localStorage.getItem(GAL_KEY) === "1"; } catch(e){}
+/* ★ 처음 열면 **무조건 갤러리** (2026-09-24). 사진이 커야 무엇을 파는
+ * 곳인지 한눈에 안다. 한 번이라도 바꾸면 그다음부터는 그 사람 것을 따른다. */
+let GAL = true;
+try {
+  const g = localStorage.getItem(GAL_KEY);
+  if (g !== null) GAL = g === "1";
+} catch(e){}
 
 const ICO_GAL = '<svg viewBox="0 0 24 24" fill="currentColor">' +
   '<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/>' +
@@ -1171,7 +1213,9 @@ function setMode(on){
   GAL = !!on;
   $("#list").classList.toggle("gal", GAL);
   // 단추에는 **바뀔 모습**을 그린다. 지금 모습을 그리면 무엇이 눌리는지 모른다.
-  $("#mode").innerHTML = GAL ? ICO_LIST : ICO_GAL;
+  // 단추에는 **바뀔 모습**을 그린다. 이름표도 같이 바뀐다.
+  $("#mode").innerHTML = (GAL ? ICO_LIST : ICO_GAL) +
+      '<em>' + (GAL ? "리스트" : "갤러리") + "</em>";
   $("#mode").title = GAL ? "목록으로 보기" : "갤러리로 보기";
   try { localStorage.setItem(GAL_KEY, GAL ? "1" : "0"); } catch(e){}
   sharpen_all();
@@ -1380,11 +1424,39 @@ function openSheet(html){
 }
 function closeSheet(){ dismiss(); }
 
+/* 처음 온 사람에게 단추마다 무엇인지 알려 준다. 아이콘만으로는 모른다. */
+function openHelp(){
+  openSheet("<h3>사용방법</h3>" +
+    '<div class="help">' +
+    '<p><b>1. 찾기</b><br>상품 이름을 치면 바로 걸러집니다. ' +
+    '<b>ㄷㅌㅈ</b> 처럼 초성만 쳐도 되고, 띄어쓰기는 안 맞아도 됩니다.</p>' +
+    '<p><b>2. 값 읽기</b><br>왼쪽이 <b>군마트</b>, 오른쪽이 ' + CP +
+    ' 값입니다. 초록은 군마트가 싼 것, 빨강은 ' + CP + ' 가 싼 것입니다. ' +
+    '<b>비교군 없음</b> 은 견줄 상품을 못 찾은 것입니다.</p>' +
+    '<p><b>3. 머리의 단추</b><br>' +
+    '<b>리스트/갤러리</b> — 사진을 작게 볼지 크게 볼지 바꿉니다.<br>' +
+    '<b>찜</b> — 찜해 둔 것만 모아 봅니다.<br>' +
+    '<b>메뉴</b> — 지금 이 창과 홈 화면에 추가.<br>' +
+    '<b>라이트/다크</b> — 화면을 밝게/어둡게.</p>' +
+    '<p><b>4. 상품 누르기</b><br>상품 이름을 누르면 ' + CP +
+    ' 로 가기 · 찜하기 · 공유하기 · <b>직접 가격 비교 입력하기</b> 가 나옵니다. ' +
+    '목록에서 사진을 누르면 크게 보이고, 갤러리에서는 이미 크므로 ' +
+    '이름을 누른 것과 같습니다.</p>' +
+    '<p><b>5. 찜하기</b><br>카드 오른쪽 하트를 누르면 담깁니다. ' +
+    'PX 에 가서 그 목록만 보면 됩니다.</p>' +
+    '<p><b>6. 홈 화면에 추가</b><br>앱처럼 한 번에 열립니다. ' +
+    '설치도 가입도 필요 없습니다.</p>' +
+    "</div>" +
+    '<p class="note">값은 그날 화면에서 사람이 보고 적은 것입니다. ' +
+    '수시로 바뀌니 참고로만 봐 주세요.</p>');
+}
+
 $("#sheet").addEventListener("click", e => {
   if (e.target.id === "sheet") closeSheet();
   const b = e.target.closest("button, .x"); if (!b) return;
   const p = b.dataset.p, act = b.dataset.act;
   if (act === "close") return closeSheet();
+  if (act === "help") return openHelp();
   // 여기서 closeSheet() 를 부르면 안 된다. 그건 history.back() 이라서
   // 방금 시킨 쿠팡 이동을 취소해 버린다. 실제로 그래서 안 넘어갔다.
   if (act === "coupang"){
@@ -1613,7 +1685,6 @@ saveCart();
    훑으면서 넣을 때 메뉴를 한 번 거치지 않아도 된다.
    아이콘 위에서는 안 되게 한다 — 거기는 저마다 할 일이 있다.
    손가락이 10px 넘게 움직이면 목록을 넘기려는 것이므로 그만둔다. */
-const LP = {t: 0, x: 0, y: 0, fired: false};
 $("#onlyall").addEventListener("click", () => {
   ONLY = "";
   $("#onlybar").style.display = "none";
@@ -1637,28 +1708,14 @@ $("#list").addEventListener("click", e => {
   run();
 });
 
-$("#list").addEventListener("pointerdown", e => {
-  clearTimeout(LP.t);
-  LP.fired = false;
-  const card = e.target.closest(".item");
-  // 갤러리에서는 사진이 카드의 대부분이다. 거기서도 길게 눌러 값을 넣을 수
-  // 있어야 한다. 목록에서는 사진이 '크게 보기' 자리라 그대로 둔다.
-  if (!card || e.target.closest(".cpg,.cart")) return;
-  if (!GAL && e.target.closest(".thumb")) return;
-  const p = card.dataset.p;
-  LP.x = e.clientX; LP.y = e.clientY;
-  LP.t = setTimeout(() => { LP.fired = true; openPrice(p); }, 500);
-});
-$("#list").addEventListener("pointermove", e => {
-  if (Math.abs(e.clientX - LP.x) > 10 || Math.abs(e.clientY - LP.y) > 10)
-    clearTimeout(LP.t);
-});
-["pointerup", "pointercancel", "pointerleave"].forEach(
-    t => $("#list").addEventListener(t, () => clearTimeout(LP.t)));
-addEventListener("scroll", () => clearTimeout(LP.t), {passive: true});
-
+/* ★ 길게 눌러 값 넣기를 걷어냈다 (2026-09-24).
+ *
+ * **배운 사람만 아는 손짓이라 아무도 안 썼다.** 게다가 훑어 내리다 손가락이
+ * 멈추면 엉뚱하게 값 넣기 창이 떴다. 값은 상품명을 눌러 나오는 자리에서
+ * 넣는다 — 거기에 글자로 적혀 있어 처음 온 사람도 찾는다.
+ *
+ * 되살리려면 `백업/웹4차_20260924/웹틀.html` 에 그대로 있다. */
 $("#list").addEventListener("click", e => {
-  if (LP.fired){ LP.fired = false; return; }   // 길게 누른 뒤 따라오는 누름
   const card = e.target.closest(".item"); if (!card) return;
   const p = card.dataset.p;
   const it = DATA.find(x => x.p === p); if (!it) return;
@@ -1674,7 +1731,10 @@ $("#list").addEventListener("click", e => {
     cartIcon.classList.toggle("on", inCart(p));
     return;
   }
-  const img = e.target.closest(".thumb");
+  // ★ 갤러리에서는 사진이 이미 크다. 또 키워 봐야 얻는 것이 없어서,
+  // 누르면 **이름을 누른 것과 같게** 아래 창으로 내려보낸다 (2026-09-24).
+  // 목록에서는 사진이 작으니 그대로 '크게 보기' 다.
+  const img = GAL ? null : e.target.closest(".thumb");
   if (img){
     $("#zoom img").src = img.src || "";
     $("#zoom p").textContent = it.name;
@@ -1699,7 +1759,7 @@ $("#list").addEventListener("click", e => {
     '<button data-act="share" data-p="' + p + '"><i class="ico share">↗</i>' +
       "공유하기</button>" +
     '<button data-act="price" data-p="' + p + '"><i class="ico won">₩</i>' +
-      (it.mine ? CP + " 가격비교 수정하기" : CP + " 가격비교 입력하기") + "</button>");
+      (it.mine ? "직접 가격 비교 수정하기" : "직접 가격 비교 입력하기") + "</button>");
 });
 $("#zoom").addEventListener("click", dismiss);
 </script>
