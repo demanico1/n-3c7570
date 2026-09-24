@@ -755,11 +755,23 @@ function start(d){
   // 공유 주소. `#p=32912` 처럼 온다. 검색어 해시와 섞이지 않도록
   // '문자 p, 등호, 숫자만' 일 때로 못박는다.
   const shared = /^p=[0-9]+$/.test(raw) ? raw.slice(2) : "";
+  /* ★ `#c=식품` — **분류를 골라 둔 채로** 연다 (2026-09-25).
+   *
+   * 유입 페이지의 `식품 1,263` 칸이 여기로 온다. 전에는 우리 분류 페이지로
+   * 보냈는데, 그 영역은 통째로 앱으로 보내는 자리라 일관되게 맞췄다.
+   *
+   * **검색어 해시로 보내면 안 된다.** `#식품` 이면 이름에 `식품` 이 든 것까지
+   * 섞여서 1,263개가 안 나온다. 분류는 칩으로 걸러야 정확하다. */
+  const wantBig = raw.indexOf("c=") === 0
+                ? decodeURIComponent(raw.slice(2)) : "";
   const sIt = shared ? DATA.find(x => x.p === shared) : null;
   if (sIt){
     ONLY = shared;
     $("#onlybar").style.display = "flex";
-    $("#onlytext").textContent = "공유받은 상품입니다";
+    // ★ `공유받은 상품입니다` 였다. 유입 페이지의 미리보기 카드를 눌러
+    // 들어오는 길이 생기면서 안 맞는 말이 됐다(2026-09-25). 공유로 온
+    // 사람에게도 참인 말로 바꾼다.
+    $("#onlytext").textContent = "이 상품만 보고 있어요";
     document.title = sIt.name;
   }
   if (raw === "noapp"){
@@ -773,6 +785,11 @@ function start(d){
     } catch (e) {}
     try { history.replaceState({}, "", location.pathname); } catch(e){}
     setTimeout(() => alert(msg), 300);
+  } else if (wantBig) {
+    // 분류 해시다. 검색칸에는 아무것도 안 넣는다.
+    BIG = wantBig;
+    $("#chips").querySelectorAll(".chip").forEach(
+        c => c.classList.toggle("on", c.dataset.b === wantBig));
   } else if (!sIt) {
     // 공유 주소일 때는 넣으면 안 된다. `p=28438` 이 검색어로 들어간다.
     const h = decodeURIComponent(raw);
