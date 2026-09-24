@@ -329,7 +329,10 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
   :root:not([data-theme="light"]) .tag-df{background:#4a3a00;border-color:#8a6d00;color:#ffe08a}
 }
 [data-theme="dark"] .tag-df{background:#4a3a00;border-color:#8a6d00;color:#ffe08a}
-#inapp{display:none;margin:10px 12px 0;padding:12px 13px;border-radius:12px;
+/* `position:relative` 는 닫기 단추(`#inappx`)를 구석에 앉히려고 준 것이다.
+   빼면 단추가 화면 오른쪽 위로 날아간다. */
+#inapp{position:relative;display:none;margin:10px 12px 0;
+     padding:12px 34px 12px 13px;border-radius:12px;
      background:var(--bad-bg);color:var(--bad);font-size:12.5px;line-height:1.65;
      border:1px solid var(--bad)}
 #inapp b{display:block;margin-bottom:4px;font-size:13.5px}
@@ -338,6 +341,13 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 #inapp button{margin-top:8px;margin-right:6px;padding:7px 11px;border-radius:9px;
      border:1px solid var(--line);background:var(--card);color:var(--ink);
      font-size:12.5px;cursor:pointer}
+/* 닫기. 손가락으로 누르는 것이라 눈에 보이는 X 보다 **누를 자리를 넓게** 잡는다.
+   위의 `#inapp button` 을 전부 덮어써야 해서 값을 하나씩 되돌린다. */
+#inapp #inappx{position:absolute;top:6px;right:6px;margin:0;padding:0;
+     width:28px;height:28px;line-height:28px;text-align:center;
+     border:0;background:transparent;color:var(--bad);
+     font-size:14px;opacity:.65;border-radius:8px}
+#inapp #inappx:hover{opacity:1;background:var(--card)}
 #cartbar{display:none;gap:6px;padding:8px 12px 0}
 #cartbar button{flex:1;padding:8px;border:1px solid var(--line);border-radius:9px;
      background:var(--card);font-size:13px;cursor:pointer}
@@ -394,7 +404,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 /* 값 칸은 두 줄 두 칸이다. 왼쪽에 군마트가·쿠팡가, 오른쪽에 할인율·차액.
  *
  * 할인율을 한때 사진 왼쪽 위에 얹었다. 사진 위에 떠 있으니 '이 사진의
- * 무엇' 인지 아리송하고, 견줄 값과 멀리 떨어져 눈이 두 번 움직였다.
+ * 무엇' 인지 아리송하고, 비교할 값과 멀리 떨어져 눈이 두 번 움직였다.
  * 목록에서처럼 값 바로 오른쪽에 두면 세 숫자가 한 덩이로 읽힌다.
  *
  * 쿠팡가 자리는 값이 없어도 비워 둔다. 값을 넣어도 칸이 안 커져야 한다. */
@@ -416,7 +426,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 /* **'비교군 없음' 만 예전 자리(사진 왼쪽 위)에 남긴다.**
  *
  * 이름표가 다섯 글자라 여섯 자리 값(`172,860원`)과 한 줄에 못 선다. 글자를
- * 줄여도 좁은 폰에서는 둘 중 하나가 잘렸다. 그런데 이 줄은 **견줄 값이
+ * 줄여도 좁은 폰에서는 둘 중 하나가 잘렸다. 그런데 이 줄은 **비교할 값이
  * 아예 없는 줄**이다. 쿠팡가도 차액도 비어 있으니 값 옆에 붙어 있을 까닭이
  * 없다. 사진 위로 되돌려 보내면 다툴 일이 사라진다.
  *
@@ -475,8 +485,14 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
   </header>
 
   <div id="inapp">
+    <!-- ★ 닫기 단추 (2026-09-25 사장님 결정).
+         **누른 것을 기억하지 않는다.** 카카오톡으로 열 때마다 다시 뜬다.
+         잠깐 둘러보려는 사람이 큰 카드에 막히지 않게 그 순간만 치우는 것이라
+         `localStorage` 에 남기면 뜻이 달라진다 — 다음에 열었을 때 안 뜨면
+         찜한 것이 왜 사라졌는지 알 길이 없어진다. -->
+    <button id="inappx" type="button" aria-label="이 안내 닫기">&#10005;</button>
     <b id="inapptitle">카카오톡 브라우저에서는 쓰지 마세요</b>
-    찜하기 연동 안 됩니다. 홈 화면 고정도 못 합니다.
+    찜하기 저장이 카톡에만 남아서 불편하고 홈 화면 고정 기능을 쓸 수 없어요.
     <div id="inappbtns"></div>
     <span class="tip">브라우저에서 연 뒤 메뉴 → <b style="display:inline">홈 화면에 추가</b>
     를 해 두면 앱처럼 바로 열리고, 넣은 값도 한곳에 쌓입니다.</span>
@@ -966,7 +982,7 @@ function run(){
       //   중분류가 `키보드` 다. 이름은 적어도 거짓말을 안 한다.
       //
       // `localeCompare` 를 안 쓰는 건 **프로그램과 같은 차례**를 내려는 것이다.
-      // 파이썬 쪽은 글자 코드 순으로 견준다. 한글은 그게 곧 가나다순이다.
+      // 파이썬 쪽은 글자 코드 순으로 비교한다. 한글은 그게 곧 가나다순이다.
       case "name":    return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
       default:        return a.no - b.no;
     }
@@ -1550,7 +1566,7 @@ function openHelp(){
     '<b>ㄷㅌㅈ</b> 처럼 초성만 쳐도 되고, 띄어쓰기는 안 맞아도 됩니다.</p>' +
     '<p><b>2. 값 읽기</b><br>왼쪽이 <b>군마트</b>, 오른쪽이 ' + CP +
     ' 값입니다. 초록은 군마트가 싼 것, 빨강은 ' + CP + ' 가 싼 것입니다. ' +
-    '<b>비교군 없음</b> 은 견줄 상품을 못 찾은 것입니다.</p>' +
+    '<b>비교군 없음</b> 은 비교할 상품을 못 찾은 것입니다.</p>' +
     '<p><b>3. 머리의 단추</b><br>' +
     '<b>리스트/갤러리</b> — 사진을 작게 볼지 크게 볼지 바꿉니다.<br>' +
     '<b>찜</b> — 찜해 둔 것만 모아 봅니다.<br>' +
@@ -1790,6 +1806,10 @@ if (IN_APP){
       '<button data-pkg="copy">주소 복사</button>';
   $("#inapp").style.display = "block";
 }
+$("#inappx").addEventListener("click", () => {
+  // 이 한 줄이 전부다. 저장하지 않으므로 다시 열면 또 뜬다.
+  $("#inapp").style.display = "none";
+});
 $("#inappbtns").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const pkg = b.dataset.pkg;
