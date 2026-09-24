@@ -22,9 +22,9 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>PX 가격비교 — 군마트 vs 온라인</title>
-<meta name="description" content="군마트(PX)에서 파는 2,263건을 쿠팡 가격과 하나씩 견줘 정리했습니다. 그중 2,006건은 직접 확인한 값입니다.">
+<meta name="description" content="군마트(PX)에서 파는 2,263건을 쿠팡 가격과 하나씩 비교해 정리했습니다. 그중 2,006건은 직접 확인한 값입니다.">
 <meta property="og:title" content="PX 가격비교 — 군마트 vs 온라인">
-<meta property="og:description" content="군마트(PX)에서 파는 2,263건을 쿠팡 가격과 하나씩 견줘 정리했습니다. 그중 2,006건은 직접 확인한 값입니다.">
+<meta property="og:description" content="군마트(PX)에서 파는 2,263건을 쿠팡 가격과 하나씩 비교해 정리했습니다. 그중 2,006건은 직접 확인한 값입니다.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="og/home.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -926,6 +926,17 @@ function run(){
   };
   VIEW = DATA.filter(it => pass(it, BIG, view, true));
 
+  // ★ 할인율로 줄 세울 때는 **비교군 없음을 아예 뺀다** (2026-09-25).
+  //
+  // 할인율이 없는 줄(`rate == null`)을 섞으면 `할인율 낮은 순` 맨 앞이
+  // 통째로 `비교군 없음` 257건으로 찬다. 쿠팡보다 비싼 것을 보려고 고른
+  // 건데 정작 그게 한참 뒤에 나온다.
+  //
+  // 뒤로 미는 것으로는 모자란다. **할인율을 묻는 자리에 할인율이 없는
+  // 줄은 답이 아니다.** 건수(`#hits`)도 뺀 뒤로 센다.
+  if (SORTK === "rate" || SORTK === "rate_up")
+    VIEW = VIEW.filter(it => it.rate != null);
+
   const k = SORTK;
   const big = 1e12;
   VIEW.sort((a, b) => {
@@ -1578,18 +1589,40 @@ $("#sheet").addEventListener("click", e => {
   if (act === "share"){
     const it = DATA.find(x => x.p === p);
     if (!it) return;
-    // 받는 사람이 눌렀을 때 그 상품이 바로 뜨도록 주소에 코드를 싣는다.
-    const url = location.origin + location.pathname + "#p=" + p;
-    const line = it.name + " — 군마트 " + won(it.g)
-               + (it.c == null ? "" : " / " + CP + " " + won(it.c)
-                  + " (" + pct(it.rate) + ")");
+    /* ★ 2026-09-25 — **상품 페이지 주소**를 보낸다.
+     *
+     * 전에는 `#p=코드` 를 보냈다. 그런데 `#` 뒤는 카톡이 안 읽어서
+     * 미리보기에 **늘 앱 소개 카드**가 떴다. 삼다수를 보냈는데 받는 사람
+     * 화면에는 `군마트 값, 온라인과 비교` 가 뜬다.
+     *
+     * `/p/<코드>/` 는 그 상품만의 페이지라 제목·설명·**사진**이 다 그
+     * 상품 것이다(`상품페이지_만들기.py` 의 `og:` 들). 받는 사람이 무엇을
+     * 받았는지 바로 안다.
+     *
+     * `pathname` 에서 파일 이름만 턴다 — `/n-3c7570/index.html` 로 열려
+     * 있어도 `/n-3c7570/p/35032/` 가 나온다. */
+    const base = location.origin + location.pathname.replace(/[^/]*$/, "");
+    const url = base + "p/" + p + "/";
+    /* 글은 담백하게. 얼마나 · 몇 % 싼지만 적는다.
+     * **이름을 여기 또 넣지 마라** — `title` 에 이미 있어서 카톡에 두 번
+     * 찍힌다. 실제로 상품명이 두 줄로 겹쳐 나왔다. */
+    const gap = it.c == null ? null : Math.round(it.c - it.g);
+    const line = it.rate == null
+      ? "군마트 " + won(it.g)
+      : (it.rate < 0
+          ? "군마트 " + won(it.g) + " — " + CP + "보다 "
+            + won(gap) + "(" + Math.abs(Math.round(it.rate)) + "%) 저렴"
+          : "군마트 " + won(it.g) + " — " + CP + "이 "
+            + won(-gap) + "(" + Math.round(it.rate) + "%) 저렴");
     // 안드로이드·아이폰은 navigator.share 로 카톡·문자에 바로 보낸다.
     // 데스크톱 크롬은 이게 없어서 주소를 복사해 준다.
     if (navigator.share){
       navigator.share({title: it.name, text: line, url: url}).catch(() => {});
       return;
     }
-    try { navigator.clipboard.writeText(line + "\n" + url); } catch(e){}
+    // 복사할 때는 제목이 따로 안 붙으니 이름을 앞에 넣는다.
+    try { navigator.clipboard.writeText(it.name + "\n" + line + "\n" + url); }
+    catch(e){}
     b.textContent = "주소를 복사했습니다";
     return;
   }
