@@ -154,47 +154,62 @@ footer{margin-top:32px;padding-top:17px;border-top:1px solid var(--line);
 
 /* ② 실제로 비교해 둔 것 한 건 — 말보다 이게 세다.
    앱의 상품 카드 생김새를 그대로 따른다(테두리·모서리·배지). */
-/* ── 미리보기 카드 — **앱 화면 그대로** (2026-09-25) ───────────────
-   전에는 이 자리만의 모양(`.iprod`)이었다. 눌러 들어가면 처음 보는 화면이
-   나와서 미리보기 구실을 못했다. 같은 모양이면 약속과 결과가 같아진다.
+/* ── 미리보기 카드 — **앱 갤러리 카드를 그대로 옮긴 것** (2026-09-25) ──
 
-   ★ **모양이 두 곳에 있다.** 앱은 `웹틀.html` 의 `.gal .item`, 여기는 이
-     `.peek`. 카드 모양을 바꿀 땐 **둘 다** 고쳐라.
+   사장님이 "앱이랑 똑같이 한다면서 왜 다르냐" 고 짚어 주셨다. 맞는
+   말씀이었다 — 처음엔 비슷하게 새로 짰더니 사진 여백도 글자 크기도
+   달랐다. 지금은 `웹틀.html` 의 `.gal .item` 규칙을 **값까지 그대로**
+   옮겨 왔다. 클래스 이름도 앱과 같게 맞췄다(`item` `thumb` `nm` `sub`
+   `pr` `g` `c` `side` `badge` `gap`).
 
-   2열이 한계다 — 원본 사진이 긴 변 300px 이라 그 이상은 흐려진다. */
-.peek{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
- gap:10px;margin:14px 0 8px}
-.pk{display:block;text-decoration:none;color:inherit;overflow:hidden;
- background:var(--card);border:1px solid var(--line);border-radius:14px}
-.pk:active{background:var(--bg)}
-.pk img{width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;
- display:block;background:#fff;padding:6px;box-sizing:border-box}
-.pkb{padding:8px 9px 10px}
-/* 이름은 **두 줄까지**. 카드 높이가 제각각이면 격자가 어긋나 보인다. */
-.pknm{font-size:13.5px;font-weight:700;line-height:1.35;color:var(--ink);
- display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
- overflow:hidden;min-height:2.7em;overflow-wrap:anywhere}
-.pksub{margin-top:3px;font-size:11px;color:var(--dim);
+   ★ **그래서 두 곳을 같이 고쳐야 한다.** 앱 카드 모양을 바꾸면 여기도.
+
+   값이 왜 이런지는 앱 쪽 주석에 있다. 여기서는 옮겨 온 것만 적는다.
+   다른 점은 셋뿐이다 — 찜·쿠팡 아이콘이 없고, 카드 전체가 링크이고,
+   꼬리표(`tags`)를 안 띄운다(앱도 갤러리에서는 `display:none` 이다). */
+/* ★ 소개 영역의 안쪽 여백(16px)을 **밖으로 밀어낸다.**
+   안 밀면 카드가 150px 이 되는데 앱은 173px 이다. 그만큼 좁으면
+   `쿠팡 27,360원` 이 `쿠팡 2…` 로 잘린다 — 앱에서는 안 잘리는 값이다.
+   밀어내면 166px 이 되어 앱과 거의 같아진다. */
+.peek{display:grid;grid-template-columns:1fr 1fr;gap:10px;
+ margin:14px -16px 8px}
+.peek .item{display:block;padding:0;overflow:hidden;position:relative;
+ background:var(--card);border:1px solid var(--line);border-radius:14px;
+ box-shadow:0 1px 2px rgba(16,24,40,.05);
+ text-decoration:none;color:inherit}
+.peek .item:active{background:var(--bg)}
+.peek .thumb{width:100%;height:auto;aspect-ratio:1/1;border-radius:0;
+ background:#fff;padding:7%;box-sizing:border-box;object-fit:contain;display:block}
+/* ★ 앱보다 카드가 7px 좁다(166 vs 173). 소개 영역이 페이지 안쪽에 있어서
+   거기까지는 못 넓힌다. 그 7px 때문에 `쿠팡 27,360원` 이 잘렸다.
+   **잘린 값보다 1px 작은 글자가 낫다** — 안쪽 여백과 오른쪽 칸을 조금씩
+   줄여 12px 을 벌었다. 눈으로는 앱과 구별이 안 된다. */
+.peek .body{padding:8px 7px 10px}
+.peek .nm{font-weight:600;font-size:13.5px;line-height:1.35;min-height:2.7em;
+ color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;
+ -webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.peek .sub{margin-top:2px;font-size:12px;color:var(--dim);
  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pkpr{display:flex;align-items:center;justify-content:space-between;
- gap:6px;margin-top:7px}
-.pkpr b{font-size:16px;font-weight:800;letter-spacing:-.5px;color:var(--ink)}
-.pkpr .badge{flex:none;padding:2px 7px;border-radius:7px;
- font-size:11.5px;font-weight:800;white-space:nowrap}
-/* ★ 아랫줄은 **접히면 안 된다.** `쿠팡 27,890원 -17,510원` 이 두 줄로
-   갈리면서 `원` 만 따로 떨어져 나갔다. 둘 다 nowrap 으로 묶고, 자리가
-   모자라면 앞쪽(쿠팡가)을 말줄임한다 — 차액이 더 중요한 숫자다. */
-.pkc{margin-top:4px;font-size:11px;color:var(--dim);
- display:flex;justify-content:space-between;gap:5px;align-items:baseline}
-.pkc span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.pkc i{font-style:normal;color:#0f7b3f;font-weight:700;white-space:nowrap;
- flex:none}
-/* 좁은 폰에서는 글자만 한 단계 줄인다. 2열은 지킨다 — 1열로 떨어지면
-   '많다' 는 느낌이 사라진다. */
-@media(max-width:340px){
-  .pknm{font-size:12.5px}
-  .pkpr b{font-size:15px}
-}
+/* 값 두 줄. 앱은 한 격자에 담아 오른쪽 칸을 두 줄이 함께 쓰는데, 우리
+   카드는 앱보다 7px 좁아서 그러면 `쿠팡 27,360원` 이 잘렸다.
+   **줄마다 제 너비를 쓰게** 나눴다 — 보이는 모양은 똑같다. */
+.peek .pr{margin-top:5px}
+.peek .prr{display:flex;align-items:baseline;justify-content:space-between;gap:5px}
+.peek .prr+.prr{margin-top:2px}
+.peek .pr .g{font-size:15px;font-weight:700;color:var(--ink);
+ font-variant-numeric:tabular-nums;white-space:nowrap}
+.peek .pr .c{min-width:0;font-size:12px;color:var(--dim);
+ font-variant-numeric:tabular-nums;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.peek .badge{display:inline-block;font-size:11px;padding:3px 5px;flex:none;
+ border-radius:9px;font-weight:700;font-variant-numeric:tabular-nums}
+.peek .b-good{background:#e7f6ec;color:#0f7b3f}    /* 앱의 `--good` 그대로 */
+/* ★ 앱은 이 자리를 `.gap` 이라 부르는데 **이 파일엔 이미 다른 뜻의
+   `.gap` 이 있다**(57줄, 안쪽 여백 13px 짜리 상자). 그게 먹혀서 차액이
+   74px 을 차지했고 쿠팡 값이 잘렸다. 그래서 여기서만 `.dif` 로 부른다.
+   앱 카드를 손볼 때 이 이름 하나가 다르다는 걸 기억해라. */
+.peek .dif{font-size:11px;color:var(--dim);flex:none;
+ font-variant-numeric:tabular-nums;white-space:nowrap}
 
 /* (옛) 한 장짜리 미리보기. `hero` 가 한 건뿐일 때를 위해 남겨 둔다. */
 .iprod{background:var(--bg);border:1px solid var(--line);border-radius:16px;
