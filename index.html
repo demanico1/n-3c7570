@@ -563,6 +563,7 @@ async function loadPics(){
   try {
     if (OPEN) {
       PICS = await (await fetch("pics.json", {cache:"no-cache"})).json();
+      PICSDONE = true;
       for (const el of document.querySelectorAll("img.thumb:not([src])")) paint(el);
       return;
     }
@@ -570,12 +571,23 @@ async function loadPics(){
     const plain = await crypto.subtle.decrypt(
       {name:"AES-GCM", iv: raw.slice(5, 17)}, KEY, raw.slice(17));
     PICS = JSON.parse(new TextDecoder().decode(plain));
+    PICSDONE = true;
     for (const el of document.querySelectorAll("img.thumb:not([src])")) paint(el);
   } catch (e) { /* 사진 없이 그냥 쓴다 */ }
 }
+/* ★ 사진이 없을 때 넣는 **투명한 한 점**.
+ *
+ * `src` 를 아예 안 주면 브라우저가 제 나름의 **자리표시 아이콘**을 그린다.
+ * 깨진 그림처럼 보여서 사장님이 잡아내셨다. 투명한 1픽셀을 넣으면 그릴
+ * 것이 없어서 `.thumb` 의 제 배경색만 남는다 — 하얗게 빈 칸이 된다. */
+const BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+let PICSDONE = false;      // 사진 뭉치를 다 받았나
+
 function paint(el){
   const b = PICS[el.dataset.p];
   if (b) el.src = "data:image/jpeg;base64," + b;
+  // 다 받고도 없으면 그 상품은 사진이 없는 것이다. 2,263건 중 4건.
+  else if (PICSDONE){ el.src = BLANK; el.dataset.nopic = "1"; }
 }
 
 $("#go").addEventListener("click", async () => {
@@ -1112,7 +1124,9 @@ function card(it, raw){
   const b = PICS[it.p];
   const img = '<img class="thumb" loading="lazy" alt="" data-p="' + it.p +
       '" data-nm="' + esc(it.name) + '"' +
-      (b ? ' src="data:image/jpeg;base64,' + b + '"' : "") + ">";
+      (b ? ' src="data:image/jpeg;base64,' + b + '"'
+         // 사진 뭉치를 다 받았는데도 없으면 그 상품은 사진이 없는 것이다.
+         : (PICSDONE ? ' src="' + BLANK + '" data-nopic="1"' : "")) + ">";
   // 사진 아래에 파란 '쿠팡이동' 단추가 있었다. 카드 오른쪽 위에 화살표가
   // 생기면서 같은 일을 하는 길이 셋(화살표·메뉴·이 단추)이 되어 걷어냈다.
   const left = '<div class="left">' + img + "</div>";
@@ -1302,9 +1316,27 @@ const PICOBS = ("IntersectionObserver" in window) ? new IntersectionObserver(es 
   }
 }, {rootMargin: "400px"}) : null;
 
+/* ★ 사진이 없는 상품이 4건 있다 (원본 2,259장 / 상품 2,263건).
+ *
+ * 갤러리에서 `big/<코드>.jpg` 로 갈아 끼우는데 그 파일이 없으면 404 가 나고
+ * **깨진 그림 아이콘**이 뜬다. 목록에서는 작은 사진도 없어 빈 칸이다.
+ *
+ * 못 받으면 `src` 를 아예 떼어 버린다. 그러면 브라우저가 다시 받으려 하지
+ * 않고 깨진 아이콘도 안 그린다. 칸은 `.thumb` 의 제 배경색(갤러리는 흰색)
+ * 으로 **하얗게** 남는다. `data-nopic` 을 찍어 두어 다시 시도하지 않는다.
+ *
+ * 손짓은 `#list` 에 한 번만 건다. `error` 는 위로 안 올라오므로
+ * **잡아채는 단계(capture)** 로 받아야 한다 — 마지막 `true` 가 그것이다. */
+$("#list").addEventListener("error", e => {
+  const el = e.target;
+  if (el.tagName !== "IMG") return;
+  el.dataset.nopic = "1";
+  el.src = BLANK;
+}, true);
+
 async function sharpen(img){
   const p = img.dataset.p;
-  if (!p) return;
+  if (!p || img.dataset.nopic) return;
   await showBig(p, 1);
   if (BIGPIC[p]) img.src = BIGPIC[p];
 }
@@ -1806,7 +1838,10 @@ $("#list").addEventListener("click", e => {
   // ★ 갤러리에서는 사진이 이미 크다. 또 키워 봐야 얻는 것이 없어서,
   // 누르면 **이름을 누른 것과 같게** 아래 창으로 내려보낸다 (2026-09-24).
   // 목록에서는 사진이 작으니 그대로 '크게 보기' 다.
-  const img = GAL ? null : e.target.closest(".thumb");
+  //
+  // 사진이 없는 줄은 크게 보기를 안 연다 — 빈 창이 뜨고 거기서 또 깨진다.
+  let img = GAL ? null : e.target.closest(".thumb");
+  if (img && (img.dataset.nopic || !img.getAttribute("src"))) img = null;
   if (img){
     $("#zoom img").src = img.src || "";
     $("#zoom p").textContent = it.name;
