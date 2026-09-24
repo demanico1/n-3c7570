@@ -492,7 +492,8 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
          찜한 것이 왜 사라졌는지 알 길이 없어진다. -->
     <button id="inappx" type="button" aria-label="이 안내 닫기">&#10005;</button>
     <b id="inapptitle">카카오톡 브라우저에서는 쓰지 마세요</b>
-    찜하기 저장이 카톡에만 남아서 불편하고 홈 화면 고정 기능을 쓸 수 없어요.
+    찜하기 저장이 카톡에만 남아서 불편해요.<br>
+    홈 화면 고정 기능도 쓸 수 없어요.
     <div id="inappbtns"></div>
     <span class="tip">브라우저에서 연 뒤 메뉴 → <b style="display:inline">홈 화면에 추가</b>
     를 해 두면 앱처럼 바로 열리고, 넣은 값도 한곳에 쌓입니다.</span>
@@ -1615,10 +1616,27 @@ $("#sheet").addEventListener("click", e => {
      * 상품 것이다(`상품페이지_만들기.py` 의 `og:` 들). 받는 사람이 무엇을
      * 받았는지 바로 안다.
      *
-     * `pathname` 에서 파일 이름만 턴다 — `/n-3c7570/index.html` 로 열려
-     * 있어도 `/n-3c7570/p/35032/` 가 나온다. */
-    const base = location.origin + location.pathname.replace(/[^/]*$/, "");
-    const url = base + "p/" + p + "/";
+     * ★ **주소 끝에 `/` 가 없을 때를 조심해라** (2026-09-25 사장님이 잡아
+     * 주셨다). 전에는 `pathname.replace(/[^/]*$/, "")` 한 줄로 끝 토막을
+     * 잘라냈는데, 그러면 이렇게 된다.
+     *
+     *     /n-3c7570/            →  /n-3c7570/p/35032/   ✓
+     *     /n-3c7570             →  /p/35032/            ✗ 404
+     *     /n-3c7570/index.html  →  /n-3c7570/p/35032/   ✓
+     *
+     * `n-3c7570` 을 **파일 이름으로 보고 잘라낸 것**이다. 슬래시 없는
+     * 주소는 홈 화면에 붙여 두거나 손으로 칠 때 흔하다. 실제로 삼다수를
+     * 공유했더니 받는 쪽에서 안 열렸다.
+     *
+     * 그래서 **점(.)이 있으면 파일, 없으면 폴더**로 가른다. */
+    let path = location.pathname;
+    if (!path.endsWith("/")){
+      const cut = path.lastIndexOf("/");
+      path = path.slice(cut + 1).includes(".")
+           ? path.slice(0, cut + 1)      // 파일 이름이다 — 턴다
+           : path + "/";                 // 폴더다 — 슬래시를 붙인다
+    }
+    const url = location.origin + path + "p/" + p + "/";
     /* 글은 담백하게. 얼마나 · 몇 % 싼지만 적는다.
      * **이름을 여기 또 넣지 마라** — `title` 에 이미 있어서 카톡에 두 번
      * 찍힌다. 실제로 상품명이 두 줄로 겹쳐 나왔다. */
