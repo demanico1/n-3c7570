@@ -1648,53 +1648,15 @@ $("#sheet").addEventListener("click", e => {
             + won(gap) + "(" + Math.abs(Math.round(it.rate)) + "%) 저렴"
           : "군마트 " + won(it.g) + " — " + CP + "이 "
             + won(-gap) + "(" + Math.round(it.rate) + "%) 저렴");
-    /* ★ 공유창을 여는 길이 **셋**이다 (2026-09-25 사장님이 잡아 주셨다).
-     *
-     * 전에는 `navigator.share` 하나만 보고, 없으면 그냥 클립보드에
-     * 복사했다. 그런데 **카톡·네이버처럼 앱 안에서 뜨는 브라우저**는
-     * 안드로이드 WebView 라 `navigator.share` 가 아예 없다. 그래서
-     * 공유하기를 눌러도 공유창이 안 뜨고 "복사했습니다" 만 떴다.
-     *
-     *   ① navigator.share             크롬 · 사파리 · 삼성 인터넷
-     *   ② android.intent.action.SEND  안드로이드 앱 안 브라우저
-     *   ③ 클립보드                     그 밖의 모든 곳
-     *
-     * **클립보드는 먼저 채워 둔다.** 셋 중 무엇이 되든 손해가 없고,
-     * 공유창이 안 뜨는 곳에서도 붙여넣기는 되기 때문이다. 다만 창이
-     * 열렸으면 "복사했습니다" 는 안 띄운다 — 헷갈린다.
-     *
-     * **`navigator.share` 는 사람이 누른 그 순간에만 불린다.** 앞에
-     * `await` 를 끼우면 그 권한이 풀려서 아무 일도 안 일어난다. */
-    const full = it.name + "\n" + line + "\n" + url;
-    try { navigator.clipboard.writeText(full); } catch(e){}
-
+    // 안드로이드·아이폰은 navigator.share 로 카톡·문자에 바로 보낸다.
+    // 데스크톱 크롬은 이게 없어서 주소를 복사해 준다.
     if (navigator.share){
-      navigator.share({title: it.name, text: line, url: url})
-        .catch(err => {
-          // 사람이 창을 닫은 것(AbortError)은 실패가 아니다. 그때 글을
-          // 띄우면 안 보낸 것을 보낸 것처럼 보인다.
-          if (err && err.name === "AbortError") return;
-          b.textContent = "주소를 복사했습니다";
-        });
+      navigator.share({title: it.name, text: line, url: url}).catch(() => {});
       return;
     }
-
-    /* ② 안드로이드 앱 안 브라우저 — 공유창을 직접 연다.
-     *
-     * `intent:` 로 `ACTION_SEND` 를 던지면 운영체제가 앱 고르는 창을
-     * 띄운다. `S.` 는 글자 여분값(extra)이라는 뜻이다.
-     * 안 열려도 이미 복사해 뒀으니 잃는 것이 없다. */
-    if (!IOS && /Android/i.test(UA)){
-      location.href = "intent:#Intent;action=android.intent.action.SEND;"
-        + "type=text/plain;S.android.intent.extra.TEXT="
-        + encodeURIComponent(full) + ";end";
-      // 공유창이 안 열리는 브라우저도 있다. 그때 아무 일도 안 일어나면
-      // 눌린 건지 아닌지 알 수가 없으니, 잠깐 뒤에 복사됐다고 알린다.
-      // 창이 열렸으면 화면이 뒤로 가 있어서 이 글은 안 보인다.
-      setTimeout(() => { b.textContent = "주소를 복사했습니다"; }, 700);
-      return;
-    }
-
+    // 복사할 때는 제목이 따로 안 붙으니 이름을 앞에 넣는다.
+    try { navigator.clipboard.writeText(it.name + "\n" + line + "\n" + url); }
+    catch(e){}
     b.textContent = "주소를 복사했습니다";
     return;
   }
