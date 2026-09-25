@@ -3,7 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<!-- ★ 한때 `noindex, nofollow` 였다. 비밀번호로 잠가 두던 시절의
+     찌꺼기인데 잠금을 걷을 때 같이 안 걷혀서, 열기 직전에 잡았다.
+     그대로 뒀으면 `PX`(27,870/월) `피엑스`(4,210/월)를 통째로 버리고
+     홈에서 2,247장으로 가는 길도 막힐 뻔했다. -->
+<link rel="canonical" href="https://pxpick.com/">
+<meta property="og:url" content="https://pxpick.com/">
 <meta name="referrer" content="no-referrer">
 <!-- 이 파일은 캐시해 두지 마라.
      자료(`data.json`·`pics.json`)는 `cache:"no-cache"` 로 받고 있어서 늘
@@ -90,11 +95,11 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
        padding:10px 12px 6px;border-bottom:1px solid var(--line)}
 .top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 
-/* ── 상표 자리 = 홈 단추 (2026-09-24)
+/* ── 브랜드 자리 = 홈 단추 (2026-09-24)
  *
  * 전에는 `<h1 id="title">군마트 쿠팡가 비교</h1>` 였다. 유입 페이지 2,240장은
  * `PX 가격비교 / 군마트 vs 온라인` 으로 되어 있어서, 거기서 넘어온 사람이
- * **다른 사이트에 온 줄 알았다.** 같은 상표로 맞춘다.
+ * **다른 사이트에 온 줄 알았다.** 같은 브랜드로 맞춘다.
  *
  * 그리고 누르면 처음 화면으로 돌아간다. 검색어가 든 채로도 여기만 누르면
  * 맨 처음 상태가 된다 — 사람들이 로고를 그렇게 쓴다. */
@@ -117,7 +122,7 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 .iconbtn{display:inline-flex;align-items:center;gap:3px;padding:6px 7px}
 .iconbtn em{font-style:normal;font-size:9px;font-weight:700;color:var(--dim);
  letter-spacing:-.5px;line-height:1;white-space:nowrap}
-/* 좁은 화면에서는 `메뉴` 이름표를 뺀다. 안 빼면 상표가 `PX 가격…` 으로
+/* 좁은 화면에서는 `메뉴` 이름표를 뺀다. 안 빼면 브랜드가 `PX 가격…` 으로
    잘린다 — 이름이 잘리는 것보다 이름표 하나 없는 편이 낫다.
    `⋯` 은 그것만으로 알아본다. */
 @media(max-width:400px){ #more em{display:none} }
@@ -832,7 +837,7 @@ function start(d){
   loadPics();
 }
 
-/* 상표를 누르면 **처음 접속한 그 화면**으로 돌아간다.
+/* 브랜드를 누르면 **처음 접속한 그 화면**으로 돌아간다.
  *
  * 검색어·분류·정렬·보기·공유 상태를 한꺼번에 되돌린다. 주소에 붙은 해시도
  * 지운다 — `#크림` 이 남아 있으면 새로 고쳤을 때 다시 크림만 뜬다.
