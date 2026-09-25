@@ -111,11 +111,19 @@ li b.g{color:var(--px)}li b.b{color:var(--bad)}
 
 /* 분류 페이지 머리 — 몇 건이 얼마나 싼지 한눈에 */
 .sum{display:flex;gap:9px;margin:4px 0 16px}
-.sum div{flex:1;background:var(--card);border:1px solid var(--line);
+/* ★ `minmax(0,1fr)` 아닌 `flex:1` 은 칸 속 글자가 밀어내면 고르게 안
+   나뉜다. 그리고 안쪽 여백 12px 은 375px 에서 이름표가 낱말 가운데서
+   끊긴다 — `PX에서 파 / 는 것` 이 나왔다 (2026-09-25). */
+.sum div{flex:1 1 0;min-width:0;background:var(--card);border:1px solid var(--line);
  border-radius:13px;padding:12px;text-align:center}
 .sum .n{font-size:21px;font-weight:800;color:var(--px);letter-spacing:-.6px;
  font-variant-numeric:tabular-nums}
-.sum .l{font-size:11.5px;color:var(--dim);margin-top:1px}
+/* `keep-all` 이라야 한글이 낱말 단위로 접힌다. 줄 높이를 두 줄로 잡아
+   세 칸의 키를 맞춘다 — 한 칸만 두 줄이면 높이가 들쭉날쭉해 보인다. */
+.sum .l{font-size:11.5px;color:var(--dim);margin-top:2px;
+ word-break:keep-all;line-height:1.35;min-height:2.7em;
+ display:flex;align-items:center;justify-content:center}
+@media(max-width:380px){ .sum{gap:6px} .sum div{padding:12px 6px} .sum .l{font-size:11px} }
 
 footer{margin-top:32px;padding-top:17px;border-top:1px solid var(--line);
  font-size:12px;color:var(--dim);line-height:1.8}
