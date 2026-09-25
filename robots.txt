@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: /
 
-Sitemap: https://pxlist.pages.dev/sitemap.xml
+Sitemap: https://pxpick.com/sitemap.xml
