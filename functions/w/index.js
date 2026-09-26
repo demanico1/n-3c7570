@@ -38,7 +38,10 @@ export async function onRequest(context) {
       try {
         const r = await env.ASSETS.fetch(new Request(u.toString()));
         if (r.body) r.body.cancel();
-        if (r.ok) { img = u.toString(); break; }
+        // ★ `ok` 만 보면 안 된다. 없는 파일을 부르면 클라우드플레어가 404 대신
+        //   **앱 홈(HTML)을 200 으로** 돌려준다. 그림인지 꼭 본다.
+        const ct = r.headers.get("content-type") || "";
+        if (r.ok && ct.startsWith("image/")) { img = u.toString(); break; }
       } catch (e) { /* 다음 것 */ }
     }
 
