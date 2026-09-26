@@ -14,8 +14,12 @@
 <meta property="og:url" content="https://pxpick.com/">
 <meta name="referrer" content="no-referrer">
 <!-- 이 파일은 캐시해 두지 마라.
-     자료(`data.json`·`pics.json`)는 `cache:"no-cache"` 로 받고 있어서 늘
-     새것이 오는데, **이 화면 파일만 옛것이 남는 일이 있었다.** 잠금을
+     ★ 이 파일이 늘 새것이어야 자료가 즉시 반영된다 (2026-09-26).
+     자료(`data.json`·`pics.json`)는 `?v=내용지문` 을 달고 1년 캐시한다.
+     내용이 바뀌면 지문이 바뀌고, 그 새 지문은 **이 파일에만** 적혀 있다.
+     그래서 이 파일이 옛것이면 새 자료가 영영 안 닿는다.
+     예전에는 자료를 `no-cache` 로 받아서 들어올 때마다 1.8초를 물었다.
+     그 전에도 **이 화면 파일만 옛것이 남는 일이 있었다.** 잠금을
      걷어냈는데도 폰에 예전 것이 남아 비밀번호 창이 계속 떴다.
      홈 화면에 추가해 둔 경우가 특히 오래 물고 있다.
      이 표시를 지우면 새로 구운 것이 사람들 폰에 안 닿는다. -->
@@ -573,7 +577,7 @@ let KEY = null;
 
 async function unlock(pw, remember){
   /* 공개판은 잠긴 것이 없다. 그냥 받아서 읽는다. */
-  if (OPEN) return await (await fetch("data.json", {cache:"no-cache"})).json();
+  if (OPEN) return await (await fetch("data.json?v=aae47956c5")).json();
   const buf = await (await fetch("data.bin", {cache:"no-cache"})).arrayBuffer();
   const raw = new Uint8Array(buf);
   const salt = raw.slice(5, 21), iv = raw.slice(21, 33), body = raw.slice(33);
@@ -590,7 +594,7 @@ async function unlock(pw, remember){
 async function loadPics(){
   try {
     if (OPEN) {
-      PICS = await (await fetch("pics.json", {cache:"no-cache"})).json();
+      PICS = await (await fetch("pics.json?v=0fba38319b")).json();
       PICSDONE = true;
       for (const el of document.querySelectorAll("img.thumb:not([src])")) paint(el);
       return;
