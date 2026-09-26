@@ -73,16 +73,22 @@ body{
 button,input,select{font:inherit;color:inherit}
 
 /* ---------- 잠금 화면 ---------- */
+/* ★ 잠금 화면은 **처음부터 숨겨 둔다** (2026-09-27 사장님이 잡아 주셨다).
+   전에는 보이는 채로 두고 맨 아래 스크립트가 숨겼다. 서버가 LA 를 거쳐
+   느리게 오니 브라우저가 스크립트보다 화면을 먼저 그려서, 공개 사이트인데
+   **비밀번호 창이 번쩍** 떴다가 사라졌다. 잠긴 판일 때만 `auto()` 가 꺼낸다. */
 #lock{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-      padding:16px;background:var(--bg);z-index:50}
+      padding:16px;background:var(--bg);z-index:50;visibility:hidden}
 /* 열쇠를 기억해 둔 기기는 잠금 화면 대신 이것만 보고 기다린다. */
-#wait{position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+#wait{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
       flex-direction:column;gap:14px;background:var(--bg);z-index:49;color:var(--dim);
       font-size:13.5px}
 #wait .dot{width:34px;height:34px;border-radius:17px;border:3px solid var(--line);
       border-top-color:var(--accent);animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){#wait .dot{animation:none}}
+#wait button{padding:10px 18px;border:0;border-radius:10px;background:var(--accent);
+      color:#fff;font-weight:600;cursor:pointer}
 
 #lock .box{width:100%;max-width:340px;background:var(--card);border:1px solid var(--line);
       border-radius:16px;padding:24px 20px;box-shadow:var(--shadow);text-align:center}
@@ -580,7 +586,14 @@ let KEY = null;
 
 async function unlock(pw, remember){
   /* 공개판은 잠긴 것이 없다. 그냥 받아서 읽는다. */
-  if (OPEN) return await (await fetch("data.json?v=aae47956c5")).json();
+  /* ★ `referrerPolicy: "same-origin"` 을 지우지 마라 (2026-09-27).
+     이 페이지는 `<meta name="referrer" content="no-referrer">` 라 리퍼러를 안
+     보낸다. 요즘 폰은 대신 `Sec-Fetch-Site` 를 붙여서 자료 가드를 지나지만
+     **옛 아이폰(iOS 16.3 이하)과 일부 앱 속 브라우저는 둘 다 안 보내서
+     403 으로 막혔다.** 우리 파일을 부를 때만 우리 주소를 붙인다. 쿠팡으로
+     갈 때는 지금처럼 아무것도 안 붙는다. */
+  if (OPEN) return await (await fetch("data.json?v=aae47956c5",
+                                      {referrerPolicy: "same-origin"})).json();
   const buf = await (await fetch("data.bin", {cache:"no-cache"})).arrayBuffer();
   const raw = new Uint8Array(buf);
   const salt = raw.slice(5, 21), iv = raw.slice(21, 33), body = raw.slice(33);
@@ -608,7 +621,8 @@ async function loadPics(){
       let seen = false;
       try { seen = localStorage.getItem(PK) === u; } catch (e) {}
       if (!seen) await new Promise(ok => setTimeout(ok, 3000));
-      PICS = await (await fetch(u, seen ? {} : {priority:"low"})).json();
+      PICS = await (await fetch(u, seen ? {referrerPolicy: "same-origin"}
+                                        : {referrerPolicy: "same-origin", priority: "low"})).json();
       try { localStorage.setItem(PK, u); } catch (e) {}
       setTimeout(warmAll, 0);
       PICSDONE = true;
@@ -670,16 +684,23 @@ $("#pw").addEventListener("keydown", e => { if (e.key === "Enter") $("#go").clic
      * `$("#app").hidden = false` 까지 못 가서 **화면이 빈 채로 남는다.**
      * 실제로 그렇게 만들었다가 제목만 바뀌고 본문이 안 뜨는 것을 봤다.
      * 잠금 화면은 숨기기만 하고 치우는 건 `start()` 에 맡긴다. */
-    const box = $("#lock");
-    if (box) box.style.visibility = "hidden";
-    $("#wait").style.display = "flex";
     try { start(await unlock(null, false)); }
-    catch(e){ if (box) box.style.visibility = "visible"; }
+    catch(e){
+      /* 공개판에 비밀번호는 없다. 못 받았으면 그렇다고 말하고 다시 열게 한다.
+         전에는 여기서 잠금 화면을 꺼내서 **비밀번호 창이 그대로 남았다.** */
+      $("#wait").innerHTML = "<div>불러오지 못했어요</div>"
+        + '<button type="button" onclick="location.reload()">다시 열기</button>';
+      return;
+    }
     $("#wait").style.display = "none";
     return;
   }
   try { pw = localStorage.getItem(KEY_NAME) || sessionStorage.getItem(KEY_NAME); } catch(e){}
-  if (!pw) return;
+  if (!pw) {                       // 잠긴 판 · 처음 온 사람 — 이때만 잠금 화면
+    $("#lock").style.visibility = "visible";
+    $("#wait").style.display = "none";
+    return;
+  }
   const lock = $("#lock");
   if (lock) lock.style.visibility = "hidden";
   $("#wait").style.display = "flex";
