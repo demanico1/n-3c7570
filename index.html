@@ -258,6 +258,8 @@ main{padding:10px 12px 28px;display:grid;gap:8px}
 #onlybar{display:none;align-items:center;justify-content:space-between;gap:10px;
         margin:0 12px 10px;padding:10px 12px;border-radius:10px;
         background:var(--accent);color:#fff;font-size:13px}
+#onlybar{flex-wrap:wrap}
+#onlybar .ob{display:flex;gap:6px;flex-shrink:0}
 #onlybar button{font-size:12.5px;padding:6px 12px;border-radius:7px;cursor:pointer;
         background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.45);color:#fff}
 .empty{grid-column:1/-1;text-align:center;color:var(--dim);padding:44px 12px}
@@ -512,6 +514,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
   </div>
 
   <div class="rows" id="cartbar">
+    <button data-act="sharecart">공유하기</button>
     <button data-act="copyall">이름 전부 복사</button>
     <button data-act="clear">비우기</button>
   </div>
@@ -548,7 +551,7 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
     <select id="view" hidden></select>
   </div>
 
-  <div id="onlybar"><span id="onlytext"></span><button id="onlyall">전체 보기</button></div>
+  <div id="onlybar"><span id="onlytext"></span><span class="ob"><button id="onlytake" hidden>내 찜에 담기</button><button id="onlyall">전체 보기</button></span></div>
 
   <main id="list"></main>
 
@@ -725,6 +728,10 @@ let DATA = [], VIEW = [], BIG = "전체", SHOWN = 0, CP = "", WAIT = "", PICS = 
 /* 공유 주소(#p=코드)로 들어왔을 때 그 한 줄만 보여 준다. 받은 사람이
    2,263줄 맨 위부터 뒤지게 하면 공유한 뜻이 사라진다. */
 let ONLY = "";
+/* ★ 공유받은 찜 목록 (`#w=코드-코드-…`, 2026-09-26). 그 상품들만 보여 준다.
+   받는 사람의 찜(`CART`)은 건드리지 않는다 — `내 찜에 담기` 를 눌러야 더한다. */
+let WLIST = null;
+let TITLE0 = document.title;   // 공유로 바꾼 탭 제목을 되돌릴 때 쓴다
 const won = n => n == null ? "–" : n.toLocaleString("ko-KR") + "원";
 const pct = n => (n > 0 ? "+" : "") + n.toFixed(1) + "%";
 /* 군마트가 싸면 음수다. 기준이 쿠팡가이기 때문(프로그램의 calc() 과 같다). */
@@ -733,7 +740,7 @@ const wonDiff = n => (n > 0 ? "+" : "") + n.toLocaleString("ko-KR") + "원";
 function start(d){
   // 페이지를 열기 전에는 제목조차 알 수 없어야 한다. 잠긴 자료에서 꺼내 온다.
   DATA = d.items;
-  document.title = d.title;
+  document.title = TITLE0 = d.title;
   $("#foot").innerHTML = d.foot;
   $("#q").placeholder = d.hint;
   CP = d.cp;
@@ -790,6 +797,20 @@ function start(d){
   const wantBig = raw.indexOf("c=") === 0
                 ? decodeURIComponent(raw.slice(2)) : "";
   const sIt = shared ? DATA.find(x => x.p === shared) : null;
+  if (/^w=[0-9-]+$/.test(raw)) {
+    const have = new Set(DATA.map(x => x.p));
+    const got = [...new Set(raw.slice(2).split("-"))].filter(c => have.has(c));
+    if (got.length) {
+      WLIST = new Set(got);
+      $("#onlybar").style.display = "flex";
+      $("#onlytext").textContent = "공유받은 찜 목록 " + got.length + "개예요";
+      const tk = $("#onlytake");
+      tk.hidden = false;
+      tk.disabled = got.every(inCart);
+      tk.textContent = tk.disabled ? "이미 다 찜했어요" : "내 찜에 담기";
+      document.title = "PX 찜 목록 " + got.length + "개";
+    }
+  }
   if (sIt){
     ONLY = shared;
     $("#onlybar").style.display = "flex";
@@ -824,7 +845,7 @@ function start(d){
     BIG = wantBig;
     $("#chips").querySelectorAll(".chip").forEach(
         c => c.classList.toggle("on", c.dataset.b === wantBig));
-  } else if (!sIt) {
+  } else if (!sIt && !WLIST) {
     // 공유 주소일 때는 넣으면 안 된다. `p=28438` 이 검색어로 들어간다.
     const h = decodeURIComponent(raw);
     if (h) $("#q").value = h;
@@ -866,6 +887,8 @@ function start(d){
  * 정해 둔 설정이라, 홈으로 간다고 되돌리면 빼앗는 것이 된다. */
 function goHome(){
   ONLY = "";
+  WLIST = null; $("#onlytake").hidden = true;
+  document.title = TITLE0;
   const bar = $("#onlybar");
   if (bar) bar.style.display = "none";
   $("#q").value = "";
@@ -951,7 +974,7 @@ function run(){
   try {
     // 공유받아 들어온 주소(#p=코드)는 그대로 둔다. 여기서 다시 쓰면
     // `#p%3D28438` 로 인코딩돼 그 주소를 또 공유하면 안 열린다.
-    if (!ONLY)
+    if (!ONLY && !WLIST)
       history.replaceState(history.state, "", raw ? "#" + encodeURIComponent(raw) : " ");
   } catch(e){}
 
@@ -968,6 +991,7 @@ function run(){
   // 두 벌로 베껴 두면 한쪽만 고쳐져 안내가 거짓말을 하게 된다.
   const pass = (it, big, vw, scoring) => {
     if (ONLY) return it.p === ONLY;      // 공유받은 한 줄만
+    if (WLIST) return WLIST.has(it.p);   // 공유받은 찜 목록만
     if (big !== "전체" && it.big !== big) return false;
     // 찜한 것 보기는 빼고(거기서 빼면 바로 사라지는 게 맞다),
     // 나머지 보기에서는 방금 손댄 줄을 남겨 둔다.
@@ -1043,9 +1067,10 @@ function run(){
   const bar = $("#cartbar");
   bar.style.display = (view === "cart" || view === "mine") ? "flex" : "none";
   bar.dataset.mode = view;
-  bar.children[0].textContent = view === "mine" ? "직접 입력한 값 복사"
+  bar.children[0].style.display = view === "mine" ? "none" : "";   // 공유하기
+  bar.children[1].textContent = view === "mine" ? "직접 입력한 값 복사"
                                                 : "이름 전부 복사";
-  bar.children[1].textContent = view === "mine" ? "직접 입력한 값 모두 지우기"
+  bar.children[2].textContent = view === "mine" ? "직접 입력한 값 모두 지우기"
                                                 : "비우기";
   stats();
 
@@ -1982,11 +2007,43 @@ $("#inappbtns").addEventListener("click", e => {
       (IOS ? "사파리" : "브라우저") + ' 주소창에 붙여 넣으세요.</span>');
 });
 
+/* ★ 찜 목록 공유 (2026-09-26 사장님 지시).
+ *
+ * `/w/?c=코드-코드-…` 를 보낸다. `#` 가 아니라 `?` 인 까닭은 카톡이 `#` 뒤를
+ * 안 읽어서다 — `/w/` 는 클라우드플레어 서버 기능(`functions/w/index.js`)이
+ * 받아 **미리보기(몇 개 · 첫 상품 사진)** 를 만들고, 사람이 누르면 이 앱
+ * `#w=…` 로 넘긴다. 찜 목록은 어디에도 저장하지 않는다. 주소에 실려 갈 뿐이다.
+ *
+ * 앱 주소 뒤에 폴더가 붙어 있어도(예전 깃허브 주소) 맞게 가도록 상품 공유와
+ * 같은 방식으로 뿌리를 찾는다. */
+function shareCart(b){
+  const have = new Set(DATA.map(x => x.p));
+  const codes = CART.filter(p => have.has(p));
+  if (!codes.length) return;
+  let path = location.pathname;
+  if (!path.endsWith("/")){
+    const cut = path.lastIndexOf("/");
+    path = path.slice(cut + 1).includes(".") ? path.slice(0, cut + 1) : path + "/";
+  }
+  const url = location.origin + path + "w/?c=" + codes.join("-");
+  const title = "PX 찜 목록 " + codes.length + "개";
+  const line = "군마트(PX) 상품 " + codes.length + "개를 모아서 보냈어요.";
+  if (navigator.share){
+    navigator.share({title: title, text: line, url: url}).catch(() => {});
+    return;
+  }
+  try { navigator.clipboard.writeText(title + "\n" + line + "\n" + url); } catch(e){}
+  const was = b.textContent;
+  b.textContent = "주소를 복사했어요";
+  setTimeout(() => { b.textContent = was; }, 1500);
+}
+
 $("#cartbtn").insertAdjacentHTML("afterbegin", HEART);
 $("#cartbtn").addEventListener("click", openCart);
 $("#cartbar").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const mine = $("#cartbar").dataset.mode === "mine";
+  if (b.dataset.act === "sharecart") return shareCart(b);
   if (b.dataset.act === "clear"){
     if (mine){ MINE = {}; saveMine(); }
     else { CART = []; saveCart(); }
@@ -2005,8 +2062,19 @@ saveCart();
    훑으면서 넣을 때 메뉴를 한 번 거치지 않아도 된다.
    아이콘 위에서는 안 되게 한다 — 거기는 저마다 할 일이 있다.
    손가락이 10px 넘게 움직이면 목록을 넘기려는 것이므로 그만둔다. */
+$("#onlytake").addEventListener("click", e => {
+  if (!WLIST) return;
+  let n = 0;
+  for (const p of WLIST) if (!inCart(p)) { CART.push(p); n++; }
+  saveCart();
+  e.target.disabled = true;
+  e.target.textContent = n ? n + "개 담았어요" : "이미 다 찜했어요";
+  run();
+});
 $("#onlyall").addEventListener("click", () => {
   ONLY = "";
+  WLIST = null; $("#onlytake").hidden = true;
+  document.title = TITLE0;
   $("#onlybar").style.display = "none";
   try { history.replaceState(history.state, "", location.pathname); } catch(e){}
   run();
