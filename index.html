@@ -29,8 +29,12 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0b7a4b">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!-- ★ 아이폰 홈 화면 아이콘은 **사파리로** 연다 (2026-09-27 사장님 결정).
+     `apple-mobile-web-app-capable` 을 빼면 아이콘이 따로 떨어진 앱이 아니라
+     사파리 탭으로 열린다. 따로 떨어진 앱은 **찜을 사파리와 따로 저장**해서
+     사파리에서 찜한 것이 아이콘으로 열면 안 보였다.
+     아이콘 아래 이름은 제목에서 잘리지 않게 못박는다. -->
+<meta name="apple-mobile-web-app-title" content="PX 가격비교">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>PX 가격비교 — 군마트 vs 온라인</title>
@@ -372,6 +376,42 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
      color:var(--bg);font-size:13px;line-height:1.5;opacity:0;pointer-events:none;
      transform:translate(-50%,30px);transition:opacity .2s,transform .2s}
 #toast.on{opacity:1;transform:translate(-50%,0)}
+/* ★ 홈 화면 추가 안내 — 브라우저 메뉴 자리를 **화살표로** 가리킨다 (2026-09-27).
+   글만으로는 나이 드신 분이 메뉴를 못 찾는다. 화면 가장자리의 실제 단추 쪽을
+   가리키고, 가운데 카드에 순서를 적는다. */
+#guide{position:fixed;inset:0;z-index:70;display:none;background:rgba(0,0,0,.55);
+       align-items:center;justify-content:center;padding:16px}
+#guide.on{display:flex}
+#guide .gcard{position:relative;width:100%;max-width:360px;background:var(--card);
+       color:var(--ink);border-radius:16px;padding:20px 18px 16px;box-shadow:var(--shadow)}
+#guide h3{margin:0 0 12px;padding-right:30px;font-size:16px}
+#guide h3 small{font-size:12px;font-weight:600;color:var(--dim);margin-left:4px}
+#guide ol{margin:0;padding:0;list-style:none;counter-reset:g}
+#guide li{position:relative;padding:0 0 12px 34px;font-size:14px;line-height:1.7;counter-increment:g}
+#guide li::before{content:counter(g);position:absolute;left:0;top:1px;width:24px;height:24px;
+       border-radius:12px;background:var(--accent);color:#fff;font-size:12.5px;font-weight:700;
+       line-height:24px;text-align:center}
+#guide .gchip{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;margin:0 1px;
+       border:1px solid var(--line);border-radius:7px;background:var(--bg);font-weight:700;
+       white-space:nowrap}
+#guide .gnote{margin:2px 0 12px;color:var(--dim);font-size:12.5px;line-height:1.6}
+#guide .gdone{width:100%;padding:12px;border:0;border-radius:11px;background:var(--accent);
+       color:#fff;font-weight:700;font-size:14px;cursor:pointer}
+#guide .gx{position:absolute;top:10px;right:10px;width:30px;height:30px;border:0;
+       background:transparent;color:var(--dim);font-size:15px;cursor:pointer}
+/* 화살표 — 실제 브라우저 단추가 있는 가장자리를 가리킨다 */
+#guide .garrow{position:fixed;width:0;height:0;border:16px solid transparent}
+#guide.at-top-right .garrow{top:6px;right:14px;border-bottom-color:#fff;border-top:0;
+       animation:gup 1s ease-in-out infinite}
+#guide.at-bottom-right .garrow{bottom:calc(6px + env(safe-area-inset-bottom));right:14px;
+       border-top-color:#fff;border-bottom:0;animation:gdn 1s ease-in-out infinite}
+#guide.at-bottom-center .garrow{bottom:calc(6px + env(safe-area-inset-bottom));left:calc(50% - 16px);
+       border-top-color:#fff;border-bottom:0;animation:gdn 1s ease-in-out infinite}
+@keyframes gup{50%{transform:translateY(-8px)}}
+@keyframes gdn{50%{transform:translateY(8px)}}
+@media (prefers-reduced-motion:reduce){#guide .garrow{animation:none}}
+/* 메뉴 창의 선 그림 아이콘 — 초록 단추 위에서는 흰색 */
+#sheet button.go .ico svg path{stroke:#fff}
 #cartbar{display:none;gap:6px;padding:8px 12px 0}
 #cartbar button{flex:1;padding:8px;border:1px solid var(--line);border-radius:9px;
      background:var(--card);font-size:13px;cursor:pointer}
@@ -748,8 +788,24 @@ let WLIST = null;
    찜은 목록이 준비된 뒤 `start()` 에서 푼다(여기서는 아직 찜 목록이 없다). */
 let CARRY = null;
 (function(){
+  // 방문 수 — 두 번째 방문부터 홈 화면 추가를 권한다
+  try {
+    if (!sessionStorage.getItem("gmpx-sess")){
+      sessionStorage.setItem("gmpx-sess", "1");
+      localStorage.setItem("gmpx-visits", String(Number(localStorage.getItem("gmpx-visits") || 0) + 1));
+    }
+  } catch(e){}
   try {
     const q = new URLSearchParams(location.search);
+    // ★ 홈 화면 아이콘으로 열면 `?home=1` 이 온다(manifest start_url · 안내 때
+    //   잠깐 붙인 주소). 이미 넣은 사람이니 다시 권하지 않는다.
+    if (q.get("home") === "1"){
+      try { localStorage.setItem("gmpx-home", "1"); } catch(e){}
+      if (!q.get("h") && !q.get("imp")){
+        history.replaceState(null, "", location.pathname + location.hash);
+        return;
+      }
+    }
     const h = q.get("h"), imp = q.get("imp");
     if (!h && !imp) return;
     if (imp) CARRY = {imp: imp, from: q.get("from") || ""};
@@ -1361,6 +1417,8 @@ function unpack(text){
   return [(data.c || []).length, Object.keys(data.m || {}).length];
 }
 
+const ICO_BOOK = '<svg viewBox="0 0 24 24"><path d="M12 6.5C10.5 5.3 8.3 4.8 4 5v13c4.3-.2 6.5.3 8 1.5 1.5-1.2 3.7-1.7 8-1.5V5c-4.3-.2-6.5.3-8 1.5zm0 0v13" stroke-linejoin="round"/></svg>';
+const ICO_ADDHOME = '<svg viewBox="0 0 24 24"><path d="M8 3h8a1.5 1.5 0 0 1 1.5 1.5v15A1.5 1.5 0 0 1 16 21H8a1.5 1.5 0 0 1-1.5-1.5v-15A1.5 1.5 0 0 1 8 3zm4 6v6m-3-3h6" stroke-linecap="round"/></svg>';
 function openMove(){
   const n1 = CART.length, n2 = Object.keys(MINE).length;
   /* ★ 2026-09-24 — 메뉴를 둘로 줄였다.
@@ -1371,8 +1429,11 @@ function openMove(){
    * 단추만 되살리면 다시 쓸 수 있다. */
   openSheet("<h3>메뉴</h3>" +
     '<p class="note">찜한 것 ' + n1 + "건 · 넣은 값 " + n2 + "건</p>" +
-    '<button class="go" data-act="help"><i class="ico">?</i>사용방법</button>' +
-    (STANDALONE ? "" : '<button data-act="install">홈 화면에 추가</button>'));
+    // ★ 아이콘은 둘 다 같은 굵기의 선 그림 (2026-09-27). `?` 하나만 붙어
+    //   있어서 어색했다 — 사장님이 짚으셨다. 펼친 책 · 폰에 더하기.
+    '<button class="go" data-act="help"><i class="ico">' + ICO_BOOK + "</i>사용방법</button>" +
+    (STANDALONE ? "" : '<button data-act="install"><i class="ico">' + ICO_ADDHOME +
+                       "</i>홈 화면에 추가</button>"));
 }
 $("#more").addEventListener("click", openMove);
 
@@ -1758,31 +1819,49 @@ function openSheet(html){
 }
 function closeSheet(){ dismiss(); }
 
-/* 처음 온 사람에게 단추마다 무엇인지 알려 준다. 아이콘만으로는 모른다. */
+/* 사용방법 — 처음 온 사람에게 무엇을 어떻게 쓰는지 알려 준다.
+ * ★ 2026-09-27 사장님 확인을 받고 새로 썼다. 번호마다 끊어 필요한 것만 찾아
+ * 읽게 했다. 화면의 단추 이름과 글자가 **똑같아야** 한다 — 단추 이름을
+ * 바꾸면 여기도 같이 바꿔라. */
 function openHelp(){
+  const li = a => "<p>" + a.map(x => "· " + x).join("<br>") + "</p>";
   openSheet("<h3>사용방법</h3>" +
     '<div class="help">' +
-    '<p><b>1. 찾기</b><br>상품 이름을 치면 바로 걸러집니다. ' +
-    '<b>ㄷㅌㅈ</b> 처럼 초성만 쳐도 되고, 띄어쓰기는 안 맞아도 됩니다.</p>' +
-    '<p><b>2. 값 읽기</b><br>왼쪽이 <b>군마트</b>, 오른쪽이 ' + CP +
-    ' 값입니다. 초록은 군마트가 싼 것, 빨강은 ' + CP + ' 가 싼 것입니다. ' +
-    '<b>비교군 없음</b> 은 비교할 상품을 못 찾은 것입니다.</p>' +
-    '<p><b>3. 머리의 단추</b><br>' +
-    '<b>리스트/갤러리</b> — 사진을 작게 볼지 크게 볼지 바꿉니다.<br>' +
-    '<b>찜</b> — 찜해 둔 것만 모아 봅니다.<br>' +
-    '<b>메뉴</b> — 지금 이 창과 홈 화면에 추가.<br>' +
-    '<b>라이트/다크</b> — 화면을 밝게/어둡게.</p>' +
-    '<p><b>4. 상품 누르기</b><br>상품 이름을 누르면 ' + CP +
-    ' 로 가기 · 찜하기 · 공유하기 · <b>직접 가격 비교 입력하기</b> 가 나옵니다. ' +
-    '목록에서 사진을 누르면 크게 보이고, 갤러리에서는 이미 크므로 ' +
-    '이름을 누른 것과 같습니다.</p>' +
-    '<p><b>5. 찜하기</b><br>카드 오른쪽 하트를 누르면 담깁니다. ' +
-    'PX 에 가서 그 목록만 보면 됩니다.</p>' +
-    '<p><b>6. 홈 화면에 추가</b><br>앱처럼 한 번에 열립니다. ' +
-    '설치도 가입도 필요 없습니다.</p>' +
+    "<p><b>이런 곳이에요</b><br>군마트(PX)에서 파는 2,263개 상품의 가격을 " +
+    "온라인(" + CP + ")과 하나씩 비교해 뒀어요. PX 가기 전에 살 것을 미리 찾아보세요.</p>" +
+    "<p><b>1. 찾기</b></p>" + li([
+      "위 검색칸에 상품 이름을 치면 바로 걸러져요.",
+      "초성만 쳐도 돼요 — <b>ㄷㅍㅇ</b> 로 달팽이크림.",
+      "띄어쓰기는 안 맞아도 돼요.",
+      "식품 · 화장품 같은 종류 단추를 누르면 그 종류만 보여요."]) +
+    "<p><b>2. 가격 보는 법</b></p>" + li([
+      "카드마다 <b>PX 가격</b>과 <b>" + CP + " 가격</b>이 나란히 있어요.",
+      "<b>초록</b>은 PX가 더 저렴한 것, <b>빨강</b>은 온라인이 더 저렴한 것이에요. 숫자는 몇 % 차이인지예요.",
+      "<b>비교군 없음</b> — 온라인에서 같은 상품을 못 찾은 것이에요.",
+      "<b>3개들이에서 낱개</b> — 온라인은 묶음으로 팔아서 한 개 값으로 나눠 비교한 것이에요.",
+      "<b>환산</b> — 크기가 달라서 같은 양으로 맞춰 계산한 것이에요."]) +
+    "<p><b>3. 줄 세우기</b></p>" + li([
+      "<b>랭킹순</b> — 온라인 후기가 많은 것부터",
+      "<b>낮은 가격순</b> — PX 가격이 싼 것부터",
+      "세 번째 칸에서 <b>높은 가격순 · 할인율 높은 순 · 할인율 낮은 순</b> 도 고를 수 있어요."]) +
+    "<p><b>4. 보기 바꾸기</b></p>" + li([
+      "맨 위 <b>리스트/갤러리</b> 단추로 사진을 작게 또는 크게 볼 수 있어요.",
+      "리스트에서 사진을 누르면 크게 보여요."]) +
+    "<p><b>5. 상품을 누르면</b></p>" + li([
+      "<b>" + CP + " 가격 확인하기</b> — " + CP + " 화면으로 바로 가서 가격을 봐요.",
+      "<b>찜하기</b> · <b>공유하기</b> — 카톡으로 그 상품을 보낼 수 있어요.",
+      "<b>직접 가격 비교 입력하기</b> — 내가 본 온라인 가격을 적어 두면, 내 폰에서는 그 값으로 비교해요."]) +
+    "<p><b>6. 찜하기</b></p>" + li([
+      "카드 오른쪽 위 <b>하트</b>를 누르면 담겨요.",
+      "맨 위 <b>찜</b> 단추를 누르면 찜한 것만 모아 봐요. PX에서는 이 목록만 보면 돼요.",
+      "찜 화면에서 <b>공유하기</b>를 누르면 목록을 통째로 카톡에 보낼 수 있어요.",
+      "찜은 이 폰, 이 브라우저에 저장돼요."]) +
+    "<p><b>7. 홈 화면에 추가</b></p>" + li([
+      "메뉴 → <b>홈 화면에 추가</b> 를 해 두면 아이콘 하나로 바로 열려요. 설치나 가입은 없어요."]) +
+    "<p><b>8. 밝게 · 어둡게</b></p>" + li([
+      "맨 위 <b>◐</b> 단추로 바꿔요."]) +
     "</div>" +
-    '<p class="note">값은 그날 화면에서 사람이 보고 적은 것입니다. ' +
-    '수시로 바뀌니 참고로만 봐 주세요.</p>');
+    '<p class="note">가격은 직접 확인한 날 기준이에요. 온라인 가격은 자주 바뀌어요.</p>');
 }
 
 $("#sheet").addEventListener("click", e => {
@@ -1797,7 +1876,7 @@ $("#sheet").addEventListener("click", e => {
     const it = DATA.find(x => x.p === b.dataset.p);
     return coupang(b.dataset.q, it && it.a);
   }
-  if (act === "add"){ CART.push(p); saveCart(); closeSheet(); return run(); }
+  if (act === "add"){ CART.push(p); saveCart(); closeSheet(); inappJit(); homeHint(); return run(); }
   if (act === "del"){
     CART = CART.filter(x => x !== p);
     saveCart(); closeSheet(); return run();
@@ -2095,7 +2174,12 @@ function inbar(mode){
     bar.id = "inbar";
     document.body.appendChild(bar);
     bar.addEventListener("click", e => {
-      if (e.target.closest(".go")) return goOut();
+      if (e.target.closest(".go")){
+        if (bar.dataset.mode !== "home") return goOut();
+        bar.classList.remove("on");
+        document.body.style.paddingBottom = "";
+        return openInstall();
+      }
       if (e.target.closest(".x")){
         // ✕ 는 **7일** 기억한다. 공유받은 링크를 열 때마다 뜨면 짜증 난다.
         // 대신 찜을 누를 때는 따로 한 번 짚어 준다(`jit`) — 실제로 손해 보는 순간이다.
@@ -2108,7 +2192,12 @@ function inbar(mode){
   }
   const name = APP_NAME[APP] || "이 앱";
   bar.dataset.mode = mode;
-  bar.innerHTML = mode === "jit"
+  bar.innerHTML = mode === "home"
+    ? '<div class="t"><b>PX 갈 때 찜한 것 바로 보려면</b>' +
+      "<span>홈 화면에 아이콘을 만들어 두세요.</span></div>" +
+      '<button class="go">추가하는 법</button>' +
+      '<button class="x" aria-label="닫기">&#10005;</button>'
+    : mode === "jit"
     ? '<div class="t"><b>' + name + " 안에서 찜하면 " + name + "에만 남아요</b></div>" +
       '<button class="go">' + OUT_WORD + (OUT_DIRECT ? "로 옮기기" : "로 옮기는 법") + "</button>" +
       '<button class="x" aria-label="닫기">&#10005;</button>'
@@ -2254,7 +2343,7 @@ $("#list").addEventListener("click", e => {
   const cartIcon = e.target.closest(".cart");
   if (cartIcon){
     if (inCart(p)) CART = CART.filter(x => x !== p);
-    else { CART.push(p); inappJit(); }
+    else { CART.push(p); inappJit(); homeHint(); }
     saveCart();
     // 찜한 것 보기에서는 줄이 빠져야 하니 다시 그리고, 아니면 하트만 바꾼다
     if ($("#view").value === "cart") return run();
@@ -2307,8 +2396,8 @@ if ("serviceWorker" in navigator)
 
 /* 안드로이드·데스크톱 크롬은 설치할 수 있게 되면 이 신호를 준다.
    아이폰 사파리는 신호가 없어서 직접 알려 줘야 한다. */
-let INSTALL = null;
-addEventListener("beforeinstallprompt", e => { e.preventDefault(); INSTALL = e; });
+/* `beforeinstallprompt` 는 이제 안 온다 — manifest 가 display:browser 라서다
+   (북마크 방식, 2026-09-27). 받아 두던 코드는 걷어냈다. */
 const STANDALONE = matchMedia("(display-mode: standalone)").matches
                 || navigator.standalone === true;
 
@@ -2332,14 +2421,21 @@ function addOff(){
   try {
     if (localStorage.getItem("gmpx-add") === "no") return true;
     if (sessionStorage.getItem("gmpx-add") === "skip") return true;
+    // 안내를 봤으면 30일 동안 안 권한다. 아이폰은 넣었는지 알 길이 없다.
+    if (Date.now() < Number(localStorage.getItem("gmpx-add-until") || 0)) return true;
   } catch(e){}
   return false;
+}
+function visits(){
+  try { return Number(localStorage.getItem("gmpx-visits") || 0); } catch(e){ return 0; }
 }
 
 function showAdd(){
   const bar = $("#addbar");
   if (!bar) return;
-  bar.hidden = STANDALONE || addOff() || IN_APP;
+  // ★ 처음 온 사람에게는 안 권한다 (2026-09-27). 값 하나 보러 온 사람에게
+  //   들어오자마자 '홈 화면에 추가' 는 귀찮기만 하다. 두 번째 방문부터.
+  bar.hidden = STANDALONE || addOff() || IN_APP || homeHave() || visits() < 2;
 }
 
 /* ✕ 를 눌렀을 때. 띠를 바로 없애지 않고 **한 줄로 줄여** 물어본다.
@@ -2358,53 +2454,137 @@ function addLater(){
   setTimeout(() => { bar.hidden = true; }, 6000);
 }
 
-function openInstall(){
-  if (INSTALL){
-    INSTALL.prompt();
-    INSTALL.userChoice.finally(() => { INSTALL = null; });
-    return;
+/* ★ 홈 화면에 추가 — **북마크 방식 + 화살표 안내** (2026-09-27 사장님 결정).
+ *
+ * 앱 방식(standalone)은 삼성 인터넷 등에서 '신뢰할 수 없는 앱' 경고가 떴고,
+ * 열 때마다 로딩 화면이 떴고, 아이폰은 찜을 사파리와 따로 저장했다. 그래서
+ * **모든 브라우저에서 바로가기(북마크)** 로 넣는다(`manifest` 의 display:browser).
+ *
+ * 잃은 것은 크롬의 '설치 창 한 번에' 다. 그 자리를 **그 브라우저의 실제 메뉴
+ * 자리를 가리키는 화살표**로 메운다. 글로 '메뉴를 찾아 누르세요' 는 나이 드신
+ * 분이 따라오지 못한다(예전에 그래서 되돌렸던 적이 있다).
+ *
+ * **다른 브라우저로 보내지 않는다.** 보내면 경고가 뜨고 찜이 따라오지 않는다.
+ *
+ * 메뉴 자리는 브라우저 판마다 바뀐다. 확실한 것만 화살표를 달고(`pos`),
+ * 나머지는 순서만 적는다. 아이폰 사파리는 iOS 26 부터 공유가 `⋯` 안으로
+ * 들어갔다 — UA 의 `Version/26` 으로 가른다(iOS 26 은 OS 번호를 18_6 에 묶어
+ * 둬서 OS 번호로는 못 가른다). */
+const SHARE_ICO = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">' +
+  '<path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M6 11H5v10h14V11h-1" fill="none" ' +
+  'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const chip = t => '<span class="gchip">' + t + "</span>";
+
+function guideFor(){
+  const u = navigator.userAgent;
+  const mobile = /Android|iPhone|iPad|iPod/i.test(u);
+  if (!mobile) return {
+    title: "즐겨찾기에 추가하는 법", pos: "",
+    note: "즐겨찾기에서 누르면 이 화면이 바로 열려요.",
+    done: "다음부터 즐겨찾기로 바로 열려요",
+    steps: ["키보드에서 " + chip(/Mac/i.test(u) ? "⌘ + D" : "Ctrl + D") + " 를 누르세요.",
+            chip("완료") + " 를 누르면 즐겨찾기에 들어가요."]};
+  if (IOS){
+    if (/CriOS/i.test(u)) return {
+      title: "홈 화면에 추가하는 법", sub: "크롬", pos: "top-right",
+      steps: ["주소창 오른쪽의 " + chip(SHARE_ICO + " 공유") + " 를 누르세요.",
+              "조금 내려서 " + chip("홈 화면에 추가") + " 를 누르세요.",
+              "오른쪽 위 " + chip("추가") + " 를 누르면 끝이에요."]};
+    if (/FxiOS|EdgiOS|Whale|NAVER/i.test(u)) return {
+      title: "홈 화면에 추가하는 법", pos: "",
+      steps: ["화면의 " + chip(SHARE_ICO + " 공유") + " 단추를 누르세요.",
+              "조금 내려서 " + chip("홈 화면에 추가") + " 를 누르세요.",
+              chip("추가") + " 를 누르면 끝이에요."]};
+    const v = Number((u.match(/Version\/(\d+)/) || [])[1] || 0);
+    if (v >= 26) return {
+      title: "홈 화면에 추가하는 법", sub: "사파리", pos: "bottom-right",
+      steps: ["아래 오른쪽 " + chip("⋯") + " 를 누르세요.",
+              chip(SHARE_ICO + " 공유") + " 를 누르세요.",
+              "조금 내려서 " + chip("홈 화면에 추가") + " 를 누르세요.",
+              chip("웹 앱으로 열기") + " 가 보이면 끄고 " + chip("추가") + " 를 누르세요."]};
+    return {
+      title: "홈 화면에 추가하는 법", sub: "사파리", pos: "bottom-center",
+      steps: ["아래 가운데 " + chip(SHARE_ICO + " 공유") + " 를 누르세요.",
+              "조금 내려서 " + chip("홈 화면에 추가") + " 를 누르세요.",
+              "오른쪽 위 " + chip("추가") + " 를 누르면 끝이에요."]};
   }
-  // 여기까지 왔다는 건 `beforeinstallprompt` 가 안 왔다는 뜻이다.
-  //
-  // **그러면 이 브라우저에서는 한 번에 못 넣는다.** 안내문을 읽고 메뉴를
-  // 찾아 들어가는 일은 나이 드신 분에게 사실상 불가능하다. 그래서 글로
-  // 가르치는 대신 **크롬으로 넘겨준다** — 크롬에서는 단추 하나로 끝난다.
-  const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const k = browserKind();
+  if (k === "samsung") return {
+    title: "홈 화면에 추가하는 법", sub: "삼성 인터넷", pos: "bottom-right",
+    steps: ["아래 오른쪽 끝 " + chip("≡") + " 를 누르세요.",
+            chip("현재 페이지 추가") + " 를 누르세요.",
+            chip("홈 화면") + " 을 누르면 끝이에요."]};
+  if (k === "chrome") return {
+    title: "홈 화면에 추가하는 법", sub: "크롬", pos: "top-right",
+    steps: ["오른쪽 위 " + chip("⋮") + " 를 누르세요.",
+            chip("홈 화면에 추가") + " 를 누르세요.",
+            chip("추가") + " 를 누르면 끝이에요."]};
+  const menu = {whale: "≡", edge: "⋯", firefox: "⋮", opera: "⋮"}[k] || "메뉴";
+  return {
+    title: "홈 화면에 추가하는 법", pos: "",
+    steps: ["브라우저의 " + chip(menu) + " 를 누르세요.",
+            chip("홈 화면에 추가") + " 를 누르세요.",
+            chip("추가") + " 를 누르면 끝이에요."]};
+}
+
+/* 이미 홈 화면에 넣은 사람인가 — 아이콘으로 열면 `?home=1` 이 붙어 온다 */
+function homeHave(){
+  try { return localStorage.getItem("gmpx-home") === "1"; } catch(e){ return false; }
+}
+
+let GUIDE_BACK = "", GUIDE_DONE = "";
+function openInstall(){
   if (STANDALONE)
     return openSheet("<h3>홈 화면에 추가</h3>"
-      + '<p class="note">이미 홈 화면에서 열고 있습니다.</p>');
-  if (ios)
-    return openSheet("<h3>홈 화면에 추가</h3>"
-      + '<p class="note">아래쪽 가운데 <b>공유</b> 단추<br>'
-      + '<b style="display:inline;font-size:20px">⬆</b> 를 누르고,<br>'
-      + '조금 내려서 <b>홈 화면에 추가</b> 를 누르세요.</p>'
-      + '<p class="note">사파리에서만 됩니다.</p>');
-  // 브라우저마다 메뉴 이름도 자리도 다르다. 쓰는 그 브라우저의 말로 적는다.
-  const HOW = {
-    samsung: ["아래쪽 가운데 <b>메뉴</b>(≡) 를 누르고,",
-              "<b>현재 페이지 추가</b> → <b>홈 화면</b> 을 누르세요."],
-    whale:   ["아래쪽 <b>메뉴</b>(≡) 를 누르고,",
-              "<b>홈 화면에 추가</b> 를 누르세요."],
-    firefox: ["오른쪽 위 <b>메뉴</b>(⋮) 를 누르고,",
-              "<b>홈 화면에 추가</b> 를 누르세요."],
-    edge:    ["아래쪽 <b>메뉴</b>(…) 를 누르고,",
-              "<b>휴대폰에 추가</b> 를 누르세요."],
-    opera:   ["오른쪽 아래 <b>메뉴</b> 를 누르고,",
-              "<b>홈 화면에 추가</b> 를 누르세요."],
-    chrome:  ["오른쪽 위 <b>메뉴</b>(⋮) 를 누르고,",
-              "<b>홈 화면에 추가</b> 를 누르세요."],
-  };
-  const kind = browserKind();
-  const how = HOW[kind] || ["브라우저 <b>메뉴</b> 를 누르고,",
-                            "<b>홈 화면에 추가</b> 를 누르세요."];
-  // 크롬은 따로 권하지 않는다 — 이미 크롬인데 '크롬에서 열기' 는 헛말이다.
-  const toChrome = kind === "chrome" ? ""
-    : '<button data-act="addchrome">크롬에서 열기</button>';
-  openSheet("<h3>홈 화면에 추가</h3>"
-    + '<p class="note">' + how[0] + "<br>" + how[1] + "</p>"
-    + toChrome
-    + (toChrome ? '<p class="note">크롬으로 열면 단추 하나로 끝납니다.<br>'
-                + '크롬이 없으면 위 안내대로 하세요.</p>' : ""));
+      + '<p class="note">이미 홈 화면에서 열고 있어요.</p>');
+  closeSheet();
+  const g = guideFor();
+  /* ★ 지금 주소에 `?home=1` 을 잠깐 붙인다. 브라우저에 따라 아이콘이
+     **지금 주소**를 기억하는데, 이 표시가 있어야 아이콘으로 열었을 때
+     '이미 넣은 사람' 으로 알아본다. 보던 상품(`#p=`)은 떼서, 아이콘이
+     늘 전체 목록으로 열리게 한다. 닫으면 되돌린다. */
+  GUIDE_BACK = location.pathname + location.search + location.hash;
+  try { history.replaceState(history.state, "", location.pathname + "?home=1"); } catch(e){}
+  let el = $("#guide");
+  if (!el){
+    el = document.createElement("div");
+    el.id = "guide";
+    document.body.appendChild(el);
+    el.addEventListener("click", e => {
+      if (e.target.closest(".gdone")) return closeGuide(true);
+      if (!e.target.closest(".gcard") || e.target.closest(".gx")) closeGuide(false);
+    });
+  }
+  GUIDE_DONE = g.done || "다음부터 홈 화면 아이콘으로 바로 열려요";
+  el.className = g.pos ? "on at-" + g.pos : "on";
+  el.innerHTML =
+    (g.pos ? '<div class="garrow" aria-hidden="true"></div>' : "") +
+    '<div class="gcard" role="dialog" aria-label="' + g.title + '">' +
+      '<button class="gx" aria-label="닫기">&#10005;</button>' +
+      "<h3>" + g.title + (g.sub ? " <small>" + g.sub + "</small>" : "") + "</h3>" +
+      "<ol>" + g.steps.map(t => "<li>" + t + "</li>").join("") + "</ol>" +
+      '<p class="gnote">' + (g.note || "아이콘을 누르면 이 화면이 바로 열려요. 설치나 가입은 없어요.") + "</p>" +
+      '<button class="gdone">다 했어요</button>' +
+    "</div>";
+}
+function closeGuide(done){
+  const el = $("#guide");
+  if (el) el.className = "";
+  try { history.replaceState(history.state, "", GUIDE_BACK || location.pathname); } catch(e){}
+  // 안내를 봤으면 30일 동안 다시 권하지 않는다. 아이폰은 넣었는지 알 길이 없다.
+  try { localStorage.setItem("gmpx-add-until", String(Date.now() + 30 * 864e5)); } catch(e){}
+  $("#addbar").hidden = true;
+  if (done) toast(GUIDE_DONE);
+}
+
+/* 처음 찜했을 때 한 번 — 필요를 느낀 그 순간이다 */
+function homeHint(){
+  if (IN_APP || STANDALONE || homeHave() || addOff()) return;
+  try {
+    if (localStorage.getItem("gmpx-homehint")) return;
+    localStorage.setItem("gmpx-homehint", "1");
+  } catch(e){ return; }
+  inbar("home");
 }
 
 $("#addgo").addEventListener("click", openInstall);

@@ -1,10 +1,9 @@
 {
  "name": "PX 가격비교",
  "short_name": "PX 가격비교",
- "start_url": "./",
+ "start_url": "./?home=1",
  "scope": "./",
- "display": "standalone",
- "orientation": "portrait",
+ "display": "browser",
  "background_color": "#ffffff",
  "theme_color": "#0b7a4b",
  "icons": [
