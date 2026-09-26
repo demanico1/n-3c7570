@@ -1433,6 +1433,7 @@ const BUSY  = new Set();          // 미리 받기가 지금 받고 있는 것
 async function sharpen(img){
   const p = img.dataset.p;
   if (!p || img.dataset.nopic || NOPIC.has(p)) return;
+  if (PICSDONE && !PICS[p]) return;                 // 원래 사진이 없는 상품
   if (!SHARP.has(p)) {
     await showBig(p, 1);
     if (!BIGPIC[p]) return;
@@ -1490,7 +1491,10 @@ function warmAll(){
   const next = () => {
     for (const list of [VIEW, DATA])
       for (const it of list)
-        if (!SHARP.has(it.p) && !NOPIC.has(it.p) && !BUSY.has(it.p)) return it.p;
+        // 흐린 사진 뭉치에 없는 상품은 원래 사진이 없는 것이다(4건). 묻지 않는다 —
+        // 물으면 들어올 때마다 404 가 네 줄씩 콘솔에 찍힌다.
+        if (!SHARP.has(it.p) && !NOPIC.has(it.p) && !BUSY.has(it.p)
+            && !(PICSDONE && !PICS[it.p])) return it.p;
     return null;
   };
   const lane = () => {
@@ -1770,7 +1774,11 @@ $("#sheet").addEventListener("click", e => {
            ? path.slice(0, cut + 1)      // 파일 이름이다 — 턴다
            : path + "/";                 // 폴더다 — 슬래시를 붙인다
     }
-    const url = location.origin + path + "p/" + p + "/";
+    /* ★ 2026-09-26 — `/p/` 가 아니라 **공유 전용 `/s/`** 를 보낸다.
+     * `/p/` 로 보냈더니 받은 사람이 앱이 아니라 상품 페이지로 갔다 — 사장님이
+     * 잡아 주셨다. `/s/<코드>/` 는 미리보기는 그 상품 것으로 보여 주고,
+     * 누르면 곧바로 이 앱 `#p=<코드>` 로 넘어온다 (`상품페이지_만들기.py`). */
+    const url = location.origin + path + "s/" + p + "/";
     /* 글은 담백하게. 얼마나 · 몇 % 싼지만 적는다.
      * **이름을 여기 또 넣지 마라** — `title` 에 이미 있어서 카톡에 두 번
      * 찍힌다. 실제로 상품명이 두 줄로 겹쳐 나왔다. */
