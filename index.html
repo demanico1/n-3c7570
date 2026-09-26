@@ -293,11 +293,19 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
 #zoom small{color:#b9bec6;font-size:12px;margin-top:8px}
 
 /* ---------- 아래에서 올라오는 고르기 ---------- */
+/* ★ 창은 **화면 안에서 스크롤**한다 (2026-09-27 사장님이 잡아 주셨다).
+   높이 한도가 없어서, 사용방법처럼 긴 글은 위쪽(1번부터)이 화면 밖으로
+   잘렸다. 창 안에 스크롤할 곳이 없으니 끌어내리면 **뒤 페이지가 당겨져
+   새로고침**됐다. `overscroll-behavior:contain` 이 그 당김을 창 안에 가둔다. */
 #sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:45;
-       align-items:flex-end;justify-content:center}
+       align-items:flex-end;justify-content:center;overscroll-behavior:contain}
 #sheet .box{position:relative;width:100%;max-width:460px;background:var(--card);
        border-radius:18px 18px 0 0;padding:16px 14px calc(16px + env(safe-area-inset-bottom));
-       border:1px solid var(--line);border-bottom:0}
+       border:1px solid var(--line);border-bottom:0;
+       max-height:calc(100% - 24px);max-height:calc(100dvh - 24px);
+       overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+/* 창이 떠 있는 동안 뒤 페이지는 움직이지 않는다 — 당겨서 새로고침도 막힌다 */
+html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 @media(min-width:520px){
   #sheet{align-items:center}
   #sheet .box{border-radius:18px;border-bottom:1px solid var(--line)}
@@ -380,10 +388,11 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
    글만으로는 나이 드신 분이 메뉴를 못 찾는다. 화면 가장자리의 실제 단추 쪽을
    가리키고, 가운데 카드에 순서를 적는다. */
 #guide{position:fixed;inset:0;z-index:70;display:none;background:rgba(0,0,0,.55);
-       align-items:center;justify-content:center;padding:16px}
+       align-items:center;justify-content:center;padding:16px;overscroll-behavior:contain}
 #guide.on{display:flex}
 #guide .gcard{position:relative;width:100%;max-width:360px;background:var(--card);
-       color:var(--ink);border-radius:16px;padding:20px 18px 16px;box-shadow:var(--shadow)}
+       color:var(--ink);border-radius:16px;padding:20px 18px 16px;box-shadow:var(--shadow);
+       max-height:calc(100dvh - 90px);overflow-y:auto;overscroll-behavior:contain}
 #guide h3{margin:0 0 12px;padding-right:30px;font-size:16px}
 #guide h3 small{font-size:12px;font-weight:600;color:var(--dim);margin-left:4px}
 #guide ol{margin:0;padding:0;list-style:none;counter-reset:g}
@@ -1797,6 +1806,7 @@ function markOverlay(){
   }
 }
 function hideOverlays(){
+  document.documentElement.classList.remove("sheet-on");
   $("#zoom").style.display = "none";
   $("#sheet").style.display = "none";
 }
@@ -1815,6 +1825,8 @@ function openSheet(html){
   $("#sheetbox").innerHTML =
       '<i class="x" data-act="close">' + XMARK + "</i>" + html;
   $("#sheet").style.display = "flex";
+  $("#sheetbox").scrollTop = 0;                        // 늘 맨 위(1번)부터
+  document.documentElement.classList.add("sheet-on");
   markOverlay();
 }
 function closeSheet(){ dismiss(); }
@@ -1831,7 +1843,7 @@ function openHelp(){
     "온라인(" + CP + ")과 하나씩 비교해 뒀어요. PX 가기 전에 살 것을 미리 찾아보세요.</p>" +
     "<p><b>1. 찾기</b></p>" + li([
       "위 검색칸에 상품 이름을 치면 바로 걸러져요.",
-      "초성만 쳐도 돼요 — <b>ㄷㅍㅇ</b> 로 달팽이크림.",
+      "초성만 쳐도 돼요 — <b>ㄷㅍㅇ</b>로 달팽이크림.",
       "띄어쓰기는 안 맞아도 돼요.",
       "식품 · 화장품 같은 종류 단추를 누르면 그 종류만 보여요."]) +
     "<p><b>2. 가격 보는 법</b></p>" + li([
@@ -1843,7 +1855,7 @@ function openHelp(){
     "<p><b>3. 줄 세우기</b></p>" + li([
       "<b>랭킹순</b> — 온라인 후기가 많은 것부터",
       "<b>낮은 가격순</b> — PX 가격이 싼 것부터",
-      "세 번째 칸에서 <b>높은 가격순 · 할인율 높은 순 · 할인율 낮은 순</b> 도 고를 수 있어요."]) +
+      "세 번째 칸에서 <b>높은 가격순 · 할인율 높은 순 · 할인율 낮은 순</b>도 고를 수 있어요."]) +
     "<p><b>4. 보기 바꾸기</b></p>" + li([
       "맨 위 <b>리스트/갤러리</b> 단추로 사진을 작게 또는 크게 볼 수 있어요.",
       "리스트에서 사진을 누르면 크게 보여요."]) +
@@ -1857,7 +1869,7 @@ function openHelp(){
       "찜 화면에서 <b>공유하기</b>를 누르면 목록을 통째로 카톡에 보낼 수 있어요.",
       "찜은 이 폰, 이 브라우저에 저장돼요."]) +
     "<p><b>7. 홈 화면에 추가</b></p>" + li([
-      "메뉴 → <b>홈 화면에 추가</b> 를 해 두면 아이콘 하나로 바로 열려요. 설치나 가입은 없어요."]) +
+      "메뉴 → <b>홈 화면에 추가</b>를 해 두면 아이콘 하나로 바로 열려요. 설치나 가입은 없어요."]) +
     "<p><b>8. 밝게 · 어둡게</b></p>" + li([
       "맨 위 <b>◐</b> 단추로 바꿔요."]) +
     "</div>" +
@@ -2557,6 +2569,7 @@ function openInstall(){
   }
   GUIDE_DONE = g.done || "다음부터 홈 화면 아이콘으로 바로 열려요";
   el.className = g.pos ? "on at-" + g.pos : "on";
+  document.documentElement.classList.add("sheet-on");
   el.innerHTML =
     (g.pos ? '<div class="garrow" aria-hidden="true"></div>' : "") +
     '<div class="gcard" role="dialog" aria-label="' + g.title + '">' +
@@ -2570,6 +2583,7 @@ function openInstall(){
 function closeGuide(done){
   const el = $("#guide");
   if (el) el.className = "";
+  document.documentElement.classList.remove("sheet-on");
   try { history.replaceState(history.state, "", GUIDE_BACK || location.pathname); } catch(e){}
   // 안내를 봤으면 30일 동안 다시 권하지 않는다. 아이폰은 넣었는지 알 길이 없다.
   try { localStorage.setItem("gmpx-add-until", String(Date.now() + 30 * 864e5)); } catch(e){}
