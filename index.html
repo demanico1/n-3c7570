@@ -349,25 +349,29 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
   :root:not([data-theme="light"]) .tag-df{background:#4a3a00;border-color:#8a6d00;color:#ffe08a}
 }
 [data-theme="dark"] .tag-df{background:#4a3a00;border-color:#8a6d00;color:#ffe08a}
-/* `position:relative` 는 닫기 단추(`#inappx`)를 구석에 앉히려고 준 것이다.
-   빼면 단추가 화면 오른쪽 위로 날아간다. */
-#inapp{position:relative;display:none;margin:10px 12px 0;
-     padding:12px 34px 12px 13px;border-radius:12px;
-     background:var(--bad-bg);color:var(--bad);font-size:12.5px;line-height:1.65;
-     border:1px solid var(--bad)}
-#inapp b{display:block;margin-bottom:4px;font-size:13.5px}
-#inapp .tip{display:block;margin-top:9px;padding-top:8px;color:var(--dim);
-     border-top:1px solid var(--line)}
-#inapp button{margin-top:8px;margin-right:6px;padding:7px 11px;border-radius:9px;
-     border:1px solid var(--line);background:var(--card);color:var(--ink);
-     font-size:12.5px;cursor:pointer}
-/* 닫기. 손가락으로 누르는 것이라 눈에 보이는 X 보다 **누를 자리를 넓게** 잡는다.
-   위의 `#inapp button` 을 전부 덮어써야 해서 값을 하나씩 되돌린다. */
-#inapp #inappx{position:absolute;top:6px;right:6px;margin:0;padding:0;
-     width:28px;height:28px;line-height:28px;text-align:center;
-     border:0;background:transparent;color:var(--bad);
-     font-size:14px;opacity:.65;border-radius:8px}
-#inapp #inappx:hover{opacity:1;background:var(--card)}
+/* ★ 앱 안 브라우저 안내 — 아래 띠 (2026-09-27 사장님 지시).
+   전에는 머리 바로 아래 **빨간 상자**였다. 공유받은 상품 하나 보려고 들어온
+   사람이 오류처럼 보이는 경고부터 읽었고, 첫마디가 `쓰지 마세요` 였다.
+   이제는 상품이 먼저 보이고, 2.5초 뒤 아래에 사이트 색 띠가 올라온다. */
+#inbar{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));
+     z-index:40;max-width:560px;margin:0 auto;display:flex;align-items:center;gap:10px;
+     padding:11px 8px 11px 14px;border-radius:14px;background:var(--card);
+     border:1px solid var(--line);box-shadow:var(--shadow);font-size:12.5px;line-height:1.5;
+     transform:translateY(160%);transition:transform .25s ease}
+#inbar.on{transform:none}
+#inbar .t{flex:1;min-width:0}
+#inbar .t b{display:block;font-size:13.5px;color:var(--ink)}
+#inbar .t span{color:var(--dim)}
+#inbar .go{flex:none;padding:9px 12px;border:0;border-radius:10px;background:var(--accent);
+     color:#fff;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap}
+#inbar .x{flex:none;width:30px;height:30px;border:0;background:transparent;color:var(--dim);
+     font-size:14px;cursor:pointer;border-radius:8px}
+/* 짧게 알리고 사라지는 한 줄 (찜을 옮겨 왔을 때 등) */
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));z-index:60;
+     max-width:calc(100% - 32px);padding:10px 16px;border-radius:12px;background:var(--ink);
+     color:var(--bg);font-size:13px;line-height:1.5;opacity:0;pointer-events:none;
+     transform:translate(-50%,30px);transition:opacity .2s,transform .2s}
+#toast.on{opacity:1;transform:translate(-50%,0)}
 #cartbar{display:none;gap:6px;padding:8px 12px 0}
 #cartbar button{flex:1;padding:8px;border:1px solid var(--line);border-radius:9px;
      background:var(--card);font-size:13px;cursor:pointer}
@@ -504,20 +508,6 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
     <div class="rows" id="chips"></div>
   </header>
 
-  <div id="inapp">
-    <!-- ★ 닫기 단추 (2026-09-25 사장님 결정).
-         **누른 것을 기억하지 않는다.** 카카오톡으로 열 때마다 다시 뜬다.
-         잠깐 둘러보려는 사람이 큰 카드에 막히지 않게 그 순간만 치우는 것이라
-         `localStorage` 에 남기면 뜻이 달라진다 — 다음에 열었을 때 안 뜨면
-         찜한 것이 왜 사라졌는지 알 길이 없어진다. -->
-    <button id="inappx" type="button" aria-label="이 안내 닫기">&#10005;</button>
-    <b id="inapptitle">카카오톡 브라우저에서는 쓰지 마세요</b>
-    찜하기 저장이 카톡에만 남아서 불편해요.<br>
-    홈 화면 고정 기능도 쓸 수 없어요.
-    <div id="inappbtns"></div>
-    <span class="tip">브라우저에서 연 뒤 메뉴 → <b style="display:inline">홈 화면에 추가</b>
-    를 해 두면 앱처럼 바로 열리고, 찜한 목록도 한곳에 저장됩니다.</span>
-  </div>
 
   <div class="rows" id="cartbar">
     <button data-act="sharecart">공유하기</button>
@@ -752,6 +742,20 @@ let ONLY = "";
 /* ★ 공유받은 찜 목록 (`#w=코드-코드-…`, 2026-09-26). 그 상품들만 보여 준다.
    받는 사람의 찜(`CART`)은 건드리지 않는다 — `내 찜에 담기` 를 눌러야 더한다. */
 let WLIST = null;
+/* ★ 앱 안 브라우저에서 넘어왔을 때 실려 온 것 (2026-09-27).
+   `?h=` 는 보던 화면(원래 `#` 뒤), `?imp=` 는 찜·넣은 값. `h` 는 **지금 바로**
+   `#` 로 되돌려 놓는다 — 아래 `start()` 가 늘 `#` 에서 읽기 때문이다.
+   찜은 목록이 준비된 뒤 `start()` 에서 푼다(여기서는 아직 찜 목록이 없다). */
+let CARRY = null;
+(function(){
+  try {
+    const q = new URLSearchParams(location.search);
+    const h = q.get("h"), imp = q.get("imp");
+    if (!h && !imp) return;
+    if (imp) CARRY = {imp: imp, from: q.get("from") || ""};
+    history.replaceState(null, "", location.pathname + (h ? "#" + h : ""));
+  } catch(e){}
+})();
 let TITLE0 = document.title;   // 공유로 바꾼 탭 제목을 되돌릴 때 쓴다
 const won = n => n == null ? "–" : n.toLocaleString("ko-KR") + "원";
 const pct = n => (n > 0 ? "+" : "") + n.toFixed(1) + "%";
@@ -849,6 +853,17 @@ function start(d){
      * 사장님이 `눌러서 들어온 상품이에요` 로 정하셨다 — 담백하고 둘 다 참이다. */
     $("#onlytext").textContent = "눌러서 들어온 상품이에요";
     document.title = sIt.name;
+  }
+  if (CARRY){
+    const from = {kakao: "카톡", naver: "네이버 앱", insta: "인스타", fb: "페이스북",
+                  line: "라인", band: "밴드", daum: "다음 앱"}[CARRY.from] || "앱";
+    try {
+      const [a, m] = unpack(CARRY.imp);
+      const what = a && m ? "찜한 " + a + "개와 넣은 값 " + m + "개를"
+                 : a ? "찜한 " + a + "개를" : m ? "넣은 값 " + m + "개를" : "";
+      if (what) setTimeout(() => toast(from + "에서 " + what + " 가져왔어요"), 700);
+    } catch(e){}
+    CARRY = null;
   }
   if (raw === "noapp"){
     try { history.replaceState({}, "", location.pathname); } catch(e){}
@@ -1848,6 +1863,11 @@ $("#sheet").addEventListener("click", e => {
     b.textContent = "주소를 복사했습니다";
     return;
   }
+  if (act === "copyout"){
+    try { navigator.clipboard.writeText(OUT_URL || location.href); } catch(err){}
+    b.textContent = "주소를 복사했어요";
+    return;
+  }
   if (act === "install"){ closeSheet(); return setTimeout(openInstall, 260); }
   // 크롬으로 이 주소를 다시 연다. 거기서는 홈 화면 추가가 단추 하나다.
   if (act === "addchrome") return openIn("com.android.chrome");
@@ -1999,34 +2019,135 @@ function browserKind(){
   if (/Chrome|CriOS/i.test(u))   return "chrome";
   return "";
 }
-const BROWSERS = IOS
-  ? [["사파리에서 열기", null]]        // 아이폰은 웹에서 사파리를 지목할 수 없다
-  : [["크롬으로 열기", "com.android.chrome"],
-     ["삼성 인터넷으로 열기", "com.sec.android.app.sbrowser"]];
+/* ★ 앱 안 브라우저 → **그 폰의 기본 브라우저**로 (2026-09-27 사장님 지시).
+ *
+ * 카톡·네이버 앱·인스타 안의 브라우저는 저장하는 곳이 따로라, 거기서 한 찜은
+ * 사파리·삼성 인터넷·크롬에서 안 보인다. 홈 화면 추가도 안 된다. 그래서
+ * 기본 브라우저로 넘기기를 권한다 — **그 사람이 평소 쓰는 브라우저**다.
+ * 안드로이드를 전부 삼성 인터넷으로 박으면 삼성폰이 아니거나 크롬을 쓰는
+ * 사람이 어긋난다.
+ *
+ *   카톡      `kakaotalk://web/openExternal?url=` — 아이폰은 사파리, 안드로이드는 기본 브라우저
+ *   라인      주소에 `openExternalBrowser=1` 을 붙이면 라인이 밖으로 연다
+ *   안드로이드 그 밖   `intent://` 에 **앱을 지목하지 않고** 보낸다 → 기본 브라우저
+ *   아이폰 그 밖       웹에서 사파리를 부를 길이 없다 → 여는 법 + 주소 복사
+ *
+ * **넘길 때 보던 화면과 찜·넣은 값을 싣는다** (`?h=` · `?imp=`). 넘어간 쪽에서
+ * `CARRY` 가 풀어 넣고 `카톡에서 찜한 3개를 가져왔어요` 를 띄운다.
+ * `#` 가 아니라 `?` 인 까닭 — `intent://` 는 `#` 뒤를 제 옵션 자리로 쓴다.
+ *
+ * ★ 카톡 주소는 **실제 폰에서 확인해야** 한다. 여기서는 못 돌려 본다. */
+const APP = /KAKAOTALK/i.test(UA) ? "kakao"
+          : /NAVER\(inapp/i.test(UA) ? "naver"
+          : /Instagram/i.test(UA) ? "insta"
+          : /FBAN|FBAV/i.test(UA) ? "fb"
+          : /Line\//i.test(UA) ? "line"
+          : /BAND\//i.test(UA) ? "band"
+          : /DaumApps/i.test(UA) ? "daum"
+          : IN_APP ? "app" : "";
+const APP_NAME = {kakao: "카톡", naver: "네이버 앱", insta: "인스타", fb: "페이스북",
+                  line: "라인", band: "밴드", daum: "다음 앱", app: "이 앱"};
+/* 아이폰에서 사파리를 곧바로 부를 수 있는 건 카톡·라인뿐이다 */
+const OUT_DIRECT = APP === "kakao" || APP === "line" || !IOS;
+const OUT_WORD = IOS ? "사파리" : "브라우저";
+let OUT_URL = "";
 
-if (IN_APP){
-  if (/Instagram|FBAN|FBAV/i.test(UA)) $("#inapptitle").textContent =
-      "앱 안의 브라우저에서는 쓰지 마세요";
-  $("#inappbtns").innerHTML = BROWSERS.map((b, i) =>
-      '<button data-pkg="' + (b[1] || "") + '">' + b[0] + "</button>").join("") +
-      '<button data-pkg="copy">주소 복사</button>';
-  $("#inapp").style.display = "block";
+/* 넘길 주소 — 지금 보던 곳(`h`)과 찜·넣은 값(`imp`)을 싣는다 */
+function outURL(){
+  const q = new URLSearchParams();
+  const h = location.hash.slice(1);
+  if (h) { try { q.set("h", decodeURIComponent(h)); } catch(e){ q.set("h", h); } }
+  if (CART.length || Object.keys(MINE).length){ q.set("imp", packed()); q.set("from", APP); }
+  const qs = q.toString();
+  return location.origin + location.pathname + (qs ? "?" + qs : "");
 }
-$("#inappx").addEventListener("click", () => {
-  // 이 한 줄이 전부다. 저장하지 않으므로 다시 열면 또 뜬다.
-  $("#inapp").style.display = "none";
-});
-$("#inappbtns").addEventListener("click", e => {
-  const b = e.target.closest("button"); if (!b) return;
-  const pkg = b.dataset.pkg;
-  if (pkg && pkg !== "copy") return openIn(pkg);
-  // 아이폰이거나 주소 복사 — 사파리는 손으로 붙여 넣는 수밖에 없다
-  try { navigator.clipboard.writeText(location.href.split("#")[0]); } catch(err){}
-  b.textContent = "주소를 복사했습니다";
-  $("#inapp").insertAdjacentHTML("beforeend",
-      '<span class="tip">복사한 주소를 ' +
-      (IOS ? "사파리" : "브라우저") + ' 주소창에 붙여 넣으세요.</span>');
-});
+function goOut(){
+  const url = outURL();
+  if (APP === "kakao"){
+    location.href = "kakaotalk://web/openExternal?url=" + encodeURIComponent(url);
+    return;
+  }
+  if (APP === "line"){
+    location.href = url + (url.indexOf("?") >= 0 ? "&" : "?") + "openExternalBrowser=1";
+    return;
+  }
+  if (!IOS){
+    // 앱을 지목하지 않는다 — 안드로이드가 그 사람의 기본 브라우저로 연다.
+    // 못 열면 지금 주소로 되돌아온다(아무 일 없던 것처럼).
+    location.href = "intent://" + url.replace(/^https?:\/\//, "") +
+        "#Intent;scheme=https;S.browser_fallback_url=" + encodeURIComponent(url) + ";end";
+    return;
+  }
+  OUT_URL = url;
+  openSheet("<h3>사파리로 여는 법</h3>" +
+    '<p class="note">화면의 <b>⋯</b> 를 누르고<br>' +
+    "<b>Safari로 열기</b> 또는 <b>다른 브라우저로 열기</b> 를 누르세요.</p>" +
+    '<button class="go" data-act="copyout">주소 복사하기</button>' +
+    '<p class="note">메뉴가 안 보이면 주소를 복사해 사파리 주소창에 붙여 넣으세요.' +
+    (CART.length ? "<br>찜한 것도 같이 옮겨져요." : "") + "</p>");
+}
+
+/* 아래 띠. `mode` — "ask" 는 처음 권유, "jit" 는 찜을 누른 그 순간 */
+function inbar(mode){
+  let bar = $("#inbar");
+  if (!bar){
+    bar = document.createElement("div");
+    bar.id = "inbar";
+    document.body.appendChild(bar);
+    bar.addEventListener("click", e => {
+      if (e.target.closest(".go")) return goOut();
+      if (e.target.closest(".x")){
+        // ✕ 는 **7일** 기억한다. 공유받은 링크를 열 때마다 뜨면 짜증 난다.
+        // 대신 찜을 누를 때는 따로 한 번 짚어 준다(`jit`) — 실제로 손해 보는 순간이다.
+        if (bar.dataset.mode === "ask")
+          try { localStorage.setItem("gmpx-inbar", String(Date.now() + 7 * 864e5)); } catch(err){}
+        bar.classList.remove("on");
+        document.body.style.paddingBottom = "";
+      }
+    });
+  }
+  const name = APP_NAME[APP] || "이 앱";
+  bar.dataset.mode = mode;
+  bar.innerHTML = mode === "jit"
+    ? '<div class="t"><b>' + name + " 안에서 찜하면 " + name + "에만 남아요</b></div>" +
+      '<button class="go">' + OUT_WORD + (OUT_DIRECT ? "로 옮기기" : "로 옮기는 법") + "</button>" +
+      '<button class="x" aria-label="닫기">&#10005;</button>'
+    : '<div class="t"><b>' + OUT_WORD + "로 열면 더 편해요</b>" +
+      "<span>찜한 상품이 저장되고, 홈 화면에서 바로 열 수 있어요.</span></div>" +
+      '<button class="go">' + OUT_WORD + (OUT_DIRECT ? "로 열기" : "로 여는 법") + "</button>" +
+      '<button class="x" aria-label="닫기">&#10005;</button>';
+  // `requestAnimationFrame` 을 쓰지 마라. 탭이 가려져 있으면 안 와서 띠가
+  // 영영 안 올라온다. 붙인 뒤 한 박자 쉬었다 켜면 올라오는 움직임도 산다.
+  setTimeout(() => {
+    bar.classList.add("on");
+    document.body.style.paddingBottom = (bar.offsetHeight + 24) + "px";
+  }, 30);
+}
+function inbarOff(){
+  try { return Date.now() < Number(localStorage.getItem("gmpx-inbar") || 0); }
+  catch(e){ return false; }
+}
+if (IN_APP && !inbarOff()) setTimeout(() => inbar("ask"), 2500);
+
+/* 찜을 누른 그 순간 — 이번 방문에 한 번만 */
+function inappJit(){
+  if (!IN_APP) return;
+  try {
+    if (sessionStorage.getItem("gmpx-jit")) return;
+    sessionStorage.setItem("gmpx-jit", "1");
+  } catch(e){}
+  inbar("jit");
+}
+
+/* 짧게 알리고 사라지는 한 줄 */
+function toast(msg){
+  let t = $("#toast");
+  if (!t){ t = document.createElement("div"); t.id = "toast"; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.classList.add("on");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove("on"), 3500);
+}
 
 /* ★ 찜 목록 공유 (2026-09-26 사장님 지시).
  *
@@ -2133,7 +2254,7 @@ $("#list").addEventListener("click", e => {
   const cartIcon = e.target.closest(".cart");
   if (cartIcon){
     if (inCart(p)) CART = CART.filter(x => x !== p);
-    else CART.push(p);
+    else { CART.push(p); inappJit(); }
     saveCart();
     // 찜한 것 보기에서는 줄이 빠져야 하니 다시 그리고, 아니면 하트만 바꾼다
     if ($("#view").value === "cart") return run();
