@@ -594,7 +594,19 @@ async function unlock(pw, remember){
 async function loadPics(){
   try {
     if (OPEN) {
-      PICS = await (await fetch("pics.json?v=0fba38319b")).json();
+      /* ★ 처음 온 사람에게 이 7MB 는 30초가 넘는다 (2026-09-26 실측 32.6초).
+         우리 서버가 한국 손님을 LA 로 붙이기 때문이다. 그 30초 동안 화면에
+         보이는 사진이 **같은 길에서 굶는다.** 그래서 가진 게 없으면 보이는
+         사진부터 받게 3초 비켜 주고, 낮은 순서로 받는다.
+         한 번 받은 사람은 1년 캐시에 있으니 기다리지 않고 곧바로 쓴다. */
+      /* 받아 본 적이 있는지는 적어 둔 표시로 안다. `only-if-cached` 로
+         물어보면 없을 때 콘솔에 빨간 오류가 한 줄 찍혀서 이렇게 한다. */
+      const u = "pics.json?v=0fba38319b", PK = "gmpx-pics";
+      let seen = false;
+      try { seen = localStorage.getItem(PK) === u; } catch (e) {}
+      if (!seen) await new Promise(ok => setTimeout(ok, 3000));
+      PICS = await (await fetch(u, seen ? {} : {priority:"low"})).json();
+      try { localStorage.setItem(PK, u); } catch (e) {}
       PICSDONE = true;
       for (const el of document.querySelectorAll("img.thumb:not([src])")) paint(el);
       return;
@@ -1383,7 +1395,7 @@ const PICOBS = ("IntersectionObserver" in window) ? new IntersectionObserver(es 
     PICOBS.unobserve(e.target);
     sharpen(e.target);
   }
-}, {rootMargin: "400px"}) : null;
+}, {rootMargin: "1200px 0px"}) : null;
 
 /* ★ 사진이 없는 상품이 4건 있다 (원본 2,259장 / 상품 2,263건).
  *
@@ -1403,17 +1415,48 @@ $("#list").addEventListener("error", e => {
   el.src = BLANK;
 }, true);
 
+/* ★ 흐린 사진을 먼저, 선명한 사진은 **다 받은 뒤에만** (2026-09-26).
+ *
+ * 전에는 원본 주소를 곧바로 `src` 에 넣었다. 받는 동안의 틈이 그대로
+ * 보였다. 지금 우리 서버는 한국 손님을 LA 로 붙여서 한 장에 0.3~1초라
+ * 스크롤하면 사진이 전혀 못 따라왔다 — 사장님이 잡아내셨다.
+ *
+ * 이제는 따로 받아서 **그릴 준비가 끝났을 때만** 바꿔 낀다. 그동안은
+ * 있던 흐린 사진이 그대로 남는다.
+ *
+ * **리스트 보기에서도 쓴다.** 처음 온 사람은 흐린 사진 뭉치를 받기 전이라
+ * 칸이 비어 있다. 흐린 게 없을 때만 원본을 한 장씩 받아 채운다. */
+const SHARP = new Set();          // 다 받아서 곧바로 그릴 수 있는 원본
 async function sharpen(img){
   const p = img.dataset.p;
   if (!p || img.dataset.nopic) return;
-  await showBig(p, 1);
-  if (BIGPIC[p]) img.src = BIGPIC[p];
+  if (!GAL && img.getAttribute("src")) return;     // 리스트는 흐린 사진이면 넉넉하다
+  if (!SHARP.has(p)) {
+    await showBig(p, 1);
+    if (!BIGPIC[p]) return;
+    // 못 받으면 있던 것 그대로 둔다. 다시 시도하지 않게 표시만 한다 —
+    // 사진이 없는 상품 4건이 스크롤할 때마다 404 를 내지 않게.
+    //
+    // `decode()` 를 쓰지 마라. 탭이 가려져 있으면 크롬이 그림 풀기를 미뤄서
+    // **끝나지 않는다** — 폰에서 잠깐 다른 앱을 봤다 오면 사진이 영영 안
+    // 바뀐다. `onload` 는 받기만 끝나면 온다. 300px 사진이라 푸는 건 순식간이다.
+    const ok = await new Promise(done => {
+      const pre = new Image();
+      pre.onload = () => done(true);
+      pre.onerror = () => done(false);
+      pre.src = BIGPIC[p];
+    });
+    if (!ok) { img.dataset.nopic = "1"; return; }
+    SHARP.add(p);
+  }
+  if (img.isConnected) img.src = BIGPIC[p];
 }
 function sharpen_all(){
-  if (!GAL || !PICOBS) return;
+  if (!PICOBS) return;
   for (const img of document.querySelectorAll("#list img.thumb")){
-    if (BIGPIC[img.dataset.p]) img.src = BIGPIC[img.dataset.p];
-    else PICOBS.observe(img);
+    const p = img.dataset.p;
+    if (GAL && SHARP.has(p)) img.src = BIGPIC[p];
+    else if (GAL || !img.getAttribute("src")) PICOBS.observe(img);
   }
 }
 
