@@ -601,12 +601,13 @@ async function loadPics(){
          한 번 받은 사람은 1년 캐시에 있으니 기다리지 않고 곧바로 쓴다. */
       /* 받아 본 적이 있는지는 적어 둔 표시로 안다. `only-if-cached` 로
          물어보면 없을 때 콘솔에 빨간 오류가 한 줄 찍혀서 이렇게 한다. */
-      const u = "pics.json?v=0fba38319b", PK = "gmpx-pics";
+      const u = "pics.json?v=8d836ccc02", PK = "gmpx-pics";
       let seen = false;
       try { seen = localStorage.getItem(PK) === u; } catch (e) {}
       if (!seen) await new Promise(ok => setTimeout(ok, 3000));
       PICS = await (await fetch(u, seen ? {} : {priority:"low"})).json();
       try { localStorage.setItem(PK, u); } catch (e) {}
+      setTimeout(warmAll, 0);
       PICSDONE = true;
       for (const el of document.querySelectorAll("img.thumb:not([src])")) paint(el);
       return;
@@ -617,7 +618,7 @@ async function loadPics(){
     PICS = JSON.parse(new TextDecoder().decode(plain));
     PICSDONE = true;
     for (const el of document.querySelectorAll("img.thumb:not([src])")) paint(el);
-  } catch (e) { /* 사진 없이 그냥 쓴다 */ }
+  } catch (e) { /* 사진 없이 그냥 쓴다 */ setTimeout(warmAll, 3000); }
 }
 /* ★ 사진이 없을 때 넣는 **투명한 한 점**.
  *
@@ -629,7 +630,7 @@ let PICSDONE = false;      // 사진 뭉치를 다 받았나
 
 function paint(el){
   const b = PICS[el.dataset.p];
-  if (b) el.src = "data:image/jpeg;base64," + b;
+  if (b) el.src = "data:image/webp;base64," + b;
   // 다 받고도 없으면 그 상품은 사진이 없는 것이다. 2,263건 중 4건.
   else if (PICSDONE){ el.src = BLANK; el.dataset.nopic = "1"; }
 }
@@ -1205,7 +1206,7 @@ function card(it, raw){
   const b = PICS[it.p];
   const img = '<img class="thumb" loading="lazy" alt="" data-p="' + it.p +
       '" data-nm="' + esc(it.name) + '"' +
-      (b ? ' src="data:image/jpeg;base64,' + b + '"'
+      (b ? ' src="data:image/webp;base64,' + b + '"'
          // 사진 뭉치를 다 받았는데도 없으면 그 상품은 사진이 없는 것이다.
          : (PICSDONE ? ' src="' + BLANK + '" data-nopic="1"' : "")) + ">";
   // 사진 아래에 파란 '쿠팡이동' 단추가 있었다. 카드 오른쪽 위에 화살표가
@@ -1424,13 +1425,14 @@ $("#list").addEventListener("error", e => {
  * 이제는 따로 받아서 **그릴 준비가 끝났을 때만** 바꿔 낀다. 그동안은
  * 있던 흐린 사진이 그대로 남는다.
  *
- * **리스트 보기에서도 쓴다.** 처음 온 사람은 흐린 사진 뭉치를 받기 전이라
- * 칸이 비어 있다. 흐린 게 없을 때만 원본을 한 장씩 받아 채운다. */
+ * **리스트·갤러리 둘 다** 바꿔 낀다. 흐린 사진은 64px 로 작게 만들어서
+ * 잠깐 자리만 지킨다. 선명한 사진은 1년 보관이라 한 번만 받는다. */
 const SHARP = new Set();          // 다 받아서 곧바로 그릴 수 있는 원본
+const NOPIC = new Set();          // 원본이 없는 상품 (4건) — 다시 묻지 않는다
+const BUSY  = new Set();          // 미리 받기가 지금 받고 있는 것
 async function sharpen(img){
   const p = img.dataset.p;
-  if (!p || img.dataset.nopic) return;
-  if (!GAL && img.getAttribute("src")) return;     // 리스트는 흐린 사진이면 넉넉하다
+  if (!p || img.dataset.nopic || NOPIC.has(p)) return;
   if (!SHARP.has(p)) {
     await showBig(p, 1);
     if (!BIGPIC[p]) return;
@@ -1446,18 +1448,59 @@ async function sharpen(img){
       pre.onerror = () => done(false);
       pre.src = BIGPIC[p];
     });
-    if (!ok) { img.dataset.nopic = "1"; return; }
+    if (!ok) { img.dataset.nopic = "1"; NOPIC.add(p); return; }
     SHARP.add(p);
   }
   if (img.isConnected) img.src = BIGPIC[p];
 }
 function sharpen_all(){
-  if (!PICOBS) return;
   for (const img of document.querySelectorAll("#list img.thumb")){
     const p = img.dataset.p;
-    if (GAL && SHARP.has(p)) img.src = BIGPIC[p];
-    else if (GAL || !img.getAttribute("src")) PICOBS.observe(img);
+    if (SHARP.has(p)) img.src = BIGPIC[p];
+    else if (PICOBS && !img.dataset.nopic) PICOBS.observe(img);
   }
+}
+
+/* ★ 접속한 동안 선명한 사진을 **전부** 미리 받아 둔다 (2026-09-26 사장님 지시).
+ *
+ * 전에는 화면 근처만 받아서, 처음 내려 보는 곳은 늘 흐렸다. 이제는 흐린
+ * 사진 뭉치가 온 뒤부터 뒤에서 받아 둔다. 선명한 사진은 1년 보관이라 한 번
+ * 받으면 끝이고, 중간에 나가도 받은 것은 남아 다음 방문에 이어서 받는다.
+ *
+ * - 순서: 지금 보고 있는 목록(VIEW) 먼저, 그다음 나머지(DATA).
+ *   검색을 바꾸면 **다음 장부터** 새 목록 순서를 따른다
+ * - 두 장씩만, 낮은 순서로. 화면 근처 사진(`sharpen`)이 늘 먼저다
+ * - 전부 26MB · LA 경유 약 3분. 폰의 '데이터 절약' 이 켜져 있으면 안 한다
+ * - 잠긴 판(`OPEN` 아님)에서는 안 한다. 원본이 한 장씩 잠겨 있어 풀 열쇠가 든다 */
+let WARMING = false;
+function warmAll(){
+  if (WARMING || !OPEN) return;
+  try { if (navigator.connection && navigator.connection.saveData) return; } catch (e) {}
+  WARMING = true;
+  const next = () => {
+    for (const list of [VIEW, DATA])
+      for (const it of list)
+        if (!SHARP.has(it.p) && !NOPIC.has(it.p) && !BUSY.has(it.p)) return it.p;
+    return null;
+  };
+  const lane = () => {
+    const p = next();
+    if (!p) return;                                  // 다 받았다
+    BUSY.add(p);
+    const pre = new Image();
+    try { pre.fetchPriority = "low"; } catch (e) {}
+    pre.onload = () => {
+      BUSY.delete(p); SHARP.add(p);
+      BIGPIC[p] = BIGPIC[p] || "big/" + p + ".jpg";
+      // 이미 그려진 카드면 곧바로 바꿔 낀다
+      for (const img of document.querySelectorAll('#list img.thumb[data-p="' + p + '"]'))
+        if (!img.dataset.nopic) img.src = BIGPIC[p];
+      lane();
+    };
+    pre.onerror = () => { BUSY.delete(p); NOPIC.add(p); lane(); };
+    pre.src = "big/" + p + ".jpg";
+  };
+  lane(); lane();
 }
 
 const CART_KEY = "gmpx-cart";
