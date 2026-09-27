@@ -359,6 +359,11 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 .pricebox input{flex:1;min-width:0;padding:13px;border:1px solid var(--line);
      border-radius:11px;background:var(--bg);font-size:16px;text-align:center}
 .pricebox input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+/* ★ 아이폰 사파리는 글자가 16px 보다 작은 입력칸에 커서가 들어가면 화면을
+   **저절로 확대하고 안 돌아온다**(2026-09-28 사장님이 잡으셨다). 본문이 15px 라
+   입력칸도 15px 였다. 손가락 화면에서만 16px 로 — PC 는 그대로다.
+   `maximum-scale=1` 로 막으면 안드로이드·카톡 안 브라우저에서 손가락 확대까지 막힌다. */
+@media (pointer:coarse){#q,.pricebox input,#pin{font-size:16px}}
 .pricebox label{flex:0 0 74px}
 .tag-mine{background:var(--accent);border-color:var(--accent);color:#fff}
 /* 면세는 아무나 못 사는 값이다. 눈에 띄어야 한다. */
@@ -717,6 +722,25 @@ $("#pw").addEventListener("keydown", e => { if (e.key === "Enter") $("#go").clic
  *
  * 열쇠가 있으면 곧 열릴 것이 확실하니 빈 화면으로 기다린다.
  * 풀지 못했을 때만 잠금 화면을 도로 내놓는다. */
+/* ★ 정렬 칸(select, 12.5px)도 아이폰에서 누르면 사파리가 확대한다. 16px 로
+ * 올리면 정렬 줄이 넘치므로, **아이폰에서 누르는 그 순간만** 확대를 잠갔다가
+ * 고르고 나면 푼다. 늘 잠가 두면 카톡 안 브라우저에서 손가락 확대까지 막힌다.
+ * (2026-09-28) */
+(function(){
+  const ios = /iP(hone|od|ad)/.test(navigator.userAgent)
+           || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const vp = document.querySelector('meta[name="viewport"]');
+  if (!ios || !vp) return;
+  const base = vp.content;
+  document.addEventListener("touchstart", e => {
+    if (e.target.closest && e.target.closest("select"))
+      vp.content = base + ", maximum-scale=1";
+  }, {capture:true, passive:true});
+  document.addEventListener("focusout", e => {
+    if (e.target.tagName === "SELECT") setTimeout(() => { vp.content = base; }, 400);
+  }, true);
+})();
+
 (async function auto(){
   let pw = null;
   /* 공개판이면 구울 때 심어 둔 비밀번호로 바로 연다.
@@ -1020,7 +1044,10 @@ function start(d){
     while (document.body.offsetHeight < back.y + innerHeight && SHOWN < VIEW.length
            && guard++ < 80) more();
     window.scrollTo(0, back.y);
-  } else {
+  } else if (matchMedia("(hover:hover) and (pointer:fine)").matches) {
+    // ★ 커서는 **PC 에서만** 넣는다. 아이폰은 다른 앱을 쓰다 오면 탭을 새로
+    // 불러오는 일이 잦아서, 그때마다 검색창에 커서가 들어가 (자판도 안 뜨는데)
+    // 사파리가 확대까지 했다 (2026-09-28).
     $("#q").focus({preventScroll:true});
   }
   loadPics();
