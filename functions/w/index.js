@@ -25,10 +25,21 @@ export async function onRequest(context) {
   try {
     const url = new URL(request.url);
     const raw = url.searchParams.get("c") || "";
-    const codes = [...new Set(raw.split("-").filter((c) => /^[0-9]{1,6}$/.test(c)))]
-      .slice(0, 300);
+    // ★ 수량이 붙어 올 수 있다 (2026-09-28): `32814x2` — 코드마다 한 번만
+    const seen = new Set(), toks = [], codes = [];
+    let pcs = 0;
+    for (const t of raw.split("-")) {
+      const m = t.match(/^([0-9]{1,6})(?:x([0-9]{1,2}))?$/);
+      if (!m || seen.has(m[1])) continue;
+      seen.add(m[1]);
+      const q = m[2] && Number(m[2]) > 1 ? Number(m[2]) : 1;
+      toks.push(q > 1 ? m[1] + "x" + q : m[1]);
+      codes.push(m[1]);
+      pcs += q;
+      if (codes.length >= 300) break;
+    }
     if (!codes.length) return Response.redirect(home, 302);
-    const list = codes.join("-");
+    const list = toks.join("-");
     const app = "/#w=" + list;
 
     // 미리보기 사진 — 앞에서부터 사진이 있는 첫 상품 (사진이 없는 상품이 4건 있다)
@@ -47,7 +58,8 @@ export async function onRequest(context) {
 
     const n = codes.length;
     const title = "PX 찜 목록 " + n + "개";
-    const desc = "군마트(PX) 상품 " + n + "개를 모아서 보냈어요. 눌러서 온라인 가격과 비교해 보세요.";
+    const desc = "군마트(PX) 상품 " + n + "개" + (pcs > n ? "(모두 " + pcs + "개)" : "")
+      + "를 모아서 보냈어요. 눌러서 온라인 가격과 비교해 보세요.";
     const me = url.origin + "/w/?c=" + list;
     const html =
       '<!doctype html><html lang="ko"><head><meta charset="utf-8">' +

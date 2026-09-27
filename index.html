@@ -442,6 +442,29 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 #cartbar{display:none;gap:6px;padding:8px 12px 0}
 #cartbar button{flex:1;padding:8px;border:1px solid var(--line);border-radius:9px;
      background:var(--card);font-size:13px;cursor:pointer}
+/* ★ 찜을 장바구니처럼 (2026-09-28 사장님). 합계 띠 · 수량 · 샀어요. */
+#cartsum{display:none;margin:8px 12px 0;padding:12px 14px;border:1px solid var(--line);
+     border-radius:12px;background:var(--card)}
+#cartsum .t1{font-size:13px;color:var(--dim)}
+#cartsum .t1 b{display:block;margin-top:1px;font-size:21px;color:var(--ink);
+     font-variant-numeric:tabular-nums}
+#cartsum .t2{margin-top:4px;font-size:13.5px;font-variant-numeric:tabular-nums}
+#cartsum .t2 .sv{color:var(--good);font-weight:700}
+#cartsum .t2 .ov{color:var(--bad);font-weight:700}
+#cartsum .t3{margin-top:6px;font-size:12px;color:var(--dim);line-height:1.5}
+.cq{display:flex;align-items:center;gap:6px;margin-top:7px}
+.cq .qb{width:30px;height:30px;border:1px solid var(--line);border-radius:8px;
+     background:var(--bg);font-size:17px;line-height:1;cursor:pointer;padding:0}
+.cq .qn{min-width:22px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.cq .got{margin-left:auto;height:30px;padding:0 10px;border:1px solid var(--line);
+     border-radius:8px;background:var(--bg);font-size:12.5px;cursor:pointer;white-space:nowrap}
+.item.bought .got{background:var(--good);border-color:var(--good);color:#fff}
+.item.bought .left,.item.bought .nm,.item.bought .sub,.item.bought .pr,.item.bought .tags{opacity:.4}
+.item.bought .nm{text-decoration:line-through}
+.gal .cq{gap:4px}
+.gal .cq .qb{width:28px;height:28px}
+.gal .cq .got{padding:0 7px}
+.tag-qty{background:var(--accent);color:#fff}
 /* 카드에서 바로 눌러 쓰는 것 둘. 담겼는지는 별이 차 있는지로 안다. */
 .item{position:relative;-webkit-touch-callout:none;user-select:none}
 /* 찜하기는 하트다. 이모지(★)는 글꼴에 따라 기울어 보여서 직접 그린다.
@@ -581,6 +604,7 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
     <button data-act="copyall">이름 전부 복사</button>
     <button data-act="clear">비우기</button>
   </div>
+  <div id="cartsum" aria-live="polite"></div>
 
   <!-- 홈 화면에 추가 권유. 요약 세 칸 바로 위, 목록에 닿기 전에 한 번
        보이는 자리다. 메뉴 안에 묻어 두면 아무도 못 찾는다.
@@ -965,9 +989,15 @@ function start(d){
   const wantBig = raw.indexOf("c=") === 0
                 ? decodeURIComponent(raw.slice(2)) : "";
   const sIt = shared ? DATA.find(x => x.p === shared) : null;
-  if (/^w=[0-9-]+$/.test(raw)) {
+  if (/^w=[0-9x-]+$/.test(raw)) {
     const have = new Set(DATA.map(x => x.p));
-    const got = [...new Set(raw.slice(2).split("-"))].filter(c => have.has(c));
+    WQ = {};
+    const got = [...new Set(raw.slice(2).split("-").map(t => {
+      const m = t.match(/^([0-9]+)(?:x([0-9]{1,2}))?$/);
+      if (!m) return "";
+      if (m[2] && Number(m[2]) > 1) WQ[m[1]] = Number(m[2]);
+      return m[1];
+    }))].filter(c => have.has(c));
     if (got.length) {
       WLIST = new Set(got);
       $("#onlybar").style.display = "flex";
@@ -1255,6 +1285,7 @@ function run(){
   bar.children[2].textContent = view === "mine" ? "직접 입력한 값 모두 지우기"
                                                 : "비우기";
   stats();
+  cartSum();
 
   SHOWN = 0;
   $("#list").innerHTML = "";
@@ -1437,6 +1468,13 @@ function card(it, raw){
   if (it.mine) tags.push('<span class="tag tag-mine">폰에서 넣음</span>');
   if (it.q > 1) tags.push('<span class="tag">' + it.q + "개들이에서 낱개</span>");
   if (it.sub) tags.push('<span class="tag">' + esc(it.sub) + "</span>");
+  // 공유받은 찜 목록은 수량을 보여 주기만 한다(바꾸는 건 내 찜에 담은 뒤)
+  if (WLIST && qtyOf(it.p) > 1) tags.unshift('<span class="tag tag-qty">' + qtyOf(it.p) + "개</span>");
+  const mine = !WLIST && $("#view").value === "cart";
+  const cq = mine ? '<div class="cq"><button class="qb" data-q="-1" aria-label="하나 빼기">&minus;</button>' +
+      '<span class="qn">' + qtyOf(it.p) + '</span>' +
+      '<button class="qb" data-q="1" aria-label="하나 더">&#43;</button>' +
+      '<button class="got">' + (isGot(it.p) ? "샀어요 ✓" : "샀어요") + "</button></div>" : "";
   const b = PICS[it.p];
   const img = '<img class="thumb" loading="lazy" alt="" data-p="' + it.p +
       '" data-nm="' + esc(it.name) + '"' +
@@ -1446,7 +1484,7 @@ function card(it, raw){
   // 사진 아래에 파란 '쿠팡이동' 단추가 있었다. 카드 오른쪽 위에 화살표가
   // 생기면서 같은 일을 하는 길이 셋(화살표·메뉴·이 단추)이 되어 걷어냈다.
   const left = '<div class="left">' + img + "</div>";
-  return '<article class="item" data-p="' + it.p + '">' +
+  return '<article class="item' + (mine && isGot(it.p) ? " bought" : "") + '" data-p="' + it.p + '">' +
     '<i class="cpg" title="쿠팡에서 보기">' + OUT + "</i>" +
     '<i class="cart' + (inCart(it.p) ? " on" : "") + '" title="찜하기">' +
       HEART + "</i>" + left +
@@ -1456,7 +1494,7 @@ function card(it, raw){
     '<div class="pr"><span class="g">' + won(it.g) + "</span>" +
       (it.c == null ? "" : '<span class="c">' + CP + " " + won(it.c) + "</span>") +
       '<span class="side">' + badge + "</span></div>" +
-    (tags.length ? '<div class="tags">' + tags.join("") + "</div>" : "") +
+    (tags.length ? '<div class="tags">' + tags.join("") + "</div>" : "") + cq +
     "</div></article>";
 }
 
@@ -1519,7 +1557,7 @@ function b64dec(t){
       Uint8Array.from(raw, c => c.charCodeAt(0)));
 }
 function packed(){
-  return b64enc(JSON.stringify({v: 1, c: CART, m: MINE}));
+  return b64enc(JSON.stringify({v: 1, c: CART, m: MINE, q: CQ}));
 }
 function unpack(text){
   const t = String(text || "").trim();
@@ -1528,9 +1566,12 @@ function unpack(text){
   if (!data || data.v !== 1) throw new Error("모양이 다릅니다");
   // 두 번 가져와도 겹치지 않게 넣고, 알릴 때는 '받은 짐' 전체를 센다.
   // 이미 있던 것만 들어왔을 때 '0건' 이라고 하면 실패한 줄 안다.
-  for (const p of (data.c || [])) if (!inCart(p)) CART.push(p);
+  for (const p of (data.c || [])) if (!inCart(p)){
+    CART.push(p);
+    if (data.q && data.q[p] > 1) CQ[p] = data.q[p];
+  }
   for (const p of Object.keys(data.m || {})) MINE[p] = data.m[p];
-  saveCart(); saveMine();
+  saveCart(); saveCQ(); saveMine();
   return [(data.c || []).length, Object.keys(data.m || {}).length];
 }
 
@@ -1766,6 +1807,68 @@ try {
 } catch(e){}
 
 function inCart(p){ return CART.indexOf(p) >= 0; }
+
+/* ★ 찜을 장바구니처럼 쓴다 (2026-09-28 사장님).
+ *
+ * 수량(`CQ`)과 샀어요 표시(`GOT`)는 **찜 목록과 따로** 저장한다. 찜 목록
+ * 모양(상품코드 배열)을 바꾸면 예전에 찜해 둔 사람의 목록이 깨진다.
+ * 수량이 1이면 안 적는다 — 적힌 게 없으면 1이다.
+ *
+ * 합계는 찜 화면에서만 보여 준다. 첫 화면에서 '2,263개 다 사면' 을 안 보이는
+ * 까닭(stats 의 주석)과 반대로, 찜은 **그 사람이 실제로 살 물건**이라
+ * 'PX 가면 얼마 들고 얼마 아낀다' 가 바로 쓸모 있는 답이다. */
+const CQ_KEY = "gmpx-cart-q", GOT_KEY = "gmpx-cart-got";
+let CQ = {}, GOT = [];
+try { CQ = JSON.parse(localStorage.getItem(CQ_KEY) || "{}") || {}; } catch(e){ CQ = {}; }
+try { GOT = JSON.parse(localStorage.getItem(GOT_KEY) || "[]") || []; } catch(e){ GOT = []; }
+/* 공유받은 찜 목록의 수량. 받은 사람의 것(`CQ`)과 섞지 않는다 */
+let WQ = {};
+function qtyOf(p){ return (WLIST ? WQ[p] : CQ[p]) || 1; }
+function isGot(p){ return GOT.indexOf(p) >= 0; }
+function saveCQ(){
+  for (const p of Object.keys(CQ)) if (!inCart(p) || !(CQ[p] > 1)) delete CQ[p];
+  GOT = GOT.filter(inCart);
+  try {
+    localStorage.setItem(CQ_KEY, JSON.stringify(CQ));
+    localStorage.setItem(GOT_KEY, JSON.stringify(GOT));
+  } catch(e){}
+}
+function cartMode(){ return !!WLIST || $("#view").value === "cart"; }
+
+/* 합계 띠. 쿠팡 값이 없는 줄은 쿠팡 합계에서 빼고 몇 개인지 알린다.
+ * 쿠팡 값이 비슷한 상품 값(환산)인 줄이 섞이면 '약' 을 붙인다. */
+function cartSum(){
+  const box = $("#cartsum");
+  if (!box) return;
+  if (!cartMode() || !VIEW.length){ box.style.display = "none"; return; }
+  let px = 0, cp = 0, pxC = 0, n = 0, kinds = 0, noC = 0, conv = 0, left = 0, gotN = 0;
+  for (const it of VIEW){
+    const q = qtyOf(it.p);
+    kinds++; n += q;
+    px += it.g * q;
+    if (!WLIST && isGot(it.p)) gotN++; else left += it.g * q;
+    if (it.c == null){ noC++; continue; }
+    cp += it.c * q; pxC += it.g * q;
+    if (it.conv) conv++;
+  }
+  const gap = cp - pxC;
+  const about = conv ? "약 " : "";
+  let t2 = "";
+  if (cp){
+    t2 = CP + "에서 사면 " + about + won(cp) + " · " + (gap >= 0
+      ? '<span class="sv">' + about + won(gap) + " 아껴요</span>"
+      : '<span class="ov">' + about + won(-gap) + " 더 비싸요</span>");
+  }
+  const notes = [];
+  notes.push(kinds + "가지 · 모두 " + n + "개");
+  if (gotN) notes.push("샀어요 " + gotN + "가지 · 남은 것 " + won(left));
+  if (conv) notes.push(CP + " 값 중 " + conv + "개는 같은 상품이 없어 비슷한 상품 값이라 대략이에요");
+  if (noC) notes.push(noC + "개는 " + CP + " 값이 없어 " + CP + " 합계에서 뺐어요");
+  box.innerHTML = '<div class="t1">PX에서 다 사면<b>' + won(px) + "</b></div>" +
+    (t2 ? '<div class="t2">' + t2 + "</div>" : "") +
+    '<div class="t3">' + notes.join("<br>") + "</div>";
+  box.style.display = "block";
+}
 
 /* ===================== 폰에서 넣은 값 =====================
    서버가 없으므로 이 기기의 브라우저에만 쌓인다. 화면에는 바로 반영되고,
@@ -2371,12 +2474,14 @@ function shareCart(b){
   const have = new Set(DATA.map(x => x.p));
   const codes = CART.filter(p => have.has(p));
   if (!codes.length) return;
+  // ★ 수량도 싣는다 (2026-09-28): `32814x2-36874` — 1개면 코드만
+  const toks = codes.map(p => CQ[p] > 1 ? p + "x" + CQ[p] : p);
   let path = location.pathname;
   if (!path.endsWith("/")){
     const cut = path.lastIndexOf("/");
     path = path.slice(cut + 1).includes(".") ? path.slice(0, cut + 1) : path + "/";
   }
-  const url = location.origin + path + "w/?c=" + codes.join("-");
+  const url = location.origin + path + "w/?c=" + toks.join("-");
   const title = "PX 찜 목록 " + codes.length + "개";
   const line = "군마트(PX) 상품 " + codes.length + "개를 모아서 보냈어요.";
   if (navigator.share){
@@ -2397,10 +2502,12 @@ $("#cartbar").addEventListener("click", e => {
   if (b.dataset.act === "sharecart") return shareCart(b);
   if (b.dataset.act === "clear"){
     if (mine){ MINE = {}; saveMine(); }
-    else { CART = []; saveCart(); }
+    else { CART = []; saveCart(); saveCQ(); }
     return run();
   }
-  const text = mine ? mineText() : VIEW.map(i => i.name).join("\n");
+  // 장보기 목록으로 쓰도록 수량을 붙인다 (2개 이상일 때만)
+  const text = mine ? mineText()
+             : VIEW.map(i => i.name + (qtyOf(i.p) > 1 ? " × " + qtyOf(i.p) : "")).join("\n");
   try { navigator.clipboard.writeText(text); } catch(e){}
   const was = b.textContent;
   b.textContent = "복사했습니다";
@@ -2416,8 +2523,11 @@ saveCart();
 $("#onlytake").addEventListener("click", e => {
   if (!WLIST) return;
   let n = 0;
-  for (const p of WLIST) if (!inCart(p)) { CART.push(p); n++; }
-  saveCart();
+  for (const p of WLIST) if (!inCart(p)) {
+    CART.push(p); n++;
+    if (WQ[p] > 1) CQ[p] = WQ[p];   // 보낸 사람이 적은 수량도 같이 담는다
+  }
+  saveCart(); saveCQ();
   e.target.disabled = true;
   e.target.textContent = n ? n + "개 담았어요" : "이미 다 찜했어요";
   run();
@@ -2460,11 +2570,27 @@ $("#list").addEventListener("click", e => {
   const it = DATA.find(x => x.p === p); if (!it) return;
 
   if (e.target.closest(".cpg")) return coupang(it.name, it.a);
+  // 수량 −/+ · 샀어요. 다시 그리지 않고 그 카드와 합계만 바꾼다 — 보던 자리가 안 튄다
+  const qb = e.target.closest(".qb");
+  if (qb){
+    CQ[p] = Math.min(99, Math.max(1, qtyOf(p) + Number(qb.dataset.q)));
+    saveCQ();
+    card.querySelector(".qn").textContent = qtyOf(p);
+    return cartSum();
+  }
+  if (e.target.closest(".got")){
+    if (isGot(p)) GOT = GOT.filter(x => x !== p); else GOT.push(p);
+    saveCQ();
+    card.classList.toggle("bought", isGot(p));
+    card.querySelector(".got").textContent = isGot(p) ? "샀어요 ✓" : "샀어요";
+    return cartSum();
+  }
+  if (e.target.closest(".cq")) return;
   const cartIcon = e.target.closest(".cart");
   if (cartIcon){
     if (inCart(p)) CART = CART.filter(x => x !== p);
     else { CART.push(p); inappJit(); homeHint(); }
-    saveCart();
+    saveCart(); saveCQ();
     // 찜한 것 보기에서는 줄이 빠져야 하니 다시 그리고, 아니면 하트만 바꾼다
     if ($("#view").value === "cart") return run();
     cartIcon.classList.toggle("on", inCart(p));
