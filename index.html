@@ -443,15 +443,30 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 #cartbar button{flex:1;padding:8px;border:1px solid var(--line);border-radius:9px;
      background:var(--card);font-size:13px;cursor:pointer}
 /* ★ 찜을 장바구니처럼 (2026-09-28 사장님). 합계 띠 · 수량 · 샀어요. */
-#cartsum{display:none;margin:8px 12px 0;padding:12px 14px;border:1px solid var(--line);
-     border-radius:12px;background:var(--card)}
-#cartsum .t1{font-size:13px;color:var(--dim)}
-#cartsum .t1 b{display:block;margin-top:1px;font-size:21px;color:var(--ink);
-     font-variant-numeric:tabular-nums}
-#cartsum .t2{margin-top:4px;font-size:13.5px;font-variant-numeric:tabular-nums}
-#cartsum .t2 .sv{color:var(--good);font-weight:700}
-#cartsum .t2 .ov{color:var(--bad);font-weight:700}
-#cartsum .t3{margin-top:6px;font-size:12px;color:var(--dim);line-height:1.5}
+/* 합계는 **화면 아래에 붙은 한 줄**이다 (2026-09-28 사장님). 쇼핑몰 장바구니처럼
+   어디까지 내려도 보이고, 목록을 덜 가리게 한 줄로만. 자세한 것은 눌러서 본다. */
+#cartsum{display:none;position:fixed;left:0;right:0;bottom:0;z-index:35;
+     align-items:center;justify-content:space-between;gap:10px;
+     padding:11px 16px calc(11px + env(safe-area-inset-bottom));
+     background:var(--card);border-top:1px solid var(--line);
+     box-shadow:0 -4px 14px rgba(0,0,0,.08);cursor:pointer;
+     font-variant-numeric:tabular-nums;white-space:nowrap}
+html.cart-on #cartsum{display:flex}
+#cartsum .l{min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:13px;color:var(--dim)}
+#cartsum .l b{font-size:18px;color:var(--ink);margin-right:3px}
+#cartsum .r{flex:none;font-size:14.5px;font-weight:700}
+#cartsum .r.sv{color:var(--good)}
+#cartsum .r.ov{color:var(--bad)}
+#cartsum .r i{margin-left:2px;color:var(--dim);font-weight:400}
+/* 띠에 맨 아래 카드가 가리지 않게 · 아래에 뜨는 것들은 띠 위로 */
+html.cart-on body{padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+html.cart-on #inbar{bottom:calc(66px + env(safe-area-inset-bottom))}
+html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
+.sumtbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.sumtbl td{padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.sumtbl td:last-child{text-align:right;font-weight:700}
+.sumtbl tr.sv td:last-child{color:var(--good)}
+.sumtbl tr.ov td:last-child{color:var(--bad)}
 .cq{display:flex;align-items:center;gap:6px;margin-top:7px}
 .cq .qb{width:30px;height:30px;border:1px solid var(--line);border-radius:8px;
      background:var(--bg);font-size:17px;line-height:1;cursor:pointer;padding:0}
@@ -604,7 +619,7 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
     <button data-act="copyall">이름 전부 복사</button>
     <button data-act="clear">비우기</button>
   </div>
-  <div id="cartsum" aria-live="polite"></div>
+  <div id="cartsum" role="button" aria-live="polite"></div>
 
   <!-- 홈 화면에 추가 권유. 요약 세 칸 바로 위, 목록에 닿기 전에 한 번
        보이는 자리다. 메뉴 안에 묻어 두면 아무도 못 찾는다.
@@ -1840,34 +1855,46 @@ function cartMode(){ return !!WLIST || $("#view").value === "cart"; }
 function cartSum(){
   const box = $("#cartsum");
   if (!box) return;
-  if (!cartMode() || !VIEW.length){ box.style.display = "none"; return; }
-  let px = 0, cp = 0, pxC = 0, n = 0, kinds = 0, noC = 0, conv = 0, left = 0, gotN = 0;
+  const on = cartMode() && VIEW.length > 0;
+  document.documentElement.classList.toggle("cart-on", on);
+  if (!on) return;
+  let px = 0, cp = 0, pxC = 0, n = 0, kinds = 0, noC = 0, conv = 0, left = 0, leftN = 0, gotN = 0;
   for (const it of VIEW){
     const q = qtyOf(it.p);
     kinds++; n += q;
     px += it.g * q;
-    if (!WLIST && isGot(it.p)) gotN++; else left += it.g * q;
+    if (!WLIST && isGot(it.p)) gotN++; else { left += it.g * q; leftN += q; }
     if (it.c == null){ noC++; continue; }
     cp += it.c * q; pxC += it.g * q;
     if (it.conv) conv++;
   }
-  const gap = cp - pxC;
-  const about = conv ? "약 " : "";
-  let t2 = "";
-  if (cp){
-    t2 = CP + "에서 사면 " + about + won(cp) + " · " + (gap >= 0
-      ? '<span class="sv">' + about + won(gap) + " 아껴요</span>"
-      : '<span class="ov">' + about + won(-gap) + " 더 비싸요</span>");
+  const gap = cp - pxC, about = conv ? "약 " : "";
+  CARTSUM = {px, cp, gap, n, kinds, noC, conv, left, leftN, gotN, about};
+  // 샀어요를 누른 게 있으면 **남은 것**을 보여 준다 — 장 보는 중엔 그게 궁금하다
+  const lft = gotN ? "남은 <b>" + won(left) + "</b>· " + leftN + "개"
+                   : "총 <b>" + won(px) + "</b>· " + n + "개";
+  const rgt = !cp ? ""
+    : gap >= 0 ? '<span class="r sv">' + about + won(gap) + " 아껴요<i>›</i></span>"
+               : '<span class="r ov">' + about + won(-gap) + " 더 비싸요<i>›</i></span>";
+  box.innerHTML = '<span class="l">' + lft + "</span>" + rgt;
+}
+var CARTSUM = null;   // var — 첫 화면이 이 줄보다 먼저 cartSum 을 부를 수 있다
+/* 띠를 누르면 자세히 */
+function openCartSum(){
+  const c = CARTSUM; if (!c) return;
+  const row = (k, v, cls) => "<tr" + (cls ? ' class="' + cls + '"' : "") + "><td>" + k + "</td><td>" + v + "</td></tr>";
+  let t = row("총금액", won(c.px)) + row("상품", c.kinds + "가지 · " + c.n + "개");
+  if (c.cp){
+    t += row(CP + "에서 사면", c.about + won(c.cp));
+    t += c.gap >= 0 ? row("아낀 돈", c.about + won(c.gap), "sv")
+                    : row("더 드는 돈", c.about + won(-c.gap), "ov");
   }
+  if (c.gotN) t += row("샀어요", c.gotN + "가지") + row("남은 금액", won(c.left) + " · " + c.leftN + "개");
   const notes = [];
-  notes.push(kinds + "가지 · 모두 " + n + "개");
-  if (gotN) notes.push("샀어요 " + gotN + "가지 · 남은 것 " + won(left));
-  if (conv) notes.push(CP + " 값 중 " + conv + "개는 같은 상품이 없어 비슷한 상품 값이라 대략이에요");
-  if (noC) notes.push(noC + "개는 " + CP + " 값이 없어 " + CP + " 합계에서 뺐어요");
-  box.innerHTML = '<div class="t1">PX에서 다 사면<b>' + won(px) + "</b></div>" +
-    (t2 ? '<div class="t2">' + t2 + "</div>" : "") +
-    '<div class="t3">' + notes.join("<br>") + "</div>";
-  box.style.display = "block";
+  if (c.conv) notes.push(CP + " 값 중 " + c.conv + "개는 같은 상품이 없어 비슷한 상품 값이라 대략이에요.");
+  if (c.noC) notes.push(c.noC + "개는 " + CP + " 값이 없어 " + CP + " 합계에서 뺐어요.");
+  openSheet("<h3>합계</h3>" + '<table class="sumtbl">' + t + "</table>" +
+    (notes.length ? '<p class="note">' + notes.join("<br>") + "</p>" : ""));
 }
 
 /* ===================== 폰에서 넣은 값 =====================
@@ -2496,6 +2523,7 @@ function shareCart(b){
 
 $("#cartbtn").insertAdjacentHTML("afterbegin", HEART);
 $("#cartbtn").addEventListener("click", openCart);
+$("#cartsum").addEventListener("click", openCartSum);
 $("#cartbar").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const mine = $("#cartbar").dataset.mode === "mine";
