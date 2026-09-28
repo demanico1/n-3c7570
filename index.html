@@ -178,6 +178,16 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 .chip{flex:0 0 auto;padding:6px 11px;border:1px solid var(--line);border-radius:999px;
       background:var(--card);color:var(--dim);font-size:13px;cursor:pointer;white-space:nowrap}
 .chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+/* ★ 세부 종류 칩 (2026-09-28 사장님). 분류를 고르면 그 안의 종류가, 검색하면 결과에
+   섞인 종류가 한 줄로 뜬다. 큰 칩보다 한 단 작고 네모나게 — 위계가 보이게. */
+#subchips{display:none;margin-top:7px}
+#subchips.on{display:flex}
+#subchips .sl{flex:none;align-self:center;font-size:12px;color:var(--dim);margin-right:1px}
+.sc{flex:0 0 auto;padding:5px 10px;border:0;border-radius:8px;background:var(--bg);color:var(--ink);
+    font-size:12.5px;cursor:pointer;white-space:nowrap}
+.sc i{font-style:normal;color:var(--dim);margin-left:3px;font-variant-numeric:tabular-nums}
+.sc.on{background:var(--good-bg);color:var(--good);font-weight:700}
+.sc.on i{color:var(--good)}
 /* ★ 정렬 세 칸. 위 `.sum` 과 **같은 격자**다 — `gap` 과 좌우 `padding` 을
    똑같이 두어야 칸이 위아래로 딱 맞는다. 높이만 낮다 (2026-09-25).
    **붙박이가 아니다** — 내려가면 같이 밀려 올라가서 상품이 더 보인다. */
@@ -410,6 +420,7 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
    회색 아이콘과 따로 논다. 같은 굵기·같은 회색으로 맞춘다. */
 #sheet .ico.share{font-size:16px;font-weight:700;color:var(--dim);
        line-height:20px;text-align:center}
+#sheet button.same{background:var(--good-bg);border-color:transparent;color:var(--good);font-weight:700}
 #sheet button.go{background:var(--accent);border-color:var(--accent);color:#fff;
        font-weight:600}
 #sheet button.off{color:var(--dim)}
@@ -684,6 +695,7 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
       <button id="clr" aria-label="지우기">×</button>
     </div>
     <div class="rows" id="chips"></div>
+    <div class="rows" id="subchips"></div>
   </header>
 
 
@@ -983,6 +995,10 @@ let ONLY = "";
 /* ★ 공유받은 찜 목록 (`#w=코드-코드-…`, 2026-09-26). 그 상품들만 보여 준다.
    받는 사람의 찜(`CART`)은 건드리지 않는다 — `내 찜에 담기` 를 눌러야 더한다. */
 let WLIST = null;
+/* ★ 고른 세부 종류(소분류). 분류(`BIG`)를 바꾸거나 검색어를 바꾸면 풀린다 (2026-09-28) */
+let SUB = "";
+/* 세부 종류 하나가 전체 자료에 몇 개인가 — 상품 메뉴의 `같은 종류 더 보기 · 선크림 13개` */
+const subN = k => DATA.reduce((n, x) => n + (x.sub === k ? 1 : 0), 0);
 /* ★ 앱 안 브라우저에서 넘어왔을 때 실려 온 것 (2026-09-27).
    `?h=` 는 보던 화면(원래 `#` 뒤), `?imp=` 는 찜·넣은 값. `h` 는 **지금 바로**
    `#` 로 되돌려 놓는다 — 아래 `start()` 가 늘 `#` 에서 읽기 때문이다.
@@ -1060,9 +1076,16 @@ function start(d){
   $("#chips").innerHTML = bigs.map(b =>
     '<button class="chip' + (b === "전체" ? " on" : "") + '" data-b="' + b + '">' +
     b + "</button>").join("");
+  $("#subchips").addEventListener("click", e => {
+    const b = e.target.closest(".sc"); if (!b) return;
+    SUB = b.dataset.s;
+    tipUsed("subs");
+    run();
+  });
   $("#chips").addEventListener("click", e => {
     const b = e.target.closest(".chip"); if (!b) return;
     BIG = b.dataset.b;
+    SUB = "";
     $("#chips").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === b));
     runFresh();
   });
@@ -1162,6 +1185,7 @@ function start(d){
   if (back){
     $("#q").value = back.q || "";
     BIG = back.big || "전체";
+    SUB = back.sub || "";
     $("#chips").querySelectorAll(".chip").forEach(
         c => c.classList.toggle("on", c.dataset.b === BIG));
     $("#view").value = back.view || "all";
@@ -1198,7 +1222,7 @@ function goHome(){
   const bar = $("#onlybar");
   if (bar) bar.style.display = "none";
   $("#q").value = "";
-  BIG = "전체";
+  BIG = "전체"; SUB = "";
   $("#chips").querySelectorAll(".chip").forEach(
       c => c.classList.toggle("on", c.dataset.b === "전체"));
   if ($("#view").options.length) $("#view").selectedIndex = 0;
@@ -1213,7 +1237,7 @@ function goHome(){
 }
 $("#home").addEventListener("click", e => { e.preventDefault(); goHome(); });
 
-$("#q").addEventListener("input", runFresh);
+$("#q").addEventListener("input", () => { SUB = ""; runFresh(); });
 /* ★ 줄 세우기는 **`SORTK` 하나**가 쥔다 (2026-09-25).
  *
  * 고르는 자리가 셋이다 — 붙박이 단추 둘과 셋째 칸 드롭다운. 어디서 골랐든
@@ -1322,7 +1346,9 @@ function run(){
     if (scoring) it._s = score;
     return true;
   };
-  VIEW = DATA.filter(it => pass(it, BIG, view, true));
+  const BASE = DATA.filter(it => pass(it, BIG, view, true));
+  VIEW = SUB ? BASE.filter(it => it.sub === SUB) : BASE;
+  subChips(BASE, raw, view);
 
   // ★ 할인율로 줄 세울 때는 **비교군 없음을 아예 뺀다** (2026-09-25).
   //
@@ -2024,10 +2050,54 @@ function scheduleTips(){
                    "수량을 바꾸고, 산 것은 샀어요를 눌러 지워 가세요", next)) next();
       return;
     }
+    const sc = document.querySelector("#subchips.on .sc:not(.on)");
+    if (sc && BIG !== "전체" && showTip("subs", sc, "더 자세한 종류로 골라 볼 수 있어요")) return;
     if (ONLY || CART.length) return;
     showTip("heart", document.querySelector("#list .item .cart"),
             "하트를 누르면 찜에 담겨요. 찜은 장바구니처럼 쓸 수 있어요");
   }, 1500);
+}
+
+/* ★ 세부 종류 칩 — 세 가지 중 둘이 여기서 난다 (2026-09-28 사장님).
+ * ① 분류를 고르면 그 안의 종류를 많은 순으로: `전체 212 · 크림 37 · 바디 25 …`
+ * ② `전체` 에서 검색하면 결과에 섞인 종류를 많은 순으로 넷까지: `이 종류에서 크림 9 …`
+ *    결과가 한 종류뿐이면 안 띄운다 — 띄워 봐야 쓸모가 없다.
+ * (③ 상품 메뉴의 `같은 종류 더 보기` 는 `sameSub()`)
+ * 개수는 세부 종류로 거르기 **전**(`BASE`)에서 센다. 고른 뒤에도 옆 칸 개수가 보여야
+ * 옮겨 갈 수 있다. 찜·공유받은 목록·상품 하나 보기에는 안 띄운다. */
+function subChips(base, raw, view){
+  const box = $("#subchips");
+  if (!box) return;
+  const off = () => { box.classList.remove("on"); box.innerHTML = ""; };
+  if (ONLY || WLIST || view === "cart" || view === "mine") return off();
+  const cnt = new Map();
+  for (const it of base) if (it.sub) cnt.set(it.sub, (cnt.get(it.sub) || 0) + 1);
+  let list = [...cnt.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1));
+  let label = "";
+  if (BIG === "전체"){
+    if (!raw || (list.length < 2 && !SUB)) return off();
+    list = list.slice(0, 4);
+    if (SUB && !list.some(x => x[0] === SUB)) list.unshift([SUB, cnt.get(SUB) || 0]);
+    label = '<span class="sl">이 종류에서</span>';
+  } else if (list.length < 2) return off();
+  const b = (k, n, on) => '<button class="sc' + (on ? " on" : "") + '" data-s="' + esc(k) + '">' +
+      (k || "전체") + "<i>" + n.toLocaleString("ko-KR") + "</i></button>";
+  box.innerHTML = label + b("", base.length, !SUB) + list.map(x => b(x[0], x[1], x[0] === SUB)).join("");
+  box.classList.add("on");
+}
+
+/* ③ 상품 메뉴의 `같은 종류 더 보기` — 그 상품의 분류·세부 종류를 골라 둔 채로 연다 */
+function sameSub(it){
+  if ($("#view").value === "cart" || $("#view").value === "mine") $("#view").value = "all";
+  ONLY = ""; WLIST = null; $("#onlytake").hidden = true;
+  const bar = $("#onlybar"); if (bar) bar.style.display = "none";
+  $("#q").value = "";
+  BIG = it.big; SUB = it.sub;
+  $("#chips").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c.dataset.b === BIG));
+  run();
+  scrollTo(0, 0);
+  const on = $("#subchips .sc.on");
+  if (on) on.scrollIntoView({block: "nearest", inline: "center"});
 }
 
 function cartMode(){ return !!WLIST || $("#view").value === "cart"; }
@@ -2192,7 +2262,7 @@ function coupang(name, link){
   try { history.replaceState({}, ""); } catch(e){}   // 덮개 발자국을 지운다
   try {
     sessionStorage.setItem(STATE_KEY, JSON.stringify({
-      q: $("#q").value, big: BIG, view: $("#view").value,
+      q: $("#q").value, big: BIG, sub: SUB, view: $("#view").value,
       sort: $("#sort").value, y: window.scrollY,
     }));
   } catch(e){}
@@ -2281,10 +2351,13 @@ function openHelp(sec){
 
     card("h-find", I.find, "찾기",
       '<div class="hmini"><div class="hsearch">' + lens + "<span>ㄷㅍㅇ</span></div>" +
-        '<span class="hpill on">전체</span><span class="hpill">식품</span><span class="hpill">화장품</span></div>' +
+        '<span class="hpill">전체</span><span class="hpill">식품</span><span class="hpill on">화장품</span>' +
+        '<div style="margin-top:7px;white-space:nowrap;overflow:hidden"><span class="sc on">전체<i>212</i></span> ' +
+        '<span class="sc">크림<i>37</i></span> <span class="sc">바디<i>25</i></span> <span class="sc">선크림<i>13</i></span></div></div>' +
       n(1, "이름 <b>일부만</b> 쳐도 바로 걸러져요") +
       n(2, "<b>초성</b>만 쳐도 돼요 — ㄷㅍㅇ 은 달팽이") +
-      n(3, "<b>종류 칩</b>을 누르면 그 종류만 봐요") +
+      n(3, "<b>종류 칩</b>을 누르면 그 종류만, 아래 <b>작은 칩</b>으로 더 자세한 종류를 골라요") +
+      n(4, "검색하면 <b>이 종류에서</b> 칩이 떠요. 누르면 그 종류로 좁혀져요") +
       '<div class="hnote">랭킹순은 온라인 후기가 많은 순이에요. 맨 위 <b>리스트/갤러리</b>로 사진 크기를 바꿔요.</div>') +
 
     card("h-price", I.price, "가격 보기",
@@ -2325,6 +2398,7 @@ function openHelp(sec){
       n(1, "상품 <b>이름</b>을 누르면 이 메뉴가 떠요") +
       n(2, "<b>" + CP + " 가격 확인하기</b> — 쿠팡 화면으로 바로 가요") +
       n(3, "<b>공유하기</b> — 그 상품을 카톡으로 보내요") +
+      n(4, "<b>같은 종류 더 보기</b> — 비슷한 상품들과 값을 비교해 봐요") +
       '<div class="hnote">맨 아래 <b>직접 가격 비교 입력하기</b>로 내가 본 온라인 가격을 적어 두면, 내 폰에서는 그 값으로 비교해요.</div>') +
 
     card("h-home", I.home, "홈 화면 · 밝게",
@@ -2360,6 +2434,11 @@ $("#sheet").addEventListener("click", e => {
   if (act === "close") return closeSheet();
   if (act === "help") return openHelp();
   if (act === "hgo") return helpGo(b.dataset.go);
+  if (act === "samesub"){
+    const it = DATA.find(x => x.p === p); if (!it) return;
+    closeSheet();
+    return setTimeout(() => sameSub(it), 0);
+  }
   if (act === "import") return openImport();
   if (act === "imppaste"){
     navigator.clipboard.readText().then(t => { $("#impbox").value = t; })
@@ -2529,6 +2608,7 @@ function restorePrev(){
   const p = PREV; PREV = null;
   $("#q").value = p ? p.q : "";
   BIG = p ? p.big : "전체";
+  SUB = p && p.sub || "";
   $("#chips").querySelectorAll(".chip").forEach(
       c => c.classList.toggle("on", c.dataset.b === BIG));
   $("#view").value = p ? p.view : "all";
@@ -2587,7 +2667,7 @@ function openCart(){
       "다른 곳에서 찜한 목록이 있으면 찜 가져오기로 옮겨 올 수 있어요.</p>" +
       '<button class="go" data-act="import">찜 가져오기</button>');
   }
-  PREV = {q: $("#q").value, big: BIG, view: $("#view").value,
+  PREV = {q: $("#q").value, big: BIG, sub: SUB, view: $("#view").value,
           sort: $("#sort").value, y: window.scrollY};
   $("#view").value = "cart";
   $("#q").value = "";
@@ -2964,6 +3044,9 @@ $("#list").addEventListener("click", e => {
       (it.c != null ? " · " + srcOf(it) + " " + won(it.c) : "") + "</p>" +
     '<button class="go" data-act="coupang" data-p="' + p + '" data-q="' +
       esc(it.name) + '"><i class="ico cpg-img"></i>' + CP + " 가격 확인하기</button>" +
+    (it.sub && subN(it.sub) > 1
+      ? '<button class="same" data-act="samesub" data-p="' + p + '">같은 종류 더 보기 · ' +
+        esc(it.sub) + " " + subN(it.sub) + "개 ›</button>" : "") +
     '<button data-act="' + (on ? "del" : "add") + '" data-p="' + p + '">' +
       '<i class="ico' + (on ? " on" : "") + '">' + HEART + "</i>" +
       (on ? "찜하기 취소" : "찜하기") + "</button>" +
