@@ -326,6 +326,60 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
        fill:none;opacity:.75}
 #sheet .x:hover svg path{opacity:1}
 #sheet .note{margin:0 0 14px;color:var(--dim);font-size:12.5px}
+/* ★ 사용방법 — **보는 설명서** (2026-09-28 사장님이 시안을 고르셨다).
+   흰 바탕에 글만 있어 메모장 같았다. 회색 바탕 위 대목마다 흰 카드, 실제 화면
+   조각(앱의 배지·꼬리표·수량 단추를 그대로), 글자 15px, 한 줄에 한 가지.
+   머리(제목·칩)는 고정이고 몸통만 스크롤한다 — 칩을 누르면 그 대목으로 간다. */
+#sheet .box.hbox{display:flex;flex-direction:column;overflow:hidden;padding:0;background:var(--bg);
+     height:calc(100% - 24px);height:calc(100dvh - 24px)}
+.hbox .hh{flex:none;background:var(--card);padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+#sheet .hbox .hh h3{margin:0 0 10px;font-size:18px}
+.hchips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}
+.hchips::-webkit-scrollbar{display:none}
+#sheet .hchips button{flex:none;width:auto;margin:0;padding:6px 12px;border-radius:999px;
+     border:1px solid var(--line);background:var(--card);font-size:13px;color:var(--dim);gap:0}
+#sheet .hchips button.on{background:#0b7a4b;border-color:#0b7a4b;color:#fff}
+.hbody{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+     padding:0 12px calc(16px + env(safe-area-inset-bottom))}
+.hsec{margin:12px 0;background:var(--card);border:1px solid var(--line);border-radius:14px;
+     padding:14px;font-size:15px;line-height:1.55;color:var(--ink)}
+.hsec b{font-weight:700}
+.hst{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.hst b{font-size:16.5px}
+.hic{flex:none;width:32px;height:32px;border-radius:50%;background:var(--good-bg);color:var(--good);
+     display:flex;align-items:center;justify-content:center}
+.hic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;
+     stroke-linecap:round;stroke-linejoin:round}
+.hmini{background:var(--bg);border-radius:12px;padding:10px;margin:2px 0 10px}
+.hcard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;gap:10px}
+.hthumb{flex:none;width:46px;height:46px;border-radius:8px;background:var(--bg);border:1px solid var(--line)}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.hex{display:flex;gap:8px;align-items:flex-start;margin:7px 0}
+.hn{flex:none;width:20px;height:20px;margin-top:2px;border-radius:50%;background:#0b7a4b;color:#fff;
+     font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.hflow{display:flex;align-items:center;gap:6px;margin:2px 0 10px}
+.hstep{flex:1;min-width:0;background:var(--bg);border-radius:10px;padding:8px 4px;text-align:center;
+     font-size:12px;color:var(--dim)}
+.hstep .v{height:30px;display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:3px;color:var(--ink)}
+.harr{flex:none;color:var(--dim)}
+.hbar{display:flex;align-items:center;justify-content:space-between;background:#0b7a4b;color:#fff;
+     border-radius:12px 12px 0 0;padding:8px 12px;margin:2px 0 10px;line-height:1.35}
+.hbar small{display:block;font-size:11px;opacity:.85}
+.hbar .t{font-size:18px;font-weight:700}
+.hbtns{display:flex;gap:5px;margin:2px 0 10px}
+.hbtns span{flex:1;min-width:0;text-align:center;padding:7px 2px;border:1px solid var(--line);border-radius:8px;
+     background:var(--card);font-size:12px;white-space:nowrap}
+.hsearch{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+     border-radius:10px;padding:8px 12px;font-size:15px}
+.hsearch svg{width:16px;height:16px;fill:none;stroke:var(--dim);stroke-width:2.2;stroke-linecap:round}
+.hpill{display:inline-block;padding:4px 10px;margin:6px 4px 0 0;border-radius:999px;border:1px solid var(--line);
+     background:var(--card);font-size:12.5px}
+.hpill.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.hmenu span{display:block;padding:9px 12px;margin-top:6px;border:1px solid var(--line);border-radius:10px;
+     background:var(--card);font-size:13.5px}
+.hmenu span.go{background:var(--accent);border-color:var(--accent);color:#fff}
+.hnote{font-size:13px;color:var(--dim);margin-top:6px}
+#sheet .hsec button.go{margin-top:10px}
 #impbox{display:block;width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);
      border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:14px;
      line-height:1.5;resize:vertical}
@@ -1926,8 +1980,11 @@ function showTip(name, el, text, after){
   if (!r.width || r.bottom < 60 || r.top > innerHeight - 20) return false;   // 화면 밖이면 안 띄운다
   t.n = (t.n || 0) + 1; st[name] = t; tipSave(st);
   try { sessionStorage.setItem("gmpx-tip-" + name, "1"); } catch(e){}
+  // 고정된 것(아래 초록 띠)을 가리키면 풍선도 고정 — 안 그러면 스크롤에 떨어져 나간다
+  const fixed = getComputedStyle(el).position === "fixed";
   const d = document.createElement("div");
   d.className = "tip"; d.setAttribute("role", "status");
+  if (fixed) d.style.position = "fixed";
   d.innerHTML = esc(text) + "<small>아무 데나 누르면 닫혀요</small>";
   const w = Math.min(260, innerWidth - 24);
   d.style.width = w + "px";
@@ -1936,12 +1993,20 @@ function showTip(name, el, text, after){
   const below = r.bottom + 12 + d.offsetHeight < innerHeight - 70;
   d.classList.add(below ? "dn" : "up");
   d.style.left = left + "px";
-  d.style.top = (below ? r.bottom + 10 : r.top - 10 - d.offsetHeight) + scrollY + "px";
+  d.style.top = (below ? r.bottom + 10 : r.top - 10 - d.offsetHeight) + (fixed ? 0 : scrollY) + "px";
   d.style.setProperty("--ax", Math.max(16, Math.min(w - 16, r.left + r.width / 2 - left)) + "px");
   TIP_ON = {name: name, d: d, after: after};
-  setTimeout(() => document.addEventListener("pointerdown", closeTip, {capture: true, once: true}), 60);
+  // ★ **눌렀을 때만** 닫는다. 처음엔 pointerdown 이라 스크롤하려고 손가락만 대도
+  //   사라졌다(2026-09-28 사장님). click 은 스크롤에서는 안 온다.
+  setTimeout(() => document.addEventListener("click", closeTip, {capture: true, once: true}), 60);
   return true;
 }
+/* 풍선이 스크롤로 화면 밖으로 멀리 나가면 조용히 닫는다 */
+addEventListener("scroll", () => {
+  if (!TIP_ON) return;
+  const r = TIP_ON.d.getBoundingClientRect();
+  if (r.bottom < -40 || r.top > innerHeight + 40){ TIP_ON.d.remove(); TIP_ON = null; }
+}, {passive: true});
 function scheduleTips(){
   clearTimeout(scheduleTips._t);
   scheduleTips._t = setTimeout(() => {
@@ -2177,7 +2242,8 @@ addEventListener("popstate", () => {
   if (!open && $("#view").value === "cart") restorePrev();
 });
 
-function openSheet(html){
+function openSheet(html, cls){
+  $("#sheetbox").className = "box" + (cls ? " " + cls : "");   // 사용방법은 `hbox`
   $("#sheetbox").innerHTML =
       '<i class="x" data-act="close">' + XMARK + "</i>" + html;
   $("#sheet").style.display = "flex";
@@ -2192,54 +2258,99 @@ function closeSheet(){ dismiss(); }
  * 읽게 했다. 화면의 단추 이름과 글자가 **똑같아야** 한다 — 단추 이름을
  * 바꾸면 여기도 같이 바꿔라. */
 function openHelp(sec){
-  const li = a => "<p>" + a.map(x => "· " + x).join("<br>") + "</p>";
-  openSheet("<h3>사용방법</h3>" +
-    '<div class="help">' +
-    "<p><b>이런 곳이에요</b><br>군마트(PX)에서 파는 2,263개 상품의 가격을 " +
-    "온라인(" + CP + ")과 하나씩 비교해 뒀어요. PX 가기 전에 살 것을 미리 찾아보세요.</p>" +
-    "<p><b>1. 찾기</b></p>" + li([
-      "위 검색칸에 상품 이름을 치면 바로 걸러져요.",
-      "초성만 쳐도 돼요 — <b>ㄷㅍㅇ</b>로 달팽이크림.",
-      "띄어쓰기는 안 맞아도 돼요.",
-      "식품 · 화장품 같은 종류 단추를 누르면 그 종류만 보여요."]) +
-    "<p><b>2. 가격 보는 법</b></p>" + li([
-      "카드마다 <b>PX 가격</b>과 <b>" + ONL + " 가격</b>이 나란히 있어요.",
-      "<b>초록</b>은 PX가 더 저렴한 것, <b>빨강</b>은 온라인이 더 저렴한 것이에요. 숫자는 몇 % 차이인지예요.",
-      "<b>비교군 없음</b> — 온라인에서 같은 상품을 못 찾은 것이에요.",
-      "<b>3개들이에서 낱개</b> — 온라인은 묶음으로 팔아서 한 개 값으로 나눠 비교한 것이에요.",
-      "<b>환산</b> — 크기가 달라서 같은 양으로 맞춰 계산한 것이에요."]) +
-    "<p><b>3. 줄 세우기</b></p>" + li([
-      "<b>랭킹순</b> — 온라인 후기가 많은 것부터",
-      "<b>낮은 가격순</b> — PX 가격이 싼 것부터",
-      "세 번째 칸에서 <b>높은 가격순 · 할인율 높은 순 · 할인율 낮은 순</b>도 고를 수 있어요."]) +
-    "<p><b>4. 보기 바꾸기</b></p>" + li([
-      "맨 위 <b>리스트/갤러리</b> 단추로 사진을 작게 또는 크게 볼 수 있어요.",
-      "리스트에서 사진을 누르면 크게 보여요."]) +
-    "<p><b>5. 상품을 누르면</b></p>" + li([
-      "<b>" + CP + " 가격 확인하기</b> — " + CP + " 화면으로 바로 가서 가격을 봐요.",
-      "<b>찜하기</b> · <b>공유하기</b> — 카톡으로 그 상품을 보낼 수 있어요.",
-      "<b>직접 가격 비교 입력하기</b> — 내가 본 온라인 가격을 적어 두면, 내 폰에서는 그 값으로 비교해요."]) +
-    '<p id="h-cart"><b>6. 찜하기 · 장바구니</b></p>' + li([
-      "카드 오른쪽 위 <b>하트</b>를 누르면 담겨요.",
-      "맨 위 <b>찜</b> 단추를 누르면 찜한 것만 모아 봐요. PX에서는 이 목록만 보면 돼요.",
-      "찜 화면에서 <b>－ ＋</b> 로 수량을 바꾸면, 아래 <b>초록 띠</b>에 총금액과 온라인보다 아낀 돈이 나와요. 띠를 누르면 자세히 봐요.",
-      "산 것은 <b>샀어요</b>를 누르면 흐려지고, 남은 금액만 보여요.",
-      "<b>찜 공유하기</b> — 장보기 목록과 찜 주소를 카톡으로 한 번에 보내요.",
-      "<b>찜 가져오기</b> — 받은 찜 주소나 장보기 목록 글을 붙여 넣으면 내 찜에 더해져요. 다른 폰이나 브라우저로 찜을 옮길 때도 써요.",
-      "<b>찜 비우기</b> — 찜을 모두 지워요.",
-      "공유받은 찜은 <b>내 찜에 담기</b>를 누르면 내 찜으로 옮겨져요.",
-      "찜은 이 폰, 이 브라우저에 저장돼요."]) +
-    "<p><b>7. 홈 화면에 추가</b></p>" + li([
-      "메뉴 → <b>홈 화면에 추가</b>를 해 두면 아이콘 하나로 바로 열려요. 설치나 가입은 없어요."]) +
-    "<p><b>8. 밝게 · 어둡게</b></p>" + li([
-      "맨 위 <b>◐</b> 단추로 바꿔요."]) +
-    "</div>" +
-    '<p class="note">가격은 직접 확인한 날 기준이에요. 온라인 가격은 자주 바뀌어요.</p>');
-  if (sec){                                // 찜 화면의 `?` 는 찜 대목부터 보여 준다
-    const box = $("#sheetbox"), el = $("#" + sec);
-    if (box && el) box.scrollTop = el.getBoundingClientRect().top - box.getBoundingClientRect().top
-                                   + box.scrollTop - 8;
-  }
+  const ico = d => '<span class="hic"><svg viewBox="0 0 24 24">' + d + "</svg></span>";
+  const I = {
+    find:  ico('<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>'),
+    price: ico('<path d="M3.5 12.5l8.5 8.5 9-9V3.5H12.5z"/><circle cx="16.5" cy="7.5" r="1.3"/>'),
+    cart:  ico('<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>'),
+    menu:  ico('<path d="M4 7h16M4 12h16M4 17h10"/>'),
+    home:  ico('<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M12 9v6M9 12h6"/>')
+  };
+  const n = (k, t) => '<div class="hex"><span class="hn">' + k + "</span><span>" + t + "</span></div>";
+  const card = (id, icon, title, body) =>
+    '<div class="hsec" id="' + id + '"><div class="hst">' + icon + "<b>" + title + "</b></div>" + body + "</div>";
+  const lens = '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>';
+  const chips = [["h-find", "찾기"], ["h-price", "가격 보기"], ["h-cart", "찜·장바구니"],
+                 ["h-menu", "상품 메뉴"], ["h-home", "홈 화면"]];
+  openSheet(
+    '<div class="hh"><h3>사용방법</h3><div class="hchips">' +
+      chips.map(c => '<button data-act="hgo" data-go="' + c[0] + '">' + c[1] + "</button>").join("") +
+    '</div></div><div class="hbody" id="hbody">' +
+    '<p class="hnote" style="margin:12px 4px 0">군마트(PX) 2,263개 상품 가격을 ' + ONL +
+      "과 하나씩 비교해 뒀어요. PX 가기 전에 미리 찾아보세요.</p>" +
+
+    card("h-find", I.find, "찾기",
+      '<div class="hmini"><div class="hsearch">' + lens + "<span>ㄷㅍㅇ</span></div>" +
+        '<span class="hpill on">전체</span><span class="hpill">식품</span><span class="hpill">화장품</span></div>' +
+      n(1, "이름 <b>일부만</b> 쳐도 바로 걸러져요") +
+      n(2, "<b>초성</b>만 쳐도 돼요 — ㄷㅍㅇ 은 달팽이") +
+      n(3, "<b>종류 칩</b>을 누르면 그 종류만 봐요") +
+      '<div class="hnote">랭킹순은 온라인 후기가 많은 순이에요. 맨 위 <b>리스트/갤러리</b>로 사진 크기를 바꿔요.</div>') +
+
+    card("h-price", I.price, "가격 보기",
+      '<div class="hmini"><div class="hcard"><div class="hthumb"></div><div style="flex:1;min-width:0">' +
+        '<div style="font-size:13.5px;font-weight:700;margin-bottom:4px">서울우유 2.3L</div>' +
+        '<div class="hrow"><b style="font-size:17px">6,180원</b><span class="badge b-good">-11.5%</span></div>' +
+        '<div class="hrow" style="font-size:12.5px;color:var(--dim)"><span>쿠팡 6,980원</span><span>-800원</span></div>' +
+      "</div></div></div>" +
+      n(1, "<b>큰 글씨</b>가 PX 가격이에요") +
+      n(2, "아래 작은 글씨가 <b>온라인 가격</b>") +
+      n(3, '<span class="badge b-good">초록</span> PX가 더 저렴 · <span class="badge b-bad">빨강</span> 온라인이 더 저렴') +
+      '<div style="border-top:1px solid var(--line);margin-top:10px;padding-top:4px">' +
+        '<div class="hex"><span class="tag">환산</span><span>크기를 맞춰 계산한 값</span></div>' +
+        '<div class="hex"><span class="tag">3개들이에서 낱개</span><span>묶음을 한 개 값으로</span></div>' +
+        '<div class="hex"><span class="badge b-none">비교군 없음</span><span>같은 상품을 못 찾음</span></div>' +
+      "</div>") +
+
+    card("h-cart", I.cart, "찜 · 장바구니",
+      '<div class="hflow">' +
+        '<div class="hstep"><div class="v"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z" fill="#d93025"/></svg></div>하트로 담기</div>' +
+        '<span class="harr">›</span>' +
+        '<div class="hstep"><div class="v cq" style="margin:0"><span class="qb" style="width:24px;height:24px;font-size:14px;display:inline-flex;align-items:center;justify-content:center">&minus;</span><b>3</b><span class="qb" style="width:24px;height:24px;font-size:14px;display:inline-flex;align-items:center;justify-content:center">+</span></div>수량 정하기</div>' +
+        '<span class="harr">›</span>' +
+        '<div class="hstep"><div class="v"><span style="padding:3px 8px;border-radius:7px;background:var(--good);color:#fff;font-size:11.5px">샀어요 ✓</span></div>산 건 지우기</div>' +
+      "</div>" +
+      '<div class="hbar"><div><small>5개 · ' + ONL + '보다</small><b>15,150원 아껴요</b></div><span class="t">34,790원 ›</span></div>' +
+      n(1, "아래 <b>초록 띠</b>에 총금액이 바로 나와요") +
+      n(2, "띠를 누르면 자세히 봐요") +
+      '<div class="hbtns"><span>찜 공유하기</span><span>찜 가져오기</span><span>찜 비우기</span></div>' +
+      n(3, "<b>공유하기</b> 장보기 목록을 카톡으로") +
+      n(4, "<b>가져오기</b> 받은 목록을 내 찜에") +
+      '<div class="hnote">공유받은 찜은 <b>내 찜에 담기</b>를 누르면 옮겨져요. 찜은 이 폰, 이 브라우저에 저장돼요.</div>') +
+
+    card("h-menu", I.menu, "상품 메뉴",
+      '<div class="hmini hmenu" style="padding-top:4px">' +
+        '<span class="go">' + CP + " 가격 확인하기</span><span>찜하기</span><span>공유하기</span>" +
+      "</div>" +
+      n(1, "상품 <b>이름</b>을 누르면 이 메뉴가 떠요") +
+      n(2, "<b>" + CP + " 가격 확인하기</b> — 쿠팡 화면으로 바로 가요") +
+      n(3, "<b>공유하기</b> — 그 상품을 카톡으로 보내요") +
+      '<div class="hnote">맨 아래 <b>직접 가격 비교 입력하기</b>로 내가 본 온라인 가격을 적어 두면, 내 폰에서는 그 값으로 비교해요.</div>') +
+
+    card("h-home", I.home, "홈 화면 · 밝게",
+      n(1, "메뉴 → <b>홈 화면에 추가</b>를 해 두면 아이콘 하나로 바로 열려요") +
+      n(2, "맨 위 <b>◐</b> 단추로 밝게 · 어둡게 바꿔요") +
+      '<div class="hnote">설치나 가입은 없어요.</div>' +
+      (STANDALONE ? "" : '<button class="go" data-act="install">홈 화면에 추가하는 법 보기</button>')) +
+
+    '<p class="hnote" style="margin:4px 4px 0">가격은 직접 확인한 날 기준이에요. 온라인 가격은 자주 바뀌어요.</p>' +
+    "</div>", "hbox");
+  const body = $("#hbody");
+  const mark = () => {
+    const top = body.getBoundingClientRect().top + 60;
+    let cur = chips[0][0];
+    for (const c of chips){ const el = $("#" + c[0]); if (el && el.getBoundingClientRect().top <= top) cur = c[0]; }
+    if (body.scrollTop + body.clientHeight >= body.scrollHeight - 4) cur = chips[chips.length - 1][0];   // 맨 끝이면 마지막 대목
+    body.parentNode.querySelectorAll(".hchips button").forEach(b => b.classList.toggle("on", b.dataset.go === cur));
+  };
+  body.addEventListener("scroll", mark, {passive: true});
+  if (sec) helpGo(sec); else mark();
+}
+function helpGo(id){
+  const body = $("#hbody"), el = $("#" + id);
+  if (!body || !el) return;
+  body.scrollTop = el.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop - 10;
+  body.parentNode.querySelectorAll(".hchips button").forEach(b => b.classList.toggle("on", b.dataset.go === id));
 }
 
 $("#sheet").addEventListener("click", e => {
@@ -2248,6 +2359,7 @@ $("#sheet").addEventListener("click", e => {
   const p = b.dataset.p, act = b.dataset.act;
   if (act === "close") return closeSheet();
   if (act === "help") return openHelp();
+  if (act === "hgo") return helpGo(b.dataset.go);
   if (act === "import") return openImport();
   if (act === "imppaste"){
     navigator.clipboard.readText().then(t => { $("#impbox").value = t; })
