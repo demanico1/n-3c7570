@@ -117,6 +117,28 @@ button,input,select{font:inherit;color:inherit}
 header{position:sticky;top:0;z-index:20;background:var(--bg);
        padding:10px 12px 6px;border-bottom:1px solid var(--line)}
 .top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+/* ★ 목록을 내리면 머리가 **검색칸 한 줄**로 줄어든다 (2026-09-28 사장님이 C안을 고르셨다).
+   폰에서 머리가 187px — 보이는 화면의 3분의 1 을 가렸다. 내릴 땐 훑는 중이라 줄이고,
+   조금이라도 올리거나 맨 위면 다 펴 준다. 지금 보는 종류는 검색칸 안 꼬리표로 남긴다.
+   폰에서는 머리를 `fixed` 로 띄우고 같은 높이의 빈칸(`#hdsp`)을 깐다 — 머리 높이가
+   바뀌어도 목록이 덜컥 밀리지 않게. PC 는 넓어서 지금처럼 늘 다 보인다. */
+#hdsp{display:none}
+@media (max-width:719px){
+  header{position:fixed;left:0;right:0}
+  #hdsp{display:block}
+  header .top,header #chips,header #subchips.on{max-height:60px;
+    transition:max-height .22s ease,opacity .18s ease,margin .22s ease,padding .22s ease}
+  header.cmp .top,header.cmp #chips,header.cmp #subchips.on{max-height:0;opacity:0;
+    margin-top:0;margin-bottom:0;padding-bottom:0;overflow:hidden;pointer-events:none}
+  header.cmp{padding-top:6px;padding-bottom:6px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+}
+#curtag{position:absolute;right:38px;max-width:52%;display:none;align-items:center;gap:5px;
+  padding:4px 8px;border:0;border-radius:7px;background:var(--good-bg);color:var(--good);
+  font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+#curtag .t{overflow:hidden;text-overflow:ellipsis}
+#curtag i{font-style:normal;font-weight:400;opacity:.8}
+header.cmp.tagged #curtag{display:flex}
+header.cmp.tagged #hits{display:none}
 
 /* ── 브랜드 자리 = 홈 단추 (2026-09-24)
  *
@@ -692,11 +714,13 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
       <input id="q" type="search" placeholder="검색" autocomplete="off"
              autocapitalize="off" spellcheck="false" enterkeyhint="search">
       <span id="hits"></span>
+      <button id="curtag" aria-label="지금 보는 종류"><span class="t"></span><i aria-label="전체 보기">✕</i></button>
       <button id="clr" aria-label="지우기">×</button>
     </div>
     <div class="rows" id="chips"></div>
     <div class="rows" id="subchips"></div>
   </header>
+  <div id="hdsp"></div>
 
 
   <div class="rows" id="cartbar">
@@ -1238,6 +1262,49 @@ function goHome(){
 $("#home").addEventListener("click", e => { e.preventDefault(); goHome(); });
 
 $("#q").addEventListener("input", () => { SUB = ""; runFresh(); });
+(function(){
+  const hd = $("header"), sp = $("#hdsp");
+  if (!hd || !sp) return;
+  const narrow = matchMedia("(max-width:719px)");
+  const fit = () => {
+    if (hd.classList.contains("cmp") || !hd.offsetHeight) return;   // 숨겨져 있을 땐(첫 화면 전) 안 잰다
+    sp.style.height = hd.offsetHeight + "px";
+  };
+  window.fitHead = fit;
+  // 펴진 채로 높이가 바뀔 때만(세부 칩이 생기고 사라질 때) 빈칸을 맞춘다.
+  // 줄어든 동안에는 안 맞춘다 — 맞추면 그만큼 목록이 밀린다.
+  if (window.ResizeObserver) new ResizeObserver(() => { if (scrollY < 8) fit(); }).observe(hd);
+  fit();
+  const set = on => {
+    if (hd.classList.contains("cmp") === on) return;
+    hd.classList.toggle("cmp", on);
+  };
+  let lastY = scrollY, acc = 0;
+  addEventListener("scroll", () => {
+    const y = scrollY, dy = y - lastY; lastY = y;
+    if (!narrow.matches || y < (parseFloat(sp.style.height) || 180)){
+      set(false); acc = 0;
+      if (y < 8) fit();
+      return;
+    }
+    // 손가락이 조금 떨리는 것에는 반응하지 않는다 — 한 방향으로 24px 넘게 가야 바꾼다
+    if ((dy > 0) !== (acc > 0)) acc = 0;
+    acc += dy;
+    if (acc > 24) set(true);
+    else if (acc < -24) set(false);
+  }, {passive: true});
+  $("#curtag").addEventListener("click", e => {
+    e.preventDefault();
+    if (e.target.closest("i")){                 // ✕ — 전체로
+      BIG = "전체"; SUB = "";
+      $("#chips").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c.dataset.b === "전체"));
+      runFresh();
+      scrollTo(0, 0);
+      return;
+    }
+    set(false);                                   // 글자 — 칩을 다시 펼친다
+  });
+})();
 /* ★ 줄 세우기는 **`SORTK` 하나**가 쥔다 (2026-09-25).
  *
  * 고르는 자리가 셋이다 — 붙박이 단추 둘과 셋째 칸 드롭다운. 어디서 골랐든
@@ -1349,6 +1416,7 @@ function run(){
   const BASE = DATA.filter(it => pass(it, BIG, view, true));
   VIEW = SUB ? BASE.filter(it => it.sub === SUB) : BASE;
   subChips(BASE, raw, view);
+  curTag();
 
   // ★ 할인율로 줄 세울 때는 **비교군 없음을 아예 뺀다** (2026-09-25).
   //
@@ -2084,6 +2152,19 @@ function subChips(base, raw, view){
       (k || "전체") + "<i>" + n.toLocaleString("ko-KR") + "</i></button>";
   box.innerHTML = label + b("", base.length, !SUB) + list.map(x => b(x[0], x[1], x[0] === SUB)).join("");
   box.classList.add("on");
+}
+
+/* 줄어든 머리의 검색칸 안 꼬리표 — 지금 보는 분류·종류 */
+function curTag(){
+  const hd = $("header"), t = $("#curtag");
+  if (!hd || !t) return;
+  const txt = BIG !== "전체" ? BIG + (SUB ? " › " + SUB : "") : SUB;
+  const view = $("#view").value;
+  const on = !!txt && !ONLY && !WLIST && view !== "cart" && view !== "mine";
+  t.querySelector(".t").textContent = txt || "";
+  hd.classList.toggle("tagged", on);
+  // 목록을 새로 그릴 때 맨 위 근처면 머리 아래 빈칸을 맞춘다 — 칩 줄이 생기고 사라져 머리 높이가 바뀐다
+  if (window.fitHead && scrollY < 8) fitHead();
 }
 
 /* ③ 상품 메뉴의 `같은 종류 더 보기` — 그 상품의 분류·세부 종류를 골라 둔 채로 연다 */
