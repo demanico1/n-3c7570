@@ -117,28 +117,24 @@ button,input,select{font:inherit;color:inherit}
 header{position:sticky;top:0;z-index:20;background:var(--bg);
        padding:10px 12px 6px;border-bottom:1px solid var(--line)}
 .top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-/* ★ 목록을 내리면 머리가 **검색칸 한 줄**로 줄어든다 (2026-09-28 사장님이 C안을 고르셨다).
-   폰에서 머리가 187px — 보이는 화면의 3분의 1 을 가렸다. 내릴 땐 훑는 중이라 줄이고,
-   조금이라도 올리거나 맨 위면 다 펴 준다. 지금 보는 종류는 검색칸 안 꼬리표로 남긴다.
-   폰에서는 머리를 `fixed` 로 띄우고 같은 높이의 빈칸(`#hdsp`)을 깐다 — 머리 높이가
-   바뀌어도 목록이 덜컥 밀리지 않게. PC 는 넓어서 지금처럼 늘 다 보인다. */
+/* ★ 목록을 **내리면 머리가 통째로 올라가 숨고, 조금이라도 올리면 다시 내려온다**
+   (2026-09-28 사장님). 처음엔 검색칸 한 줄을 남겼는데(C안) 써 보시고 "조금 올리면
+   바로 나오니 내리는 동안엔 검색칸도 필요 없다" 고 하셨다. 폰에서 머리가 180px —
+   보이는 화면의 3분의 1 을 가렸다.
+   폰에서는 머리를 `fixed` 로 띄우고 같은 높이의 빈칸(`#hdsp`)을 깐다 — 머리를 밀어
+   올려도 목록이 덜컥 밀리지 않게. PC 는 넓어서 지금처럼 늘 다 보인다. */
 #hdsp{display:none}
 @media (max-width:719px){
-  header{position:fixed;left:0;right:0}
+  header{position:fixed;left:0;right:0;transition:transform .22s ease,box-shadow .22s ease}
   #hdsp{display:block}
-  header .top,header #chips,header #subchips.on{max-height:60px;
-    transition:max-height .22s ease,opacity .18s ease,margin .22s ease,padding .22s ease}
-  header.cmp .top,header.cmp #chips,header.cmp #subchips.on{max-height:0;opacity:0;
-    margin-top:0;margin-bottom:0;padding-bottom:0;overflow:hidden;pointer-events:none}
-  header.cmp{padding-top:6px;padding-bottom:6px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+  header.cmp{transform:translateY(-100%)}
+  header.up{box-shadow:0 2px 10px rgba(0,0,0,.08)}
 }
 #curtag{position:absolute;right:38px;max-width:52%;display:none;align-items:center;gap:5px;
   padding:4px 8px;border:0;border-radius:7px;background:var(--good-bg);color:var(--good);
   font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
 #curtag .t{overflow:hidden;text-overflow:ellipsis}
 #curtag i{font-style:normal;font-weight:400;opacity:.8}
-header.cmp.tagged #curtag{display:flex}
-header.cmp.tagged #hits{display:none}
 
 /* ── 브랜드 자리 = 홈 단추 (2026-09-24)
  *
@@ -186,7 +182,7 @@ header.cmp.tagged #hits{display:none}
   .iconbtn{padding:5px 7px}
 }
 .searchwrap{position:relative;display:flex;align-items:center}
-#q{width:100%;padding:12px 76px 12px 38px;border:1px solid var(--line);
+#q{width:100%;padding:9px 76px 9px 38px;border:1px solid var(--line);
    border-radius:12px;background:var(--card)}
 #q:focus{outline:2px solid var(--accent);outline-offset:-1px}
 .mag{position:absolute;left:13px;color:var(--dim);pointer-events:none}
@@ -1283,15 +1279,16 @@ $("#q").addEventListener("input", () => { SUB = ""; runFresh(); });
   addEventListener("scroll", () => {
     const y = scrollY, dy = y - lastY; lastY = y;
     if (!narrow.matches || y < (parseFloat(sp.style.height) || 180)){
-      set(false); acc = 0;
+      set(false); acc = 0; hd.classList.remove("up");
       if (y < 8) fit();
       return;
     }
     // 손가락이 조금 떨리는 것에는 반응하지 않는다 — 한 방향으로 24px 넘게 가야 바꾼다
     if ((dy > 0) !== (acc > 0)) acc = 0;
     acc += dy;
-    if (acc > 24) set(true);
-    else if (acc < -24) set(false);
+    if (acc > 24) set(true);            // 내릴 땐 조금 더 가야 숨고
+    else if (acc < -12) set(false);     // 올릴 땐 살짝만 올려도 나온다
+    hd.classList.toggle("up", !hd.classList.contains("cmp"));   // 목록 위에 떠 있을 땐 그림자
   }, {passive: true});
   $("#curtag").addEventListener("click", e => {
     e.preventDefault();
