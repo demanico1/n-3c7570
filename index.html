@@ -440,8 +440,8 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 /* 메뉴 창의 선 그림 아이콘 — 초록 단추 위에서는 흰색 */
 #sheet button.go .ico svg path{stroke:#fff}
 #cartbar{display:none;gap:6px;padding:8px 12px 0}
-#cartbar button{flex:1;padding:8px;border:1px solid var(--line);border-radius:9px;
-     background:var(--card);font-size:13px;cursor:pointer}
+#cartbar button{flex:1;min-width:0;padding:8px 4px;border:1px solid var(--line);border-radius:9px;
+     background:var(--card);font-size:13px;letter-spacing:-.3px;white-space:nowrap;cursor:pointer}
 /* ★ 찜을 장바구니처럼 (2026-09-28 사장님). 합계 띠 · 수량 · 샀어요. */
 /* 합계는 **화면 아래에 붙은 한 줄**이다 (2026-09-28 사장님). 쇼핑몰 장바구니처럼
    어디까지 내려도 보이고, 목록을 덜 가리게 한 줄로만. 자세한 것은 눌러서 본다. */
@@ -618,7 +618,7 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
 
 
   <div class="rows" id="cartbar">
-    <button data-act="sharecart">공유하기</button>
+    <button data-act="sharecart">찜 공유하기</button>
     <button data-act="copyall">이름 전부 복사</button>
     <button data-act="clear">비우기</button>
   </div>
@@ -1299,9 +1299,9 @@ function run(){
   bar.dataset.mode = view;
   bar.children[0].style.display = view === "mine" ? "none" : "";   // 공유하기
   bar.children[1].textContent = view === "mine" ? "직접 입력한 값 복사"
-                                                : "이름 전부 복사";
+                                                : "장보기 목록 복사";
   bar.children[2].textContent = view === "mine" ? "직접 입력한 값 모두 지우기"
-                                                : "비우기";
+                                                : "찜 비우기";
   stats();
   cartSum();
 
@@ -1836,6 +1836,12 @@ function inCart(p){ return CART.indexOf(p) >= 0; }
  * 까닭(stats 의 주석)과 반대로, 찜은 **그 사람이 실제로 살 물건**이라
  * 'PX 가면 얼마 들고 얼마 아낀다' 가 바로 쓸모 있는 답이다. */
 const CQ_KEY = "gmpx-cart-q", GOT_KEY = "gmpx-cart-got";
+/* ★ 합계에서는 `쿠팡` 이 아니라 **`온라인`** 이라 부른다 (2026-09-28 사장님).
+ * 비교 값의 대부분은 쿠팡이지만, 같은 상품이 없어 네이버·다나와 시세나 비슷한
+ * 상품 값으로 넣은 줄(환산)이 섞여 있다. 합계는 그걸 다 더한 것이라 `온라인` 이
+ * 참이다. 머리의 `군마트 vs 온라인` 과도 맞다. **카드의 `쿠팡 6,980원` 은 그대로**
+ * — 한 줄 한 줄은 실제로 쿠팡에서 본 값이라 출처를 밝히는 게 믿음을 준다. */
+const ONL = "온라인";
 let CQ = {}, GOT = [];
 try { CQ = JSON.parse(localStorage.getItem(CQ_KEY) || "{}") || {}; } catch(e){ CQ = {}; }
 try { GOT = JSON.parse(localStorage.getItem(GOT_KEY) || "[]") || []; } catch(e){ GOT = []; }
@@ -1850,6 +1856,22 @@ function saveCQ(){
     localStorage.setItem(CQ_KEY, JSON.stringify(CQ));
     localStorage.setItem(GOT_KEY, JSON.stringify(GOT));
   } catch(e){}
+}
+/* ★ 장보기 목록 — 카톡·메모에 붙여 넣는 글 (2026-09-28 사장님).
+ * 원래 `이름 전부 복사` 는 사장님 작업용(프로그램에 붙이기)이었다. 손님이 쓰도록
+ * 수량·줄마다 PX 값·합계를 붙였다. `찜 공유하기` 는 링크, 이건 글이다. */
+function shopText(){
+  const c = CARTSUM || {};
+  const lines = VIEW.map(i => {
+    const q = qtyOf(i.p);
+    return (isGot(i.p) && !WLIST ? "✓ " : "· ") + i.name + (q > 1 ? " × " + q : "")
+         + " — " + won(i.g * q);
+  });
+  let tail = "총 " + won(c.px);
+  if (c.cp) tail += " · " + ONL + "보다 " + c.about + won(Math.abs(c.gap))
+                  + (c.gap >= 0 ? " 아껴요" : " 더 비싸요");
+  return "PX 장보기 목록 (" + c.kinds + "가지 · " + c.n + "개)\n" + lines.join("\n")
+       + "\n" + tail + "\nPX 가격비교 pxpick.com";
 }
 function cartMode(){ return !!WLIST || $("#view").value === "cart"; }
 
@@ -1876,7 +1898,7 @@ function cartSum(){
   // 샀어요를 누른 게 있으면 **남은 것**을 보여 준다 — 장 보는 중엔 그게 궁금하다
   const cnt = gotN ? "남은 " + leftN + "개" : n + "개";
   const l = !cp ? "<b>" + cnt + "</b>"
-    : "<small>" + cnt + " · " + CP + "보다</small>" + (gap >= 0
+    : "<small>" + cnt + " · " + ONL + "보다</small>" + (gap >= 0
       ? "<b>" + about + won(gap) + " 아껴요</b>"
       : '<b class="ov">' + about + won(-gap) + " 더 비싸요</b>");
   const tot = (gotN ? "<small>남은</small>" + won(left) : won(px)) + "<i>›</i>";
@@ -1889,14 +1911,14 @@ function openCartSum(){
   const row = (k, v, cls) => "<tr" + (cls ? ' class="' + cls + '"' : "") + "><td>" + k + "</td><td>" + v + "</td></tr>";
   let t = row("총금액", won(c.px)) + row("상품", c.kinds + "가지 · " + c.n + "개");
   if (c.cp){
-    t += row(CP + "에서 사면", c.about + won(c.cp));
+    t += row(ONL + "에서 사면", c.about + won(c.cp));
     t += c.gap >= 0 ? row("아낀 돈", c.about + won(c.gap), "sv")
                     : row("더 드는 돈", c.about + won(-c.gap), "ov");
   }
   if (c.gotN) t += row("샀어요", c.gotN + "가지") + row("남은 금액", won(c.left) + " · " + c.leftN + "개");
   const notes = [];
-  if (c.conv) notes.push(CP + " 값 중 " + c.conv + "개는 같은 상품이 없어 비슷한 상품 값이라 대략이에요.");
-  if (c.noC) notes.push(c.noC + "개는 " + CP + " 값이 없어 " + CP + " 합계에서 뺐어요.");
+  if (c.conv) notes.push(ONL + " 값 중 " + c.conv + "개는 같은 상품이 없어 비슷한 상품 값이라 대략이에요.");
+  if (c.noC) notes.push(c.noC + "개는 " + ONL + " 값이 없어 " + ONL + " 합계에서 뺐어요.");
   openSheet("<h3>합계</h3>" + '<table class="sumtbl">' + t + "</table>" +
     (notes.length ? '<p class="note">' + notes.join("<br>") + "</p>" : ""));
 }
@@ -2534,12 +2556,14 @@ $("#cartbar").addEventListener("click", e => {
   if (b.dataset.act === "sharecart") return shareCart(b);
   if (b.dataset.act === "clear"){
     if (mine){ MINE = {}; saveMine(); }
-    else { CART = []; saveCart(); saveCQ(); }
+    else {
+      // 실수로 누르면 되돌릴 길이 없다. 한 번 묻는다 (2026-09-28)
+      if (!confirm("찜 " + CART.length + "개를 모두 지울까요?")) return;
+      CART = []; saveCart(); saveCQ();
+    }
     return run();
   }
-  // 장보기 목록으로 쓰도록 수량을 붙인다 (2개 이상일 때만)
-  const text = mine ? mineText()
-             : VIEW.map(i => i.name + (qtyOf(i.p) > 1 ? " × " + qtyOf(i.p) : "")).join("\n");
+  const text = mine ? mineText() : shopText();
   try { navigator.clipboard.writeText(text); } catch(e){}
   const was = b.textContent;
   b.textContent = "복사했습니다";
