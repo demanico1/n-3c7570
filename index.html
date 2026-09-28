@@ -160,6 +160,9 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 /* ★ 아이콘만으로는 무엇인지 모른다 (2026-09-24). 옆에 한글을 아주 작게
    붙인다. 자리가 빠듯해서 9px 이고, 이름표까지 누르는 자리에 넣는다. */
 .iconbtn{display:inline-flex;align-items:center;gap:3px;padding:6px 7px}
+/* 찜 화면을 보는 동안 찜 단추는 눌린 모양 — 지금 어디 있는지, 다시 누르면 나간다는 걸 보인다 */
+#cartbtn.on{background:var(--bad-bg);border-color:var(--bad)}
+#cartbtn.on em{color:var(--bad)}
 .iconbtn em{font-style:normal;font-size:9px;font-weight:700;color:var(--dim);
  letter-spacing:-.5px;line-height:1;white-space:nowrap}
 /* 좁은 화면에서는 `메뉴` 이름표를 뺀다. 안 빼면 브랜드가 `PX 가격…` 으로
@@ -1104,6 +1107,7 @@ function start(d){
   });
   $("#chips").addEventListener("click", e => {
     const b = e.target.closest(".chip"); if (!b) return;
+    leaveCart();
     BIG = b.dataset.b;
     SUB = "";
     $("#chips").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === b));
@@ -1262,7 +1266,17 @@ $("#home").addEventListener("click", e => { e.preventDefault(); goHome(); });
  * 검색하면 결과 중간부터 보이고 머리도 숨은 채였다. 검색어·분류·세부 종류·줄 세우기를
  * 바꿀 때만 올린다 — 찜하기·수량·샀어요, 쿠팡·찜 화면에서 돌아올 때는 보던 자리 그대로. */
 function toTop(){ if (scrollY > 0) scrollTo(0, 0); }
-$("#q").addEventListener("input", () => { SUB = ""; runFresh(); toTop(); });
+/* ★ 찜 화면에서 분류 칩이나 검색을 쓰면 **찜 화면을 나간다** (2026-09-28 사장님).
+ * 칩·검색칸이 그대로 보여서 손님은 '전체 상품을 보는 것' 으로 알고 누르는데, 찜 안에서만
+ * 걸러져 갇힌 느낌이었다. 칩은 늘 전체 상품을 보는 칩, 한 가지 뜻만 갖는다.
+ * 찜 화면 표시(`{cart:1}`)는 지운다 — 남기면 뒤로가기가 찜 화면을 되살린다. */
+function leaveCart(){
+  if ($("#view").value !== "cart") return false;
+  $("#view").value = "all"; PREV = null;
+  try { if (history.state && history.state.cart) history.replaceState(null, ""); } catch(e){}
+  return true;
+}
+$("#q").addEventListener("input", () => { SUB = ""; leaveCart(); runFresh(); toTop(); });
 (function(){
   const hd = $("header"), sp = $("#hdsp");
   if (!hd || !sp) return;
@@ -1477,6 +1491,7 @@ function run(){
 
   const bar = $("#cartbar");
   bar.style.display = (view === "cart" || view === "mine") ? "flex" : "none";
+  $("#cartbtn").classList.toggle("on", view === "cart");
   bar.dataset.mode = view;
   bar.children[0].style.display = view === "mine" ? "none" : "";   // 공유하기
   // 가운데 단추: 찜 화면은 `찜 가져오기`, 직접 넣은 값 화면은 `복사`
