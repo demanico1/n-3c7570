@@ -44,9 +44,9 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>PX 가격비교 — 군마트 vs 온라인</title>
-<meta name="description" content="군마트(PX)에서 파는 2,263건을 쿠팡 가격과 하나씩 비교해 정리했습니다. 그중 2,263건은 직접 확인한 값입니다.">
+<meta name="description" content="군마트(PX)에서 파는 2,263건을 온라인 가격과 하나씩 비교해 정리했습니다. PX 가기 전에 살 것을 미리 찾아보세요.">
 <meta property="og:title" content="PX 가격비교 — 군마트 vs 온라인">
-<meta property="og:description" content="군마트(PX)에서 파는 2,263건을 쿠팡 가격과 하나씩 비교해 정리했습니다. 그중 2,263건은 직접 확인한 값입니다.">
+<meta property="og:description" content="군마트(PX)에서 파는 2,263건을 온라인 가격과 하나씩 비교해 정리했습니다. PX 가기 전에 살 것을 미리 찾아보세요.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="og/home.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -901,6 +901,11 @@ const noSpace = s => toJamo(String(s).replace(/\s+/g, ""));
 /* ============================ 화면 ============================ */
 let PARTIAL = false;   // 첫 화면 자료로만 그린 동안 — 건수·통계를 안 적는다
 let DATA = [], VIEW = [], BIG = "전체", SHOWN = 0, CP = "", WAIT = "", PICS = {};
+/* ★ `온라인` — 합계·요약에서 부르는 이름. 줄 하나는 **환산(it.conv)일 때만**
+ * `온라인` 이다 — 같은 상품이 없어 네이버·다나와 시세나 비슷한 상품 값을 쓴 줄은
+ * 쿠팡 값이 아니다. 나머지는 실제로 쿠팡에서 본 값이라 `쿠팡` 그대로 (2026-09-28). */
+const ONL = "온라인";
+const srcOf = it => it.conv ? ONL : CP;
 /* 공유 주소(#p=코드)로 들어왔을 때 그 한 줄만 보여 준다. 받은 사람이
    2,263줄 맨 위부터 뒤지게 하면 공유한 뜻이 사라진다. */
 let ONLY = "";
@@ -1510,7 +1515,7 @@ function card(it, raw){
     '<div class="sub">' + esc(it.spec || "") + (it.spec && it.maker ? " · " : "") +
       esc(it.maker || "") + "</div>" +
     '<div class="pr"><span class="g">' + won(it.g) + "</span>" +
-      (it.c == null ? "" : '<span class="c">' + CP + " " + won(it.c) + "</span>") +
+      (it.c == null ? "" : '<span class="c">' + srcOf(it) + " " + won(it.c) + "</span>") +
       '<span class="side">' + badge + "</span></div>" +
     (tags.length ? '<div class="tags">' + tags.join("") + "</div>" : "") + cq +
     "</div></article>";
@@ -1836,12 +1841,11 @@ function inCart(p){ return CART.indexOf(p) >= 0; }
  * 까닭(stats 의 주석)과 반대로, 찜은 **그 사람이 실제로 살 물건**이라
  * 'PX 가면 얼마 들고 얼마 아낀다' 가 바로 쓸모 있는 답이다. */
 const CQ_KEY = "gmpx-cart-q", GOT_KEY = "gmpx-cart-got";
-/* ★ 합계에서는 `쿠팡` 이 아니라 **`온라인`** 이라 부른다 (2026-09-28 사장님).
+/* (ONL 은 맨 위 CP 옆에 있다) ★ 합계에서는 `쿠팡` 이 아니라 **`온라인`** 이라 부른다 (2026-09-28 사장님).
  * 비교 값의 대부분은 쿠팡이지만, 같은 상품이 없어 네이버·다나와 시세나 비슷한
  * 상품 값으로 넣은 줄(환산)이 섞여 있다. 합계는 그걸 다 더한 것이라 `온라인` 이
  * 참이다. 머리의 `군마트 vs 온라인` 과도 맞다. **카드의 `쿠팡 6,980원` 은 그대로**
  * — 한 줄 한 줄은 실제로 쿠팡에서 본 값이라 출처를 밝히는 게 믿음을 준다. */
-const ONL = "온라인";
 let CQ = {}, GOT = [];
 try { CQ = JSON.parse(localStorage.getItem(CQ_KEY) || "{}") || {}; } catch(e){ CQ = {}; }
 try { GOT = JSON.parse(localStorage.getItem(GOT_KEY) || "[]") || []; } catch(e){ GOT = []; }
@@ -2111,7 +2115,7 @@ function openHelp(){
       "띄어쓰기는 안 맞아도 돼요.",
       "식품 · 화장품 같은 종류 단추를 누르면 그 종류만 보여요."]) +
     "<p><b>2. 가격 보는 법</b></p>" + li([
-      "카드마다 <b>PX 가격</b>과 <b>" + CP + " 가격</b>이 나란히 있어요.",
+      "카드마다 <b>PX 가격</b>과 <b>" + ONL + " 가격</b>이 나란히 있어요.",
       "<b>초록</b>은 PX가 더 저렴한 것, <b>빨강</b>은 온라인이 더 저렴한 것이에요. 숫자는 몇 % 차이인지예요.",
       "<b>비교군 없음</b> — 온라인에서 같은 상품을 못 찾은 것이에요.",
       "<b>3개들이에서 낱개</b> — 온라인은 묶음으로 팔아서 한 개 값으로 나눠 비교한 것이에요.",
@@ -2202,9 +2206,9 @@ $("#sheet").addEventListener("click", e => {
     const line = it.rate == null
       ? "군마트 " + won(it.g)
       : (it.rate < 0
-          ? "군마트 " + won(it.g) + " — " + CP + "보다 "
+          ? "군마트 " + won(it.g) + " — " + srcOf(it) + "보다 "
             + won(gap) + "(" + Math.abs(Math.round(it.rate)) + "%) 저렴"
-          : "군마트 " + won(it.g) + " — " + CP + "이 "
+          : "군마트 " + won(it.g) + " — " + srcOf(it) + "이 "
             + won(-gap) + "(" + Math.round(it.rate) + "%) 저렴");
     // 안드로이드·아이폰은 navigator.share 로 카톡·문자에 바로 보낸다.
     // 데스크톱 크롬은 이게 없어서 주소를 복사해 준다.
@@ -2672,7 +2676,7 @@ $("#list").addEventListener("click", e => {
   const on = inCart(p);
   openSheet("<h3>" + esc(it.name) + "</h3>" +
     '<p class="note">군마트 ' + won(it.g) +
-      (it.c != null ? " · " + CP + " " + won(it.c) : "") + "</p>" +
+      (it.c != null ? " · " + srcOf(it) + " " + won(it.c) : "") + "</p>" +
     '<button class="go" data-act="coupang" data-p="' + p + '" data-q="' +
       esc(it.name) + '"><i class="ico cpg-img"></i>' + CP + " 가격 확인하기</button>" +
     '<button data-act="' + (on ? "del" : "add") + '" data-p="' + p + '">' +
