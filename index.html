@@ -117,7 +117,7 @@ button,input,select{font:inherit;color:inherit}
 header{position:sticky;top:0;z-index:20;background:var(--bg);
        padding:10px 12px 6px;border-bottom:1px solid var(--line)}
 .top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-/* ★ 목록을 **내리면 머리가 통째로 올라가 숨고, 조금이라도 올리면 다시 내려온다**
+/* ★ 목록을 **내리면 머리가 손가락을 따라 올라가 숨고, 올리면 올린 만큼 내려온다**
    (2026-09-28 사장님). 처음엔 검색칸 한 줄을 남겼는데(C안) 써 보시고 "조금 올리면
    바로 나오니 내리는 동안엔 검색칸도 필요 없다" 고 하셨다. 폰에서 머리가 180px —
    보이는 화면의 3분의 1 을 가렸다.
@@ -125,9 +125,8 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
    올려도 목록이 덜컥 밀리지 않게. PC 는 넓어서 지금처럼 늘 다 보인다. */
 #hdsp{display:none}
 @media (max-width:719px){
-  header{position:fixed;left:0;right:0;transition:transform .22s ease,box-shadow .22s ease}
+  header{position:fixed;left:0;right:0;will-change:transform}
   #hdsp{display:block}
-  header.cmp{transform:translateY(-100%)}
   header.up{box-shadow:0 2px 10px rgba(0,0,0,.08)}
 }
 #curtag{position:absolute;right:38px;max-width:52%;display:none;align-items:center;gap:5px;
@@ -1271,24 +1270,32 @@ $("#q").addEventListener("input", () => { SUB = ""; runFresh(); });
   // 줄어든 동안에는 안 맞춘다 — 맞추면 그만큼 목록이 밀린다.
   if (window.ResizeObserver) new ResizeObserver(() => { if (scrollY < 8) fit(); }).observe(hd);
   fit();
-  const set = on => {
-    if (hd.classList.contains("cmp") === on) return;
-    hd.classList.toggle("cmp", on);
+  /* ★ 머리는 **손가락에 붙어서** 움직인다 (2026-09-28 사장님). 처음엔 '내렸다' 고
+   판단하는 순간 0.22초에 휙 올라가서 튕기는 느낌이었다. 이제 10px 내리면 10px
+   올라가고, 올린 만큼만 내려온다. 스크롤이 멈췄는데 반쯤 걸쳐 있으면 절반을
+   기준으로 마저 숨기거나 마저 보인다(0.15초). 맨 위 근처는 제자리에 붙은 것처럼. */
+  let off = 0, lastY = Math.max(0, scrollY), idle = 0;
+  const apply = anim => {
+    const h = hd.offsetHeight;
+    hd.style.transition = anim ? "transform .15s ease" : "none";
+    hd.style.transform = off ? "translateY(" + (-off) + "px)" : "";
+    hd.classList.toggle("cmp", off >= h);
+    hd.classList.toggle("up", off < h && scrollY > h);   // 목록 위에 떠 있을 땐 그림자
   };
-  let lastY = scrollY, acc = 0;
+  const set = on => { off = on ? hd.offsetHeight : 0; apply(true); };
   addEventListener("scroll", () => {
-    const y = scrollY, dy = y - lastY; lastY = y;
-    if (!narrow.matches || y < (parseFloat(sp.style.height) || 180)){
-      set(false); acc = 0; hd.classList.remove("up");
-      if (y < 8) fit();
-      return;
-    }
-    // 손가락이 조금 떨리는 것에는 반응하지 않는다 — 한 방향으로 24px 넘게 가야 바꾼다
-    if ((dy > 0) !== (acc > 0)) acc = 0;
-    acc += dy;
-    if (acc > 24) set(true);            // 내릴 땐 조금 더 가야 숨고
-    else if (acc < -12) set(false);     // 올릴 땐 살짝만 올려도 나온다
-    hd.classList.toggle("up", !hd.classList.contains("cmp"));   // 목록 위에 떠 있을 땐 그림자
+    const y = Math.max(0, scrollY), dy = y - lastY; lastY = y;
+    if (!narrow.matches){ if (off){ off = 0; apply(false); } return; }
+    const h = hd.offsetHeight;
+    off = Math.min(h, Math.max(0, off + dy));
+    if (y < h) off = Math.min(off, y);            // 맨 위 근처 — 빈칸이 드러나지 않게
+    apply(false);
+    clearTimeout(idle);
+    idle = setTimeout(() => {
+      const hh = hd.offsetHeight;
+      if (off > 0 && off < hh){ off = (off > hh / 2 && scrollY > hh) ? hh : 0; apply(true); }
+      if (scrollY < 8) fit();
+    }, 140);
   }, {passive: true});
   $("#curtag").addEventListener("click", e => {
     e.preventDefault();
