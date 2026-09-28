@@ -1100,6 +1100,7 @@ function start(d){
     SUB = b.dataset.s;
     tipUsed("subs");
     run();
+    toTop();
   });
   $("#chips").addEventListener("click", e => {
     const b = e.target.closest(".chip"); if (!b) return;
@@ -1107,6 +1108,7 @@ function start(d){
     SUB = "";
     $("#chips").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === b));
     runFresh();
+    toTop();
   });
   $("#lock").remove();
   $("#app").hidden = false;
@@ -1256,7 +1258,11 @@ function goHome(){
 }
 $("#home").addEventListener("click", e => { e.preventDefault(); goHome(); });
 
-$("#q").addEventListener("input", () => { SUB = ""; runFresh(); });
+/* ★ 목록이 새로 바뀌면 **맨 위부터** 보여 준다 (2026-09-28 사장님). 스크롤을 내린 채
+ * 검색하면 결과 중간부터 보이고 머리도 숨은 채였다. 검색어·분류·세부 종류·줄 세우기를
+ * 바꿀 때만 올린다 — 찜하기·수량·샀어요, 쿠팡·찜 화면에서 돌아올 때는 보던 자리 그대로. */
+function toTop(){ if (scrollY > 0) scrollTo(0, 0); }
+$("#q").addEventListener("input", () => { SUB = ""; runFresh(); toTop(); });
 (function(){
   const hd = $("header"), sp = $("#hdsp");
   if (!hd || !sp) return;
@@ -1335,12 +1341,13 @@ function setSort(k){
     b.classList.toggle("on", !sel.value && b.dataset.k === SORTK);
   $(".sortbar .selwrap").classList.toggle("on", !!sel.value);
   ($("#view").value !== was ? runFresh : run)();
+  toTop();
 }
 for (const b of document.querySelectorAll(".sortbar .sb[data-k]"))
   b.addEventListener("click", () => setSort(b.dataset.k));
 $("#sort").addEventListener("change", () => setSort($("#sort").value || SORTK));
 $("#view").addEventListener("change", runFresh);
-$("#clr").addEventListener("click", () => { $("#q").value = ""; run(); $("#q").focus(); });
+$("#clr").addEventListener("click", () => { $("#q").value = ""; run(); toTop(); $("#q").focus(); });
 function themeLabel(){
   const el = $("#themelb");
   if (!el) return;
