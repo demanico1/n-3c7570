@@ -3,43 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- 미리 부르기 — 구울 때 자료·첫 사진 4장 주소가 들어간다 (2026-09-27) -->
 <link rel="preload" href="data.json?v=f52f69d242" as="fetch" crossorigin="anonymous" referrerpolicy="same-origin">
 <link rel="preload" href="big/28438.jpg" as="image">
 <link rel="preload" href="big/35032.jpg" as="image">
 <link rel="preload" href="big/3098.jpg" as="image">
 <link rel="preload" href="big/27928.jpg" as="image">
-<!-- ★ 한때 `noindex, nofollow` 였다. 비밀번호로 잠가 두던 시절의
-     찌꺼기인데 잠금을 걷을 때 같이 안 걷혀서, 열기 직전에 잡았다.
-     그대로 뒀으면 `PX`(27,870/월) `피엑스`(4,210/월)를 통째로 버리고
-     홈에서 2,247장으로 가는 길도 막힐 뻔했다. -->
-<!-- 네이버 서치어드바이저 소유확인 (2026-09-25). 이 줄을 지우면
-     네이버 웹마스터도구 연결이 끊긴다. 확인이 끝난 뒤에도 그냥 둔다. -->
 <meta name="naver-site-verification" content="fb52d6a8cce2ee5b0100b502bb548ea64f51ffab">
 <link rel="canonical" href="https://pxpick.com/">
 <meta property="og:url" content="https://pxpick.com/">
 <meta name="referrer" content="no-referrer">
-<!-- 이 파일은 캐시해 두지 마라.
-     ★ 이 파일이 늘 새것이어야 자료가 즉시 반영된다 (2026-09-26).
-     자료(`data.json`·`pics.json`)는 `?v=내용지문` 을 달고 1년 캐시한다.
-     내용이 바뀌면 지문이 바뀌고, 그 새 지문은 **이 파일에만** 적혀 있다.
-     그래서 이 파일이 옛것이면 새 자료가 영영 안 닿는다.
-     예전에는 자료를 `no-cache` 로 받아서 들어올 때마다 1.8초를 물었다.
-     그 전에도 **이 화면 파일만 옛것이 남는 일이 있었다.** 잠금을
-     걷어냈는데도 폰에 예전 것이 남아 비밀번호 창이 계속 떴다.
-     홈 화면에 추가해 둔 경우가 특히 오래 물고 있다.
-     이 표시를 지우면 새로 구운 것이 사람들 폰에 안 닿는다. -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<!-- 홈 화면에 추가(PWA). 제목은 잠긴 판에서도 안 드러나야 하므로
-     manifest 안에만 두고 여기에는 안 적는다(4.19-1). -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0b7a4b">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<!-- ★ 아이폰 홈 화면 아이콘은 **사파리로** 연다 (2026-09-27 사장님 결정).
-     `apple-mobile-web-app-capable` 을 빼면 아이콘이 따로 떨어진 앱이 아니라
-     사파리 탭으로 열린다. 따로 떨어진 앱은 **찜을 사파리와 따로 저장**해서
-     사파리에서 찜한 것이 아이콘으로 열면 안 보였다.
-     아이콘 아래 이름은 제목에서 잘리지 않게 못박는다. -->
 <meta name="apple-mobile-web-app-title" content="PX 가격비교">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -69,9 +45,6 @@
   --mid:#e6c455; --mid-bg:#2a2412; --accent:#6fb0ff; --shadow:none;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-/* 아이콘은 전부 <i> 로 넣는데, <i> 의 기본값이 기울임이다. 그 바람에
-   별·엑스·원화 표시가 차례로 기울어 보였다. 세 번 같은 데서 났다.
-   여기서 한 번에 막는다. 그림(SVG)은 글자가 아니라 영향이 없었다. */
 i{font-style:normal}
 html,body{margin:0;padding:0}
 body{
@@ -82,14 +55,8 @@ body{
 }
 button,input,select{font:inherit;color:inherit}
 
-/* ---------- 잠금 화면 ---------- */
-/* ★ 잠금 화면은 **처음부터 숨겨 둔다** (2026-09-27 사장님이 잡아 주셨다).
-   전에는 보이는 채로 두고 맨 아래 스크립트가 숨겼다. 서버가 LA 를 거쳐
-   느리게 오니 브라우저가 스크립트보다 화면을 먼저 그려서, 공개 사이트인데
-   **비밀번호 창이 번쩍** 떴다가 사라졌다. 잠긴 판일 때만 `auto()` 가 꺼낸다. */
 #lock{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
       padding:16px;background:var(--bg);z-index:50;visibility:hidden}
-/* 열쇠를 기억해 둔 기기는 잠금 화면 대신 이것만 보고 기다린다. */
 #wait{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
       flex-direction:column;gap:14px;background:var(--bg);z-index:49;color:var(--dim);
       font-size:13.5px}
@@ -113,16 +80,9 @@ button,input,select{font:inherit;color:inherit}
 .remember{margin-top:12px;color:var(--dim);font-size:13px;display:flex;
     align-items:center;justify-content:center;gap:6px}
 
-/* ---------- 머리 ---------- */
 header{position:sticky;top:0;z-index:20;background:var(--bg);
        padding:10px 12px 6px;border-bottom:1px solid var(--line)}
 .top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-/* ★ 목록을 **내리면 머리가 손가락을 따라 올라가 숨고, 올리면 올린 만큼 내려온다**
-   (2026-09-28 사장님). 처음엔 검색칸 한 줄을 남겼는데(C안) 써 보시고 "조금 올리면
-   바로 나오니 내리는 동안엔 검색칸도 필요 없다" 고 하셨다. 폰에서 머리가 180px —
-   보이는 화면의 3분의 1 을 가렸다.
-   폰에서는 머리를 `fixed` 로 띄우고 같은 높이의 빈칸(`#hdsp`)을 깐다 — 머리를 밀어
-   올려도 목록이 덜컥 밀리지 않게. PC 는 넓어서 지금처럼 늘 다 보인다. */
 #hdsp{display:none}
 @media (max-width:719px){
   header{position:fixed;left:0;right:0;will-change:transform}
@@ -135,14 +95,6 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 #curtag .t{overflow:hidden;text-overflow:ellipsis}
 #curtag i{font-style:normal;font-weight:400;opacity:.8}
 
-/* ── 브랜드 자리 = 홈 단추 (2026-09-24)
- *
- * 전에는 `<h1 id="title">군마트 쿠팡가 비교</h1>` 였다. 유입 페이지 2,240장은
- * `PX 가격비교 / 군마트 vs 온라인` 으로 되어 있어서, 거기서 넘어온 사람이
- * **다른 사이트에 온 줄 알았다.** 같은 브랜드로 맞춘다.
- *
- * 그리고 누르면 처음 화면으로 돌아간다. 검색어가 든 채로도 여기만 누르면
- * 맨 처음 상태가 된다 — 사람들이 로고를 그렇게 쓴다. */
 .brand{display:flex;align-items:center;gap:8px;flex:1;min-width:0;
  text-decoration:none;color:var(--ink);-webkit-tap-highlight-color:transparent}
 .brand img{width:30px;height:24px;display:block;flex:0 0 30px}
@@ -152,25 +104,17 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 .brand i{display:block;font-style:normal;font-size:10.5px;color:var(--dim);
  font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brand:active{opacity:.6}
-/* 제목은 한 줄로 둔다. 단추가 넷이라 좁은 폰에서는 두 줄로 접혔다. */
 .top h1{margin:0;font-size:16px;font-weight:700;flex:1;min-width:0;
        white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .iconbtn{border:1px solid var(--line);background:var(--card);border-radius:9px;
  padding:6px 9px;cursor:pointer;font-size:13px}
-/* ★ 아이콘만으로는 무엇인지 모른다 (2026-09-24). 옆에 한글을 아주 작게
-   붙인다. 자리가 빠듯해서 9px 이고, 이름표까지 누르는 자리에 넣는다. */
 .iconbtn{display:inline-flex;align-items:center;gap:3px;padding:6px 7px}
-/* 찜 화면을 보는 동안 찜 단추는 눌린 모양 — 지금 어디 있는지, 다시 누르면 나간다는 걸 보인다 */
 #cartbtn.on{background:var(--bad-bg);border-color:var(--bad)}
 #cartbtn.on em{color:var(--bad)}
 .iconbtn em{font-style:normal;font-size:9px;font-weight:700;color:var(--dim);
  letter-spacing:-.5px;line-height:1;white-space:nowrap}
-/* 좁은 화면에서는 `메뉴` 이름표를 뺀다. 안 빼면 브랜드가 `PX 가격…` 으로
-   잘린다 — 이름이 잘리는 것보다 이름표 하나 없는 편이 낫다.
-   `⋯` 은 그것만으로 알아본다. */
 @media(max-width:400px){ #more em{display:none} }
 
-/* ── 사용방법 창. 글이 많으니 읽기 좋게만 한다 */
 .help{text-align:left;margin:4px 0 2px}
 .help p{margin:0 0 11px;font-size:13px;line-height:1.65;color:var(--ink)}
 .help p:last-child{margin-bottom:0}
@@ -198,8 +142,6 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 .chip{flex:0 0 auto;padding:6px 11px;border:1px solid var(--line);border-radius:999px;
       background:var(--card);color:var(--dim);font-size:13px;cursor:pointer;white-space:nowrap}
 .chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-/* ★ 세부 종류 칩 (2026-09-28 사장님). 분류를 고르면 그 안의 종류가, 검색하면 결과에
-   섞인 종류가 한 줄로 뜬다. 큰 칩보다 한 단 작고 네모나게 — 위계가 보이게. */
 #subchips{display:none;margin-top:7px}
 #subchips.on{display:flex}
 #subchips .sl{flex:none;align-self:center;font-size:12px;color:var(--dim);margin-right:1px}
@@ -208,9 +150,6 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 .sc i{font-style:normal;color:var(--dim);margin-left:3px;font-variant-numeric:tabular-nums}
 .sc.on{background:var(--good-bg);color:var(--good);font-weight:700}
 .sc.on i{color:var(--good)}
-/* ★ 정렬 세 칸. 위 `.sum` 과 **같은 격자**다 — `gap` 과 좌우 `padding` 을
-   똑같이 두어야 칸이 위아래로 딱 맞는다. 높이만 낮다 (2026-09-25).
-   **붙박이가 아니다** — 내려가면 같이 밀려 올라가서 상품이 더 보인다. */
 .sortbar{display:flex;gap:8px;padding:8px 12px 4px}
 .sortbar .sb{flex:1;min-width:0;display:flex;align-items:center;
  justify-content:center;gap:3px;height:34px;padding:0 4px;
@@ -218,7 +157,6 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
  color:var(--dim);font-size:12.5px;font-weight:600;letter-spacing:-.4px;
  cursor:pointer;white-space:nowrap;overflow:hidden;font-family:inherit;
  -webkit-tap-highlight-color:transparent}
-/* 고른 칸은 분류 칩과 같은 파랑이다 — 같은 뜻이면 같은 색이어야 한다 */
 .sortbar .sb.on{background:var(--accent);border-color:var(--accent);
  color:#fff;font-weight:700}
 .sortbar .sb.on select{color:#fff}
@@ -229,22 +167,14 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
  text-align:center;text-align-last:center}
 .sortbar select:focus{outline:none}
 .sortbar select option{color:var(--ink);background:var(--card);font-weight:400}
-/* 화살표는 **셋째 칸에만** 있다. 앞의 둘은 누르면 바로 바뀌는 단추다. */
 .sortbar .selwrap::after{content:"▾";font-size:9px;color:var(--dim);
  pointer-events:none;flex:0 0 auto}
 
-/* ---------- 요약 ---------- */
-/* ---------- 홈 화면에 추가 권유 ---------- */
-/* 요약 칸과 같은 모서리·같은 여백을 쓰되 색을 채워 눈에 걸리게 한다.
-   광고처럼 크게 만들면 도리어 닫고 지나가므로 한 줄 높이로 둔다. */
 #addbar{display:flex;align-items:center;gap:10px;margin:10px 12px 0;
         padding:9px 10px 9px 9px;border-radius:12px;
         background:linear-gradient(135deg,#0e8a55,#0b7a4b);color:#fff;
         box-shadow:0 2px 10px rgba(11,122,75,.28)}
 #addbar[hidden]{display:none}
-/* ★ 아이콘이 초록인데 이 띠도 초록이라 파묻힌다 (2026-09-25).
-   `background:#fff` 는 아이콘이 **불투명해서** 안 보였다. 안쪽 여백을
-   줘야 흰 테가 드러나 아이콘이 카드 위에 얹힌 것처럼 읽힌다. */
 #addbar img{width:38px;height:38px;border-radius:10px;flex:none;
             background:#fff;padding:3px;box-shadow:0 1px 3px rgba(0,0,0,.22)}
 #addbar .ab-t{flex:1;min-width:0;line-height:1.35}
@@ -255,8 +185,6 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 #addgo:active{opacity:.8}
 #addno{flex:none;width:26px;height:26px;padding:0;border-radius:7px;cursor:pointer;
        background:rgba(255,255,255,.16);border:0;color:#fff;font-size:12px;line-height:1}
-/* ✕ 를 누른 뒤 6초. 초록을 빼고 조용한 줄로 바꾼다 — 닫겠다고 한 사람에게
-   같은 색으로 계속 말을 거는 것은 닫은 것이 아니다. */
 #addbar.calm{background:var(--card);color:var(--dim);border:1px solid var(--line);
        box-shadow:none;justify-content:space-between;padding:8px 10px}
 #addbar.calm .ab-msg{font-size:12.5px}
@@ -270,7 +198,6 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
        white-space:nowrap}
 .sum span{font-size:11px;color:var(--dim)}
 
-/* ---------- 목록 ---------- */
 main{padding:10px 12px 28px;display:grid;gap:8px}
 @media(min-width:720px){main{grid-template-columns:1fr 1fr}}
 @media(min-width:1100px){main{grid-template-columns:1fr 1fr 1fr}}
@@ -286,9 +213,6 @@ main{padding:10px 12px 28px;display:grid;gap:8px}
 .pr{display:flex;align-items:flex-end;gap:10px;margin-top:7px;flex-wrap:wrap}
 .pr .g{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
 .pr .c{font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
-/* 초록 상자 안에는 **퍼센트만** 둔다. 액수까지 같은 상자에 넣었더니
-   초록 글자 두 줄이 되어 어느 쪽이 할인율인지 한눈에 안 들어왔다.
-   액수는 상자 밖 바로 아래, '쿠팡 5,900원' 과 같은 회색 작은 글자로. */
 .side{margin-left:auto;text-align:right;white-space:nowrap}
 .badge{display:inline-block;padding:4px 9px;border-radius:9px;font-size:13px;
        font-weight:700;font-variant-numeric:tabular-nums}
@@ -318,9 +242,6 @@ main{padding:10px 12px 28px;display:grid;gap:8px}
 #sheet .note.basis{margin-top:-6px;font-size:12px;color:var(--dim);line-height:1.5;word-break:keep-all}
 footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:center;line-height:1.7;word-break:keep-all}
 
-/* ---------- 사진 크게 ---------- */
-/* 작은 그림은 화면에서 68px 이라 확대하면 답답하다. 폭을 꽉 채우되
-   원본이 300px 이므로 거기까지만 키운다. 누르면 원본을 따로 받아 바꿔 끼운다. */
 #zoom{position:fixed;inset:0;background:rgba(0,0,0,.86);display:none;z-index:40;
       align-items:center;justify-content:center;padding:16px;flex-direction:column}
 #zoom img{width:100%;max-width:440px;max-height:72vh;object-fit:contain;
@@ -329,11 +250,6 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
         line-height:1.5;max-width:440px}
 #zoom small{color:#b9bec6;font-size:12px;margin-top:8px}
 
-/* ---------- 아래에서 올라오는 고르기 ---------- */
-/* ★ 창은 **화면 안에서 스크롤**한다 (2026-09-27 사장님이 잡아 주셨다).
-   높이 한도가 없어서, 사용방법처럼 긴 글은 위쪽(1번부터)이 화면 밖으로
-   잘렸다. 창 안에 스크롤할 곳이 없으니 끌어내리면 **뒤 페이지가 당겨져
-   새로고침**됐다. `overscroll-behavior:contain` 이 그 당김을 창 안에 가둔다. */
 #sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:45;
        align-items:flex-end;justify-content:center;overscroll-behavior:contain}
 #sheet .box{position:relative;width:100%;max-width:460px;background:var(--card);
@@ -341,15 +257,12 @@ footer{padding:18px 14px 34px;color:var(--dim);font-size:11.5px;text-align:cente
        border:1px solid var(--line);border-bottom:0;
        max-height:calc(100% - 24px);max-height:calc(100dvh - 24px);
        overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-/* 창이 떠 있는 동안 뒤 페이지는 움직이지 않는다 — 당겨서 새로고침도 막힌다 */
 html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 @media(min-width:520px){
   #sheet{align-items:center}
   #sheet .box{border-radius:18px;border-bottom:1px solid var(--line)}
 }
 #sheet h3{margin:0 0 3px;padding-right:34px;font-size:15px;line-height:1.4}
-/* 닫기는 글로 적힌 줄보다 오른쪽 위 ✕ 가 눈에 빨리 들어온다.
-   글자(✕)는 글꼴에 따라 기울어 보여서 두 획을 직접 긋는다. */
 #sheet .x{position:absolute;top:9px;right:10px;padding:7px;line-height:0;
        cursor:pointer;user-select:none}
 #sheet .x svg{width:17px;height:17px;display:block}
@@ -357,10 +270,6 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
        fill:none;opacity:.75}
 #sheet .x:hover svg path{opacity:1}
 #sheet .note{margin:0 0 14px;color:var(--dim);font-size:12.5px}
-/* ★ 사용방법 — **보는 설명서** (2026-09-28 사장님이 시안을 고르셨다).
-   흰 바탕에 글만 있어 메모장 같았다. 회색 바탕 위 대목마다 흰 카드, 실제 화면
-   조각(앱의 배지·꼬리표·수량 단추를 그대로), 글자 15px, 한 줄에 한 가지.
-   머리(제목·칩)는 고정이고 몸통만 스크롤한다 — 칩을 누르면 그 대목으로 간다. */
 #sheet .box.hbox{display:flex;flex-direction:column;overflow:hidden;padding:0;background:var(--bg);
      height:calc(100% - 24px);height:calc(100dvh - 24px)}
 .hbox .hh{flex:none;background:var(--card);padding:14px 16px 10px;border-bottom:1px solid var(--line)}
@@ -414,8 +323,6 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 #impbox{display:block;width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);
      border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:14px;
      line-height:1.5;resize:vertical}
-/* ★ 필요한 자리에 뜨는 도움말 말풍선 (2026-09-28 사장님). 가리는 창이 아니라
-   그 단추를 가리키는 작은 풍선이다. 아무 데나 누르면 닫힌다. */
 .tip{position:absolute;z-index:45;padding:10px 12px;border-radius:12px;background:#1f2937;
      color:#fff;font-size:13px;line-height:1.5;box-shadow:0 6px 18px rgba(0,0,0,.18);
      border:1px solid rgba(255,255,255,.12);animation:tipin .2s ease}
@@ -433,12 +340,8 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 #sheet .ico svg{width:20px;height:20px;display:block}
 #sheet .ico svg path{fill:none;stroke:var(--dim);stroke-width:1.7}
 #sheet .ico.on svg path{fill:#ca210c;stroke:#ca210c}
-/* 세 줄의 글자가 같은 자리에서 시작해야 눈이 편하다. 값 넣는 줄에는
-   원화 표시를 같은 크기의 칸에 넣어 자리를 맞춘다. */
 #sheet .ico.won{font-size:15.5px;font-weight:800;color:var(--dim);
        line-height:20px;text-align:center}
-/* 공유는 글자 기호를 쓴다. 색 이모지(📤)는 폰마다 그림이 달라 다른 줄의
-   회색 아이콘과 따로 논다. 같은 굵기·같은 회색으로 맞춘다. */
 #sheet .ico.share{font-size:16px;font-weight:700;color:var(--dim);
        line-height:20px;text-align:center}
 #sheet button.same{background:var(--good-bg);border-color:transparent;color:var(--good);font-weight:700}
@@ -460,23 +363,14 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 .pricebox input{flex:1;min-width:0;padding:13px;border:1px solid var(--line);
      border-radius:11px;background:var(--bg);font-size:16px;text-align:center}
 .pricebox input:focus{outline:2px solid var(--accent);outline-offset:-1px}
-/* ★ 아이폰 사파리는 글자가 16px 보다 작은 입력칸에 커서가 들어가면 화면을
-   **저절로 확대하고 안 돌아온다**(2026-09-28 사장님이 잡으셨다). 본문이 15px 라
-   입력칸도 15px 였다. 손가락 화면에서만 16px 로 — PC 는 그대로다.
-   `maximum-scale=1` 로 막으면 안드로이드·카톡 안 브라우저에서 손가락 확대까지 막힌다. */
 @media (pointer:coarse){#q,.pricebox input,#pin,#impbox{font-size:16px}}
 .pricebox label{flex:0 0 74px}
 .tag-mine{background:var(--accent);border-color:var(--accent);color:#fff}
-/* 면세는 아무나 못 사는 값이다. 눈에 띄어야 한다. */
 .tag-df{background:#fff3cd;border-color:#e0b400;color:#7a5c00;font-weight:600}
 @media(prefers-color-scheme:dark){
   :root:not([data-theme="light"]) .tag-df{background:#4a3a00;border-color:#8a6d00;color:#ffe08a}
 }
 [data-theme="dark"] .tag-df{background:#4a3a00;border-color:#8a6d00;color:#ffe08a}
-/* ★ 앱 안 브라우저 안내 — 아래 띠 (2026-09-27 사장님 지시).
-   전에는 머리 바로 아래 **빨간 상자**였다. 공유받은 상품 하나 보려고 들어온
-   사람이 오류처럼 보이는 경고부터 읽었고, 첫마디가 `쓰지 마세요` 였다.
-   이제는 상품이 먼저 보이고, 2.5초 뒤 아래에 사이트 색 띠가 올라온다. */
 #inbar{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));
      z-index:40;max-width:560px;margin:0 auto;display:flex;align-items:center;gap:10px;
      padding:11px 8px 11px 14px;border-radius:14px;background:var(--card);
@@ -490,15 +384,11 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
      color:#fff;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap}
 #inbar .x{flex:none;width:30px;height:30px;border:0;background:transparent;color:var(--dim);
      font-size:14px;cursor:pointer;border-radius:8px}
-/* 짧게 알리고 사라지는 한 줄 (찜을 옮겨 왔을 때 등) */
 #toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));z-index:60;
      max-width:calc(100% - 32px);padding:10px 16px;border-radius:12px;background:var(--ink);
      color:var(--bg);font-size:13px;line-height:1.5;opacity:0;pointer-events:none;
      transform:translate(-50%,30px);transition:opacity .2s,transform .2s}
 #toast.on{opacity:1;transform:translate(-50%,0)}
-/* ★ 홈 화면 추가 안내 — 브라우저 메뉴 자리를 **화살표로** 가리킨다 (2026-09-27).
-   글만으로는 나이 드신 분이 메뉴를 못 찾는다. 화면 가장자리의 실제 단추 쪽을
-   가리키고, 가운데 카드에 순서를 적는다. */
 #guide{position:fixed;inset:0;z-index:70;display:none;background:rgba(0,0,0,.55);
        align-items:center;justify-content:center;padding:16px;overscroll-behavior:contain}
 #guide.on{display:flex}
@@ -515,8 +405,6 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 #guide .gchip{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;margin:0 1px;
        border:1px solid var(--line);border-radius:7px;background:var(--bg);font-weight:700;
        white-space:nowrap}
-/* ★ 꼭 해야 하는 단계는 빨갛게 (2026-09-28). 아이폰 iOS 26 의 '웹 앱으로 열기'
-   를 켠 채 추가하면 사파리와 찜이 따로 저장된다 — 사장님 폰에서 실제로 났다. */
 #guide li.gwarn{margin:2px -6px 14px;padding:10px 10px 10px 42px;border:2px solid var(--bad);
   border-radius:11px;background:var(--bad-bg);color:var(--bad);font-weight:700}
 #guide li.gwarn::before{left:9px;top:11px;background:var(--bad);color:#fff}
@@ -527,7 +415,6 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
        color:#fff;font-weight:700;font-size:14px;cursor:pointer}
 #guide .gx{position:absolute;top:10px;right:10px;width:30px;height:30px;border:0;
        background:transparent;color:var(--dim);font-size:15px;cursor:pointer}
-/* 화살표 — 실제 브라우저 단추가 있는 가장자리를 가리킨다 */
 #guide .garrow{position:fixed;width:0;height:0;border:16px solid transparent}
 #guide.at-top-right .garrow{top:6px;right:14px;border-bottom-color:#fff;border-top:0;
        animation:gup 1s ease-in-out infinite}
@@ -538,24 +425,17 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 @keyframes gup{50%{transform:translateY(-8px)}}
 @keyframes gdn{50%{transform:translateY(8px)}}
 @media (prefers-reduced-motion:reduce){#guide .garrow{animation:none}}
-/* 메뉴 창의 선 그림 아이콘 — 초록 단추 위에서는 흰색 */
 #sheet button.go .ico svg path{stroke:#fff}
 #cartbar{display:none;gap:6px;padding:8px 12px 0}
 #cartbar button{flex:1;min-width:0;padding:8px 4px;border:1px solid var(--line);border-radius:9px;
      background:var(--card);font-size:13px;letter-spacing:-.3px;white-space:nowrap;cursor:pointer}
 #cartbar .qh{flex:none;width:36px;padding:8px 0;font-weight:700;color:var(--dim)}
-/* ★ 찜을 장바구니처럼 (2026-09-28 사장님). 합계 띠 · 수량 · 샀어요. */
-/* 합계는 **화면 아래에 붙은 한 줄**이다 (2026-09-28 사장님). 쇼핑몰 장바구니처럼
-   어디까지 내려도 보이고, 목록을 덜 가리게 한 줄로만. 자세한 것은 눌러서 본다. */
 #cartsum{display:none;position:fixed;left:0;right:0;bottom:0;z-index:35;
      align-items:center;justify-content:space-between;gap:12px;
      padding:11px 18px calc(11px + env(safe-area-inset-bottom));
      border-radius:16px 16px 0 0;background:#0b7a4b;color:#fff;cursor:pointer;
      font-variant-numeric:tabular-nums;white-space:nowrap}
 html.cart-on #cartsum{display:flex}
-/* ★ 배달앱 주문 띠처럼 **통 초록 · 위만 둥글게** (2026-09-28 사장님이 B-2 로 고르심).
-   높이 58px(홈 막대 자리 빼고) — 처음 49px 와 두 번째 68px 의 중간.
-   왼쪽 `3개 · 쿠팡보다 / 1,427원 아껴요`, 오른쪽 총금액. 초록은 밝게/어둡게 같은 색. */
 #cartsum .l{min-width:0;overflow:hidden;text-overflow:ellipsis;line-height:1.35}
 #cartsum .l small{display:block;font-size:12px;opacity:.85}
 #cartsum .l b{display:block;font-size:14.5px;font-weight:700}
@@ -563,7 +443,6 @@ html.cart-on #cartsum{display:flex}
 #cartsum .tot{flex:none;font-size:22px;font-weight:700;letter-spacing:-.3px;line-height:1.2}
 #cartsum .tot small{font-size:12px;font-weight:500;opacity:.85;margin-right:4px}
 #cartsum .tot i{font-style:normal;font-size:15px;font-weight:400;opacity:.8;margin-left:3px}
-/* 띠에 맨 아래 카드가 가리지 않게 · 아래에 뜨는 것들은 띠 위로 */
 html.cart-on body{padding-bottom:calc(66px + env(safe-area-inset-bottom))}
 html.cart-on #inbar{bottom:calc(66px + env(safe-area-inset-bottom))}
 html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
@@ -585,29 +464,14 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
 .gal .cq .qb{width:28px;height:28px}
 .gal .cq .got{padding:0 7px}
 .tag-qty{background:var(--accent);color:#fff}
-/* 카드에서 바로 눌러 쓰는 것 둘. 담겼는지는 별이 차 있는지로 안다. */
 .item{position:relative;-webkit-touch-callout:none;user-select:none}
-/* 찜하기는 하트다. 이모지(★)는 글꼴에 따라 기울어 보여서 직접 그린다.
-   빈 하트는 테두리만, 담으면 쿠팡 빨강으로 채운다. */
 .item .cart{position:absolute;top:5px;right:7px;padding:3px;cursor:pointer;
      line-height:0}
 .item .cart svg{width:22px;height:22px;display:block}
 .item .cart svg path{fill:none;stroke:var(--dim);stroke-width:1.7;opacity:.6}
 .item .cart.on svg path{fill:#ca210c;stroke:#ca210c;opacity:1}
-/* 쿠팡 앱 아이콘을 동그랗게 다듬어 넣었다. 글자로 적어 두었더니 눌린
-   단추처럼 보여서 오해를 샀다. 그림은 페이지 안에 박아 두어 따로 받아
-   오지 않는다(2KB 남짓). 카드와 고르기 메뉴가 같은 그림을 쓴다. */
 .cpg-img{background-size:cover;border-radius:50%;
      background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAK7UlEQVR4nO1bC3BVxRn+ds8593Jzk1yS8DKEQCAmyKOCQitTUfGBBV8gCJVpsTijtEytOsNI0bYWHWFUEC2UUawySrWFUauoQ9ECdUQBMbxfAcIjBMSEkOQ+ktx7Xp1/79lwiLlJkIfcpN8QkrNnd8///fv//9k9+y/DeQIDGGdQTBuGLFMY1F4a79tb4/0LvXxwoUe5Kp2zjFyNFfg5S7cBW7aNWHawVLf3BS27qjhmbi6OWlsO6tauw7q1t3Gflg1Ttj0Pcp8bSHgGcAsw6ZoDSn+v8uMb/MqYYT51VK7GCzwM3u/Td8xGtFS39q2vM1b+N2K+vytqfuV+jg1Y56oIdi6NaTTk6GQqrOttqdrkUanqL/M9fKC7niX+CUGZS2lnPJuIuMiIulzwPI0DMWvHyrCx9OOw/uYp0/62sQwXTQEc4FLgDIV1GZ+uTRuXpv2alCDJkJkyBt4U2dZCPsO2YZF7yX6I/Lsh/eV3gvqiKtMul89wFH1WYGfbwK3xO9O0+6dmeJ7urLBsuqZyIt145M4XiCApg2Sg6wrTPv5KVeyPK0L6641luyAKUJwHkF9Pz/L+5RqfciuVU5l7hC40pIVJRWyoM1fNrYz+juLF2SqBtbJSg4nd7FcnzOjkXRTgLOtiE29OETWWXfnsyei0/0SM5W4XbakPdjbkH83yzr83XXuEyikaUyTGJQC3LP8I6i/Or4w+2lolsNa+4h7v5F08Jk17gP6msh9q1BPBIWuRIt4P6a/OPhl9sDWvSrUVI99A3rChqwwaLkE48iokI8lKZY4SREBOpASeqDPybTJ7SZ78/VIl7wbJSLKSzCQ7cWguTvEmC50pLfm8HHkZcZMBJKu0BOIgg3WrFMARJ3+TXx1PAS/ZyDdWAnEgLkIJTQRt5r4gfyGTydF4nzeyfZv8nAXOZSb3Q0O+BSKWXXPf8bqhZbpVIjkmsgBGFWZmeV9J4yyD+khW8gRHdpu4ECcnIDYe9DjIPCji02JmqE+5KZHJJBukSxMn4tZ4/sKc/4SZk6b+mZOykxY4TuMLMqe/2JAmTwunn5fVDghZdpV0D043nMmONSGgPZSlsG5i9dVGyBPErNCGRdyII3ElziDu0sc7Kqzz8pyU3emcZYobSez7TUFOhIKWfWpCWW2/atOuoGtOrwu6eVuqOpkWOGId38bIE8Ss1oZJHIkrcVYYVE6FGoPnjjRtChXSeh5tFMSNOBJX4mzZMIXvF3iUQXka7+cEhTarALlCJK7E2YovnoARfuVu+k2BAm0ckqPkzMkUrvWpt9NFWzZ/CcmROGsMHp6j8vwcjedTYVs2fwnJkTjnqDyf04YFfbf/Pl9UkxXElTgXevlgtY/GBzjlCb+aeLrnIn3YcFEj+MVaxE4cF+VqZicErr0RvEMHhIo2oL5knyj3DxoCM1iD+oP7xbXWqQt8Bf0Q2rgOvr79Yes6GOfwX3m1qBPa9CXoWzL3doCv4Ar4BwyCbZqoXvNv6OUnwBQFqUOGIVp6GL78QniycxDe/BXq9u8R7WBZ8ObkIu2a4eKFF1y3FrZtIXXQUFStWtEUJcG1j8YHsAXdfJ/8xKfc4kTE77hA5h33IG/OAhjB6jiZzt2w/4EJiB07isK3PwZjDGYkAk92d5TOegzlf38Vg4sOI/jlZyh56D7RJmvsveg9bzG2DMlDr9kLELj+ZugV5XHBc3uhYtkbODzzt+h482j0nrsY9UdKoKQFoAYysO/+u1G7cxsGfVUiFGFUVYJ5PNC6XIYjf3hYtM28Yzzynl0Eo/qUeB61NU5VInasFHsnjW7SAojrxjrzUx5wZn6J0Hvuywhv3oht1/bD9usG4ti8WaLjXs+8BCsSwbbr+mP79QNQ+f4y9HzqBfAUP6z6ukb6ts/4sQ0DxZNGYfsN1N9T6DzxPjGy1atXYve4G3Fo+lQUT7oN9SXFyP3T87BNA9zrRW3xLuwYOVTIElr/GXo8MUdYTc9ZLyD89XpsHz4A24f3R3jTF1DSA02SdyPAWSbvobHL6SLR7I9pHtR8vkaMFgn/zcvzUbd/Lzr0KUB4y0ZYtbWiHpkrQU0PwNYNYeKnO3GWW7DBfT5ED5cgWlYqbsm+lY6ZSOn3IxQs+Rf6LvtEWJc3L18Qp7ZM0xDa8DlsPSbkIAtTUtPAU1JEn7HyE0JR5Dqx48eEWzJP01uSkmsPjV2u0i5tcwog4egDIVNUIQQ9RAwqKYQEU2hlyeKEqYzAOWxDF78Zc/52K4MswbnH1PjHJvrda84CmOEg9tw9AkzVcPnflsfvO5ZDox1XJMBIMbQpE6zB0dlPoOesefD1LhD7aKmDh+LYS7PjympGAX7O0sU6oNm5P+fw9shztGsgpf+ViB45CCscgje7h9A4wZubJ+padbWCsNatu1AIzTu8OT1PK07XoXbq0nBP69w1rrBoPbzdc1G16kPoJ8tF3drd25F69TXxdoYJ2zLjyiAYcXmIsFFZgdg3ZQgVrRe+X/rn6Yjs2IyWYAN2i9/6vl2yCF2nTGsQtONNo1Dy8BQcfe5J5P91KQrf+ghG5Ulk3j4OlSuWw6ipRsVbr6HHE7NR+OYH4jpz1Jj4iHu8sGoj8HTLxhXvrkH0SAmy7pqI2j07EN5WhIrlS3HZ1EegBjoKYpmjx6L+cEl89pKSAiXFf3pc/KnCKhV/KnrNWSjKtKzOQk6K/uGtm3Bi8YsNA5QIaksrv9KnZyBctAEZP7uL7B4Hpv0C1Z9+JDre96uxIgJzXwoOPfYbnHzvbUH0xGsLEDtxDBm33iki8/4HJ8I/8CqYoRqomVmo3bUNlR8sQ/qw64Spli99VYxs2fNPisAXuGGkGNFDM6aBezxCjrK5sxDZ+nWDXDVrV4lgSxZ1dPbj0LplC2UQTI8X3R+eCSUtHWXPPZmQGyPVru3pr5HZGk0qQ/psa8tbQN9lq0S82HPPLbiQKHj9HXguy8HOUXEXckNyjVh2kB/VbTFbSbh9ZNsi0IkgKH6UBOVqQ4AiNG4jIzLXPMJiRLnHe2Y7EVRP9+d+nqjnfrOQS1GZ+1lOf+k/HYHA9SNxfNG8pik5XI/q9n7aVY3PHppBIj9qzr++c895Q5Q+M1NYgAiK7qAmGtkNwfK7/TUqd4LoGc9y+qvdtRXFk+8Ss9bmUGPZp/jeqFkkn4ELCYcoxRMx9XWVne9nGNVVLZEXFfdGzSJeols7ncI29xmsGQiuJbq1k1M6GmVjtYelsARxJc7FUWsLLzOsA2W6dYButIclseRInMsM6wDXbcTW1RkftbdPYsRZtxETZr82Yr7X3j6JSc6c/GFfzNx6SLd2f99cu2SBsyPEiCtx5sSfEgfIFD4M6UvoZlt2A+JGHImrMH8GhYvkRoB9HDbepFQzKjxficiXEsSeB4NCHIkrcTZpB9yZF3PaOV0e1BfKLSS0McgtP+LopNdK7v/fHodj8ozMY+Gp6O/ldjLaCOR2P3EjjsRVujmXlWTmBKWjb6ozV4uDCU5ufjKDOBAX4kTcZCaMvM8b1bfpVTGnMjqVsijcmkpGSMsmLsTJdW4BTSrAclJNKZtKZllSpExGJZDMTp4TJy5OhphI/nTX44lMZnXEeIcSj2XmJZIMMrOVOBCXRC7NWjoA5U6VTZaESSmrTJpu7qAVa02afDIkS0tIGV0Z482mzbP2ni7PWuq4XR+YkGjXR2bcaLeHptxo18fmJNr1wUk32u3RWTfa9eFpnNlRUh6f/x+vkIUkBhXsAgAAAABJRU5ErkJggg==)}
-/* 카드에서는 쿠팡 마크 대신 '밖으로 나간다' 는 화살표를 쓴다.
- *
- * 붉은 동그라미는 옆의 하트와 붙어서 '이미 찜했나' 하고 오인하게 됐고,
- * 회색으로 바꿔도 꽉 찬 원이라 목록을 훑을 때 자꾸 눈에 걸렸다.
- * 하트와 같은 얇은 선으로 그리니 둘이 한 짝으로 묶여 조용해진다.
- * 어디로 가는지는 카드 안의 '쿠팡 5,900원' 이 말해 준다.
- *
- * 고르기 메뉴 안(.ico.cpg-img)에서는 원래 쿠팡 마크를 그대로 쓴다.
- * 거기는 하트와 붙어 있지 않고, 무엇인지 분명한 편이 낫다. */
 .item .cpg{position:absolute;top:7px;right:43px;line-height:0;padding:3px;
      cursor:pointer}
 .item .cpg svg{width:19px;height:19px;display:block}
@@ -616,63 +480,32 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
 .item .cpg:active svg path{opacity:1;stroke:var(--accent)}
 .item .nm{padding-right:77px}
 
-/* ---------- 갤러리 보기 ----------
- *
- * 목록과 **똑같은 카드**(`card()`)를 쓴다. 겉모양만 CSS 로 갈아입힌다.
- * 그래서 누르기·길게 누르기·찜·쿠팡 가기·값 넣기가 두 벌로 갈라지지 않는다.
- * 새 그리기 함수를 만들면 한쪽만 고치는 일이 반드시 생긴다.
- */
 #list.gal{grid-template-columns:1fr 1fr;gap:10px;padding:10px 10px 28px}
 @media(min-width:720px){#list.gal{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:1100px){#list.gal{grid-template-columns:repeat(4,1fr)}}
 .gal .item{display:block;padding:0;overflow:hidden}
 .gal .left{flex:none}
-/* 사진은 정사각 자리를 잡는다. 상품 사진 바탕이 흰색이라 어두운 쪽에서도 흰 판이다. */
 .gal .thumb{width:100%;height:auto;aspect-ratio:1/1;border-radius:0;
      background:#fff;padding:7%;cursor:zoom-in}
 .gal .body{padding:8px 9px 10px}
-/* 이름은 늘 두 줄 자리를 잡는다. 한 줄짜리가 섞이면 칸 높이가 들쭉날쭉해진다. */
 .gal .nm{font-size:13.5px;line-height:1.35;min-height:2.7em;padding-right:0;
      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .gal .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* 값 칸은 두 줄 두 칸이다. 왼쪽에 군마트가·쿠팡가, 오른쪽에 할인율·차액.
- *
- * 할인율을 한때 사진 왼쪽 위에 얹었다. 사진 위에 떠 있으니 '이 사진의
- * 무엇' 인지 아리송하고, 비교할 값과 멀리 떨어져 눈이 두 번 움직였다.
- * 목록에서처럼 값 바로 오른쪽에 두면 세 숫자가 한 덩이로 읽힌다.
- *
- * 쿠팡가 자리는 값이 없어도 비워 둔다. 값을 넣어도 칸이 안 커져야 한다. */
 .gal .pr{display:grid;grid-template-columns:minmax(0,1fr) auto;
      grid-template-areas:"g side" "c side";column-gap:5px;margin-top:5px}
 .gal .pr .g{grid-area:g;font-size:15px}
 .gal .pr .c{grid-area:c;display:block;min-height:1.4em;
      white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gal .side{grid-area:side;margin:0}
-/* 좁은 칸에 세 덩이가 들어가므로 목록보다 한 치수 작게. '비교군 없음' 처럼
-   긴 이름표가 값을 밀어내지 않을 만큼이 이 크기다. */
 .gal .badge{font-size:11.5px;padding:3px 6px}
 .gal .gap{font-size:11.5px;margin-top:2px}
 .gal .tags{display:none}
-/* 숫자는 접지 않는다. `172,860원` 이 `172,86 / 0원` 으로 갈라져 값을
-   잘못 읽게 됐다. 접혀도 되는 건 이름표뿐이다. */
 .gal .pr .g,.gal .gap{white-space:nowrap}
 .gal .side,.gal .badge{white-space:normal;word-break:keep-all}
-/* **'비교군 없음' 만 예전 자리(사진 왼쪽 위)에 남긴다.**
- *
- * 이름표가 다섯 글자라 여섯 자리 값(`172,860원`)과 한 줄에 못 선다. 글자를
- * 줄여도 좁은 폰에서는 둘 중 하나가 잘렸다. 그런데 이 줄은 **비교할 값이
- * 아예 없는 줄**이다. 쿠팡가도 차액도 비어 있으니 값 옆에 붙어 있을 까닭이
- * 없다. 사진 위로 되돌려 보내면 다툴 일이 사라진다.
- *
- * `아직` 은 짧아서 제자리에 둔다. 값이 들어오면 그 자리에 할인율이 앉는다.
- * `:has` 를 못 읽는 낡은 브라우저에서는 그냥 값 옆에 남는다(잘릴 뿐 안 깨진다). */
 .gal .side:has(.b-nm){position:absolute;left:7px;top:7px;margin:0;text-align:left}
-/* 아주 좁은 폰에서는 `쿠팡 61,500원` 과 `+20,180원` 이 한 줄에 안 들어간다. */
 @media(max-width:340px){
   .gal .pr .c,.gal .gap{font-size:11px}
 }
-/* 하트와 화살표는 목록과 **같은 자리**(오른쪽 위)다. 사진 위에 얹히므로
-   색이 진한 사진에서도 보이도록 바탕을 깐다. 둘 사이는 목록과 같은 12px. */
 .gal .item .cart,.gal .item .cpg{width:30px;height:30px;border-radius:15px;padding:0;
      display:flex;align-items:center;justify-content:center;
      background:rgba(255,255,255,.93);box-shadow:0 1px 3px rgba(0,0,0,.16)}
@@ -685,18 +518,6 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
 
 <div id="wait"><div class="dot"></div><div>여는 중…</div></div>
 
-<div id="lock">
-  <div class="box">
-    <h1>&#128274;</h1>
-    <p>비밀번호를 입력하세요</p>
-    <input id="pw" type="password" inputmode="text" autocomplete="current-password"
-           placeholder="비밀번호" autofocus>
-    <button id="go">열기</button>
-    <label class="remember"><input id="keep" type="checkbox"> 이 기기에서 기억</label>
-    <div id="err"></div>
-  </div>
-</div>
-
 <div id="app" hidden>
   <header>
     <div class="top">
@@ -704,9 +525,7 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
       <button class="iconbtn" id="mode" title="보기 바꾸기"><em id="modelb"></em></button>
       <button class="iconbtn" id="cartbtn" title="찜한 것"><span id="cartn"></span><em>찜</em></button>
       <button class="iconbtn" id="theme" title="밝게/어둡게">◐<em id="themelb"></em></button>
-      <!-- 메뉴는 **맨 오른쪽**이다 (사장님 결정). 자주 쓰는 것이 왼쪽,
-           가끔 여는 것이 오른쪽 끝. -->
-      <button class="iconbtn" id="more" title="메뉴">⋯<em>메뉴</em></button>
+            <button class="iconbtn" id="more" title="메뉴">⋯<em>메뉴</em></button>
     </div>
     <div class="searchwrap">
       <span class="mag">🔍</span>
@@ -730,10 +549,7 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
   </div>
   <div id="cartsum" role="button" aria-live="polite"></div>
 
-  <!-- 홈 화면에 추가 권유. 요약 세 칸 바로 위, 목록에 닿기 전에 한 번
-       보이는 자리다. 메뉴 안에 묻어 두면 아무도 못 찾는다.
-       이미 홈에서 열고 있거나 한 번 닫았으면 안 나온다. -->
-  <div id="addbar" hidden>
+    <div id="addbar" hidden>
     <img src="icons/icon-192.png" alt="">
     <div class="ab-t"><b>홈 화면에 추가</b><span>아이콘 하나로 바로 열려요</span></div>
     <button id="addgo">추가</button>
@@ -746,20 +562,11 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
     <div><b id="s3">–</b><span id="c3"></span></div>
   </div>
 
-  <!-- ★ 정렬 세 칸 (2026-09-25 사장님 결정).
-       위 요약 세 칸과 **같은 격자**다 — 너비·틈·여백을 그대로 쓰고 높이만 낮다.
-       자주 쓰는 둘은 붙박이 단추로 꺼내 두고, 나머지 다섯은 셋째 칸
-       드롭다운에 넣었다. 화살표(▾)도 셋째 칸에만 있다.
-
-       **붙박이(sticky)가 아니다.** 내려가면 같이 밀려 올라가서 상품이
-       한 줄이라도 더 보인다. -->
-  <div class="sortbar">
+    <div class="sortbar">
     <button class="sb on" data-k="rv">랭킹순</button>
     <button class="sb" data-k="gm_up">낮은 가격순</button>
     <span class="sb selwrap"><select id="sort" aria-label="그 밖의 줄 세우기"></select></span>
-    <!-- 거르기는 눈에 안 보이지만 그대로 쓴다. 찜 단추·빈 화면 안내·홈
-         단추가 이걸 건드려서, 없애면 셋이 같이 죽는다. -->
-    <select id="view" hidden></select>
+        <select id="view" hidden></select>
   </div>
 
   <div id="onlybar"><span id="onlytext"></span><span class="ob"><button id="onlytake" hidden>내 찜에 담기</button><button id="onlyall">전체 보기</button></span></div>
@@ -773,10 +580,8 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
 
 <div id="sheet"><div class="box" id="sheetbox"></div></div>
 
-<!-- 첫 화면 자료 — 구울 때 들어간다. `auto()` 가 먼저 읽는다 -->
 <script type="application/json" id="first">{"data":{"title":"PX 가격비교 — 군마트 vs 온라인","sorts":[["","직접 선택"],["gm_dn","높은 가격순"],["rate","할인율 높은 순"],["rate_up","할인율 낮은 순"],["mine","직접 입력한 것"]],"caps":["가격비교 완료","보통 이만큼 싸다","온라인보다 싼 것"],"wait":"아직","views":[["all","전부 보기"],["done","값 있는 것만"],["wait","아직 안 본 것"],["none","비교군 없음만"],["cart","찜한 것"],["mine","폰에서 넣은 것"]],"cp":"쿠팡","bigs":["식품","화장품","주류","생활용품","의류/잡화","기타"],"hint":"선크림, ㅅㅋㄹ, 닥터지…","foot":"자료 2026-09-29 기준 · 군마트 가격 출처 국군복지단\u003cbr>온라인 가격은 그날 쇼핑몰 화면에서\u003cbr>사람이 직접 확인해 적은 값입니다.\u003cbr>시세는 수시로 바뀌므로 참고용으로만 보세요.\u003cbr>개인이 참고하려고 만든 페이지입니다.\u003cbr>PX는 현역·군가족 등 자격이 있는 분만 이용할 수 있어요.\u003cbr>Contact leveragekorea@naver.com","stamp":"2026-09-29","src":"gunmart_20260917.csv","items":[{"no":801,"p":"28438","name":"서울우유협동조합 서울우유 병2.3L 2300ml","maker":"서울우유협동조합","spec":"2300ml","big":"식품","mid":"생수/음료/주류","sub":"우유·요거트·치즈","g":6180,"c":6980,"q":1,"rate":-11.5,"diff":-800,"conv":"","nm":0,"b":"쿠팡 검색 5위 · 같은 상품 1개 값 (9/27 기준)","rv":1601868,"hb":"서울우유협동조합 서울우유 병2.3l 2300ml 서울우유 병2.3l 서울우유협동조합 2300ml","hx":"28438 밀크 우유 요거트 치즈 ","a":"https://link.coupang.com/a/haWLCClRHU"},{"no":1143,"p":"35032","name":"광동제약 제주삼다수그린 500ml*20pet","maker":"광동제약(주)","spec":"500ml*20pet","big":"식품","mid":"생수/음료/주류","sub":"주스·음료","g":8190,"c":8900,"q":1,"rate":-8.0,"diff":-710,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 같은 상품 1개 값 (9/27 기준)","rv":1038679,"hb":"광동제약 제주삼다수그린 500ml*20pet 제주삼다수그린(500ml*20입) 광동제약(주) 500ml*20pet","hx":"35032  주스 음료 ","a":"https://link.coupang.com/a/haWMpMcQoe"},{"no":1245,"p":"3098","name":"농심 신라면 120G","maker":"(주)농심","spec":"120G","big":"식품","mid":"라면/즉석밥/통조림","sub":"라면","g":740,"c":747,"q":20,"rate":-0.9,"diff":-7,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 120g 20개 14,940원을 1개로 나눈 값 (9/27 기준)","rv":945334,"hb":"농심 신라면 120g 신라면 (주)농심 120g","hx":"3098 면 라면 ","a":"https://link.coupang.com/a/haWMDRQGrI"},{"no":130,"p":"27928","name":"맛있는오뚜기밥 210g","maker":"(주)오뚜기","spec":"210g","big":"식품","mid":"라면/즉석밥/통조림","sub":"즉석밥·간편식","g":870,"c":933,"q":24,"rate":-6.8,"diff":-63,"conv":"","nm":0,"b":"쿠팡 검색 3위 · 210g 24개 22,400원을 1개로 나눈 값 (9/27 기준)","rv":837628,"hb":"맛있는오뚜기밥 210g 맛있는오뚜기밥 (주)오뚜기 210g","hx":"27928  즉석밥 간편식 ","a":"https://link.coupang.com/a/haWJ5DnJka"},{"no":1141,"p":"37840","name":"스파클 먹는샘물 500ml*20","maker":"스파클주식회사","spec":"500ml*20","big":"식품","mid":"생수/음료/주류","sub":"주스·음료","g":3350,"c":4190,"q":1,"rate":-20.0,"diff":-840,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 같은 상품 1개(500ml 20개) 값 (9/27 기준)","rv":763497,"hb":"스파클 먹는샘물 500ml*20 스파클 먹는샘물 스파클주식회사 500ml*20","hx":"37840  주스 음료 ","a":"https://link.coupang.com/a/haWMpFXrFY"},{"no":1094,"p":"3030","name":"동서식품 맥심모카골드믹스 1.2KG","maker":"동서식품(주)","spec":"1.2KG","big":"식품","mid":"커피/차","sub":"커피","g":16510,"c":15250,"q":1,"rate":8.3,"diff":1260,"conv":"","nm":0,"b":"쿠팡 검색 2위 · 12g 160개입 24,400원을 1.2kg(100개)로 나눈 값 (9/27 기준)","rv":742919,"hb":"동서식품 맥심모카골드믹스 1.2kg 맥심모카골드믹스 동서식품(주) 1.2kg","hx":"3030  커피 ","a":"https://link.coupang.com/a/haWMhW59e8"},{"no":834,"p":"4666","name":"남양유업 맛있는 우유GT 900ml","maker":"남양유업(주)","spec":"900ml","big":"식품","mid":"생수/음료/주류","sub":"우유·요거트·치즈","g":2120,"c":2920,"q":1,"rate":-27.4,"diff":-800,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 같은 상품 1개 값 (9/27 기준)","rv":658330,"hb":"남양유업 맛있는 우유gt 900ml 맛있는 우유gt 남양유업(주) 900ml","hx":"4666 밀크 우유 요거트 치즈 ","a":"https://link.coupang.com/a/haWLF9Tsuy"},{"no":131,"p":"27930","name":"오뚜기 진라면 120g","maker":"(주)오뚜기","spec":"120g","big":"식품","mid":"라면/즉석밥/통조림","sub":"라면","g":620,"c":604,"q":40,"rate":2.6,"diff":16,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 120g 40개 24,150원을 1개로 나눈 값 (9/27 기준)","rv":567857,"hb":"오뚜기 진라면 120g 진라면(매운맛) (주)오뚜기 120g","hx":"27930 면 라면 ","a":"https://link.coupang.com/a/haWJ5Gr3iC"},{"no":2232,"p":"27484","name":"오뚜기 진라면 120g","maker":"(주)오뚜기","spec":"120g","big":"식품","mid":"라면/즉석밥/통조림","sub":"라면","g":540,"c":604,"q":40,"rate":-10.6,"diff":-64,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 120g 40개 24,150원을 1개로 나눈 값 (9/27 기준)","rv":567857,"hb":"오뚜기 진라면 120g 진라면(순한맛) (주)오뚜기 120g","hx":"27484 면 라면 ","a":"https://link.coupang.com/a/haWOQgI896"},{"no":1876,"p":"20502","name":"농심 육개장사발면 86g","maker":"(주)농심","spec":"86g","big":"식품","mid":"라면/즉석밥/통조림","sub":"라면","g":580,"c":867,"q":12,"rate":-33.1,"diff":-287,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 86g 12개 10,400원을 1개로 나눈 값 (9/27 기준)","rv":547665,"hb":"농심 육개장사발면 86g 육개장사발면 (주)농심 86g","hx":"20502  라면 ","a":"https://link.coupang.com/a/haWN3tRTRQ"},{"no":1286,"p":"2946","name":"농심 올리브짜파게티 140G","maker":"(주)농심","spec":"140G","big":"식품","mid":"라면/즉석밥/통조림","sub":"라면","g":940,"c":890,"q":40,"rate":5.6,"diff":50,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 140g 40개 35,590원을 1개로 나눈 값 (9/27 기준)","rv":535844,"hb":"농심 올리브짜파게티 140g 올리브짜파게티 (주)농심 140g","hx":"2946  라면 ","a":"https://link.coupang.com/a/haWMJBJgL6"},{"no":1138,"p":"3008","name":"농심 안성탕면 125G","maker":"(주)농심","spec":"125G","big":"식품","mid":"라면/즉석밥/통조림","sub":"라면","g":660,"c":700,"q":20,"rate":-5.7,"diff":-40,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 125g 20개 14,000원을 1개로 나눈 값 (9/27 기준)","rv":436336,"hb":"농심 안성탕면 125g 안성탕면 (주)농심 125g","hx":"3008  라면 ","a":"https://link.coupang.com/a/haWMnDShs4"},{"no":1145,"p":"33272","name":"한국청정음료 몽베스트 330ml","maker":"한국청정음료(주)","spec":"330ml","big":"식품","mid":"생수/음료/주류","sub":"주스·음료","g":180,"c":268,"q":40,"rate":-32.8,"diff":-88,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 330ml 40개 10,740원을 1개로 나눈 값 (9/27 기준)","rv":419628,"hb":"한국청정음료 몽베스트 330ml 몽베스트 330ml 한국청정음료(주) 330ml","hx":"33272  주스 음료 ","a":"https://link.coupang.com/a/haWMpSBJh6"},{"no":1144,"p":"35034","name":"광동제약 제주삼다수그린 2l*6pet","maker":"광동제약(주)","spec":"2l*6pet","big":"식품","mid":"생수/음료/주류","sub":"주스·음료","g":5650,"c":6920,"q":1,"rate":-18.4,"diff":-1270,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 같은 상품 1개 값 (9/27 기준)","rv":406749,"hb":"광동제약 제주삼다수그린 2l*6pet 제주삼다수그린(2l*6입) 광동제약(주) 2l*6pet","hx":"35034  주스 음료 ","a":"https://link.coupang.com/a/haWMpPkcX6"},{"no":794,"p":"2972","name":"동원에프앤비 참치살코기 150g","maker":"(주)동원에프앤비","spec":"150g","big":"식품","mid":"오일/소스/양념","sub":"통조림·햄","g":2290,"c":2186,"q":12,"rate":4.8,"diff":104,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 150g 12개 26,230원을 1개로 나눈 값 (9/27 기준)","rv":376723,"hb":"동원에프앤비 참치살코기 150g 참치살코기 (주)동원에프앤비 150g","hx":"2972  통조림 햄 ","a":"https://link.coupang.com/a/haWLAsENrw"},{"no":1341,"p":"3118","name":"동원에프앤비 라이트스텐다드 100g","maker":"(주)동원에프앤비","spec":"100G","big":"식품","mid":"라면/즉석밥/통조림","sub":"통조림·햄","g":1770,"c":2007,"q":10,"rate":-11.8,"diff":-237,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 100g 10개 20,070원을 1개로 나눈 값 (9/27 기준)","rv":376723,"hb":"동원에프앤비 라이트스텐다드 100g 라이트스텐다드 100g (주)동원에프앤비 100g","hx":"3118  통조림 햄 ","a":"https://link.coupang.com/a/haWMRq7lcq"},{"no":1882,"p":"20476","name":"동서식품 맥심화이트골드커피믹스 2.106kg","maker":"동서식품(주)","spec":"2.106kg","big":"식품","mid":"커피/차","sub":"커피","g":26670,"c":28120,"q":1,"rate":-5.2,"diff":-1450,"conv":"","nm":0,"rv":368141,"hb":"동서식품 맥심화이트골드커피믹스 2.106kg 맥심화이트골드커피믹스 동서식품(주) 2.106kg","hx":"20476 coffee 커피 ","a":"https://link.coupang.com/a/haWN5GGyyW"},{"no":2015,"p":"4776","name":"롯데칠성음료 칠성사이다 250ML","maker":"롯데칠성음료(주)","spec":"250ML","big":"식품","mid":"생수/음료/주류","sub":"탄산음료","g":690,"c":875,"q":30,"rate":-21.1,"diff":-185,"conv":"","nm":0,"b":"쿠팡 검색 5위 · 250ml 30개 배송비 포함 26,240원을 1개로 나눈 값 (9/27 기준)","rv":345440,"hb":"롯데칠성음료 칠성사이다 250ml 칠성사이다(캔) 롯데칠성음료(주) 250ml","hx":"4776  탄산음료 ","a":"https://link.coupang.com/a/haWOmyOhYi"},{"no":2046,"p":"4744","name":"코카콜라음료 코카콜라 250ML","maker":"코카콜라음료(주)","spec":"250ML","big":"식품","mid":"생수/음료/주류","sub":"탄산음료","g":710,"c":935,"q":30,"rate":-24.1,"diff":-225,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 250ml 30개 배송비 포함 28,040원을 1개로 나눈 값 (9/27 기준)","rv":325223,"hb":"코카콜라음료 코카콜라 250ml 코카콜라 코카콜라음료(주) 250ml","hx":"4744  탄산음료 ","a":"https://link.coupang.com/a/haWOrz4mzs"},{"no":783,"p":"32042","name":"서울우유협동조합 목장의 신선함이 살아있는 우유 1000ml","maker":"서울우유협동조합","spec":"1000ml","big":"식품","mid":"생수/음료/주류","sub":"우유·요거트·치즈","g":2690,"c":3540,"q":1,"rate":-24.0,"diff":-850,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 같은 상품 1개 값 (9/27 기준)","rv":314728,"hb":"서울우유협동조합 목장의 신선함이 살아있는 우유 1000ml 목장의 신선함이 살아있는 우유 서울우유협동조합 1000ml","hx":"32042 밀크 우유 요거트 치즈 ","a":"https://link.coupang.com/a/haWLzT9CFg"},{"no":2060,"p":"28976","name":"웅진식품 하늘보리 1500ml","maker":"웅진식품(주)","spec":"1500ml","big":"식품","mid":"생수/음료/주류","sub":"주스·음료","g":830,"c":1260,"q":12,"rate":-34.1,"diff":-430,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 1.5L 12개 15,120원을 1개로 나눈 값 (9/27 기준)","rv":314713,"hb":"웅진식품 하늘보리 1500ml 하늘보리 웅진식품(주) 1500ml","hx":"28976  주스 음료 ","a":"https://link.coupang.com/a/haWOsfNoGW"},{"no":1962,"p":"5102","name":"웅진식품 하늘보리 500ml","maker":"웅진식품(주)","spec":"500ml","big":"식품","mid":"생수/음료/주류","sub":"주스·음료","g":720,"c":747,"q":20,"rate":-3.6,"diff":-27,"conv":"","nm":0,"b":"쿠팡 검색 3위 · 500ml 20개 14,940원을 1개로 나눈 값 (9/27 기준)","rv":314711,"hb":"웅진식품 하늘보리 500ml 하늘보리 웅진식품(주) 500ml","hx":"5102  주스 음료 ","a":"https://link.coupang.com/a/haWOgENsdw"},{"no":612,"p":"32266","name":"유한킴벌리 크리넥스데코&소프트 35m×24롤","maker":"유한킴벌리","spec":"35m×24롤","big":"생활용품","mid":"화장지/물티슈","sub":"휴지·티슈","g":19250,"c":20300,"q":1,"rate":-5.2,"diff":-1050,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 같은 상품 1개 값 (9/27 기준)","rv":300622,"hb":"유한킴벌리 크리넥스데코&소프트 35m×24롤 크리넥스데코&소프트 유한킴벌리 35m×24롤","hx":"32266  휴지 티슈 ","a":"https://link.coupang.com/a/haWLbbidXM"},{"no":1142,"p":"36424","name":"농심 백산수 500ml","maker":"(주)농심","spec":"500ml","big":"식품","mid":"생수/음료/주류","sub":"주스·음료","g":410,"c":382,"q":40,"rate":7.3,"diff":28,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 500ml 40개 15,260원을 1개로 나눈 값 (9/27 기준)","rv":299787,"hb":"농심 백산수 500ml 백산수(0.5l) (주)농심 500ml","hx":"36424  주스 음료 ","a":"https://link.coupang.com/a/haWMpIXmRU"},{"no":1287,"p":"2944","name":"농심 너구리 120G","maker":"(주)농심","spec":"120G","big":"식품","mid":"라면/즉석밥/통조림","sub":"라면","g":810,"c":795,"q":10,"rate":1.9,"diff":15,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 120g 10개 7,950원을 1개로 나눈 값 (9/27 기준)","rv":274044,"hb":"농심 너구리 120g 너구리(얼) (주)농심 120g","hx":"2944  라면 ","a":"https://link.coupang.com/a/haWMJEVfZk"},{"no":127,"p":"27918","name":"동서식품 맥심카누콜롬비아블랜드마일드로스트아메리카노 90g","maker":"동서식품(주)","spec":"90g","big":"식품","mid":"커피/차","sub":"커피","g":22290,"c":24260,"q":1,"rate":-8.1,"diff":-1970,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 10개입 10개(100개, 90g) 24,260원 값 (9/27 기준)","rv":269039,"hb":"동서식품 맥심카누콜롬비아블랜드마일드로스트아메리카노 90g 맥심카누콜롬비아블랜드마일드로스트아메리카노 동서식품(주) 90g","hx":"27918  커피 ","a":"https://link.coupang.com/a/haWJ5usu3o"},{"no":1140,"p":"36422","name":"농심 백산수 2000ml","maker":"(주)농심","spec":"2000ml","big":"식품","mid":"생수/음료/주류","sub":"주스·음료","g":950,"c":947,"q":24,"rate":0.3,"diff":3,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 2L 24개 배송비 포함 22,720원을 1개로 나눈 값 (9/27 기준)","rv":260968,"hb":"농심 백산수 2000ml 백산수(2.0l) (주)농심 2000ml","hx":"36422  주스 음료 ","a":"https://link.coupang.com/a/haWMnJjVoy"},{"no":23,"p":"31838","name":"농심켈로그 콘푸로스트 600g","maker":"농심켈로그(주)","spec":"600g","big":"식품","mid":"과자/초콜릿/디저트","sub":"시리얼","g":3670,"c":6460,"q":1,"rate":-43.2,"diff":-2790,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 같은 상품 1개 값 (9/27 기준)","rv":252442,"hb":"농심켈로그 콘푸로스트 600g 콘푸로스트 농심켈로그(주) 600g","hx":"31838  시리얼 ","a":"https://link.coupang.com/a/haWJQ3SwiO"},{"no":1148,"p":"32358","name":"한국청정음료 몽베스트 500ml","maker":"한국청정음료(주)","spec":"500ml","big":"식품","mid":"생수/음료/주류","sub":"주스·음료","g":250,"c":285,"q":40,"rate":-12.3,"diff":-35,"conv":"","nm":0,"b":"쿠팡 검색 3위 · 500ml 40개 11,390원을 1개로 나눈 값 (9/27 기준)","rv":246531,"hb":"한국청정음료 몽베스트 500ml 몽베스트 한국청정음료(주) 500ml","hx":"32358  주스 음료 ","a":"https://link.coupang.com/a/haWMp07Hb2"},{"no":727,"p":"37214","name":"매일유업 유기농 우유 200ml*6","maker":"매일유업(주)","spec":"200ml*6","big":"식품","mid":"생수/음료/주류","sub":"우유·요거트·치즈","g":5050,"c":5600,"q":4,"rate":-9.8,"diff":-550,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 200ml 24개 22,400원을 6개 묶음으로 나눈 값 (9/27 기준)","rv":243476,"hb":"매일유업 유기농 우유 200ml*6 유기농 우유 매일유업(주) 200ml*6","hx":"37214 밀크 우유 요거트 치즈 ","a":"https://link.coupang.com/a/haWLrLbegu"},{"no":789,"p":"31192","name":"매일유업 유기농 우유 125ml*4","maker":"매일유업(주)","spec":"125ml*4","big":"식품","mid":"생수/음료/주류","sub":"우유·요거트·치즈","g":2920,"c":5900,"q":1,"rate":-50.5,"diff":-2980,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 같은 상품 1개(125ml 4팩) 값 (9/27 기준)","rv":243453,"hb":"매일유업 유기농 우유 125ml*4 유기농 우유 매일유업(주) 125ml*4","hx":"31192 밀크 우유 요거트 치즈 ","a":"https://link.coupang.com/a/haWLAbUsLI"},{"no":1146,"p":"32354","name":"풀무원샘물 by Nature 0.5L 500ml","maker":"풀무원샘물(주)","spec":"500ml","big":"식품","mid":"생수/음료/주류","sub":"주스·음료","g":190,"c":208,"q":60,"rate":-8.7,"diff":-18,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 500ml 60개 12,480원을 1개로 나눈 값 (9/27 기준)","rv":242624,"hb":"풀무원샘물 by nature 0.5l 500ml 풀무원샘물 by nature 0.5l 풀무원샘물(주) 500ml","hx":"32354  주스 음료 ","a":"https://link.coupang.com/a/haWMpVNIvk"},{"no":206,"p":"3492","name":"오뚜기 토마토케찹500g","maker":"(주)오뚜기","spec":"500g","big":"식품","mid":"오일/소스/양념","sub":"양념·소스","g":2530,"c":2730,"q":2,"rate":-7.3,"diff":-200,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 500g 2개 5,460원을 1개로 나눈 값 (9/27 기준)","rv":238001,"hb":"오뚜기 토마토케찹500g 토마토케찹500g (주)오뚜기 500g","hx":"3492  양념 소스 ","a":"https://link.coupang.com/a/haWKgflUPI"},{"no":1619,"p":"36776","name":"씨제이제일제당 햇반 발아현미밥 210gx3ea","maker":"씨제이제일제당(주)","spec":"210gx3ea","big":"식품","mid":"라면/즉석밥/통조림","sub":"즉석밥·간편식","g":3300,"c":4950,"q":1,"rate":-33.3,"diff":-1650,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 같은 상품(210g 3개) 1개 값 (9/27 기준)","rv":232675,"hb":"씨제이제일제당 햇반 발아현미밥 210gx3ea 햇반 발아현미밥 씨제이제일제당(주) 210gx3ea","hx":"36776  즉석밥 간편식 ","a":"https://link.coupang.com/a/haWNtalD76"},{"no":2238,"p":"27556","name":"씨제이제일제당 햇반 130g","maker":"씨제이제일제당(주)","spec":"130g","big":"식품","mid":"라면/즉석밥/통조림","sub":"즉석밥·간편식","g":640,"c":803,"q":36,"rate":-20.3,"diff":-163,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 130g 36개 28,900원을 1개로 나눈 값 (9/27 기준)","rv":232652,"hb":"씨제이제일제당 햇반 130g 햇반 씨제이제일제당(주) 130g","hx":"27556  즉석밥 간편식 ","a":"https://link.coupang.com/a/haWOQyTHk4"},{"no":1861,"p":"31234","name":"동아오츠카 나랑드사이다 245ml","maker":"동아오츠카(주)","spec":"245ml","big":"식품","mid":"생수/음료/주류","sub":"탄산음료","g":410,"c":397,"q":30,"rate":3.3,"diff":13,"conv":"","nm":0,"b":"쿠팡 검색 3위 · 245ml 30개 11,900원을 1개로 나눈 값 (9/27 기준)","rv":231908,"hb":"동아오츠카 나랑드사이다 245ml 나랑드사이다(캔) 동아오츠카(주) 245ml","hx":"31234  탄산음료 ","a":"https://link.coupang.com/a/haWN2K1hjE"},{"no":121,"p":"27894","name":"오뚜기 양조식초 900ml","maker":"(주)오뚜기","spec":"900ml","big":"식품","mid":"오일/소스/양념","sub":"양념·소스","g":1390,"c":1730,"q":2,"rate":-19.7,"diff":-340,"conv":"","nm":0,"b":"쿠팡 검색 3위 · 900ml 2개 3,460원을 1개로 나눈 값 (9/27 기준)","rv":219621,"hb":"오뚜기 양조식초 900ml (영외)양조식초 (주)오뚜기 900ml","hx":"27894  양념 소스 ","a":"https://link.coupang.com/a/haWJ5beaZw"},{"no":2016,"p":"4724","name":"동아오츠카 포카리PET 1.5L","maker":"동아오츠카(주)","spec":"1.5L","big":"식품","mid":"생수/음료/주류","sub":"주스·음료","g":2280,"c":2643,"q":6,"rate":-13.7,"diff":-363,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 1.5L 6개 배송비 포함 15,860원을 1개로 나눈 값 (9/27 기준)","rv":216902,"hb":"동아오츠카 포카리pet 1.5l 포카리pet 동아오츠카(주) 1.5l","hx":"4724  주스 음료 ","a":"https://link.coupang.com/a/haWOmBVEya"},{"no":2261,"p":"29062","name":"동아오츠카 포카리스웨트500페트 500ml","maker":"동아오츠카(주)","spec":"500ml","big":"식품","mid":"생수/음료/주류","sub":"주스·음료","g":1300,"c":1210,"q":20,"rate":7.4,"diff":90,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 500ml 20개 24,190원을 1개로 나눈 값 (9/27 기준)","rv":216837,"hb":"동아오츠카 포카리스웨트500페트 500ml 포카리스웨트500페트 동아오츠카(주) 500ml","hx":"29062  주스 음료 ","a":"https://link.coupang.com/a/haWOVbw4o8"},{"no":713,"p":"37176","name":"남양유업 진짜고소한락토프리 900ml","maker":"남양유업(주)","spec":"900ml","big":"식품","mid":"생수/음료/주류","sub":"우유·요거트·치즈","g":2460,"c":2990,"q":2,"rate":-17.7,"diff":-530,"conv":"","nm":0,"rv":216133,"hb":"남양유업 진짜고소한락토프리 900ml 진짜고소한락토프리 남양유업(주) 900ml","hx":"37176  우유 요거트 치즈 ","a":"https://link.coupang.com/a/haWLpeILhQ"},{"no":1139,"p":"2976","name":"삼양식품 삼양라면 오리지널 120G","maker":"삼양식품(주)","spec":"120G","big":"식품","mid":"가공식품","sub":"라면","g":530,"c":579,"q":40,"rate":-8.5,"diff":-49,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 120g 40개 23,160원을 1개로 나눈 값 (9/27 기준)","rv":212436,"hb":"삼양식품 삼양라면 오리지널 120g 삼양라면 오리지널 삼양식품(주) 120g","hx":"2976 면 라면 ","a":"https://link.coupang.com/a/haWMnGcyOH"},{"no":145,"p":"27946","name":"사조산업 사조살코기참치안심따개 150g","maker":"사조산업(주)","spec":"150g","big":"식품","mid":"라면/즉석밥/통조림","sub":"통조림·햄","g":2320,"c":2027,"q":12,"rate":14.5,"diff":293,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 150g 12개 24,320원을 1개로 나눈 값 (9/27 기준)","rv":210063,"hb":"사조산업 사조살코기참치안심따개 150g 사조살코기참치안심따개(150g) 사조산업(주) 150g","hx":"27946  통조림 햄 ","a":"https://link.coupang.com/a/haWJ717LkO"},{"no":146,"p":"27948","name":"사조산업 사조살코기참치안심따개 100g","maker":"사조산업(주)","spec":"100g","big":"식품","mid":"라면/즉석밥/통조림","sub":"통조림·햄","g":1450,"c":1402,"q":24,"rate":3.4,"diff":48,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 100g 24개 33,660원을 1개로 나눈 값 (9/27 기준)","rv":210063,"hb":"사조산업 사조살코기참치안심따개 100g 사조살코기참치안심따개(100g) 사조산업(주) 100g","hx":"27948  통조림 햄 ","a":"https://link.coupang.com/a/haWJ75OkaO"},{"no":804,"p":"28464","name":"이롬황성주국산콩두유검은콩고칼슘 190ml","maker":"(주)이롬","spec":"190ml","big":"식품","mid":"생수/음료/주류","sub":"두유·두부","g":550,"c":486,"q":96,"rate":13.2,"diff":64,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 190ml 96개 46,650원을 1개로 나눈 값 (9/27 기준)","rv":204127,"hb":"이롬황성주국산콩두유검은콩고칼슘 190ml 이롬황성주국산콩두유검은콩고칼슘 (주)이롬 190ml","hx":"28464  두유 두부 ","a":"https://link.coupang.com/a/haWLCK9qJU"},{"no":1976,"p":"3106","name":"롯데칠성음료 레쓰비마일드 175ML","maker":"롯데칠성음료(주)","spec":"175ML","big":"식품","mid":"생수/음료/주류","sub":"커피","g":390,"c":363,"q":90,"rate":7.4,"diff":27,"conv":"","nm":0,"b":"쿠팡 검색 3위 · 175ml 90개 배송비 포함 32,700원을 1개로 나눈 값 (9/27 기준)","rv":202671,"hb":"롯데칠성음료 레쓰비마일드 175ml 레쓰비마일드 롯데칠성음료(주) 175ml","hx":"3106  커피 ","a":"https://link.coupang.com/a/haWOhlrGvI"},{"no":796,"p":"3088","name":"씨제이제일제당 하얀설탕 3KG","maker":"씨제이제일제당(주)","spec":"3KG","big":"식품","mid":"오일/소스/양념","sub":"양념·소스","g":5140,"c":5950,"q":2,"rate":-13.6,"diff":-810,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 3kg 2개 11,900원을 1개로 나눈 값 (9/27 기준)","rv":201024,"hb":"씨제이제일제당 하얀설탕 3kg 하얀설탕 씨제이제일제당(주) 3kg","hx":"3088  양념 소스 ","a":"https://link.coupang.com/a/haWLAzbzq0"},{"no":807,"p":"4580","name":"서울우유협동조합 서울우유 병1.8L","maker":"서울우유협동조합","spec":"1.8l","big":"식품","mid":"생수/음료/주류","sub":"우유·요거트·치즈","g":4920,"c":5970,"q":1,"rate":-17.6,"diff":-1050,"conv":"","nm":0,"b":"쿠팡 검색 결과 속 같은 상품 · 1.8L 1개 값 (9/27 기준)","rv":197130,"hb":"서울우유협동조합 서울우유 병1.8l 서울우유 병1.8l 서울우유협동조합 1.8l","hx":"4580 밀크 우유 요거트 치즈 ","a":"https://link.coupang.com/a/haWLCT4E0G"},{"no":1054,"p":"3930","name":"오뚜기 골드마요네즈 300g","maker":"(주)오뚜기","spec":"300g","big":"식품","mid":"오일/소스/양념","sub":"양념·소스","g":2900,"c":4010,"q":1,"rate":-27.7,"diff":-1110,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 같은 상품 1개 값 (9/27 기준)","rv":194584,"hb":"오뚜기 골드마요네즈 300g 골드마요네즈 (주)오뚜기 300g","hx":"3930  양념 소스 ","a":"https://link.coupang.com/a/haWMcrhQbc"},{"no":717,"p":"37178","name":"롯데웰푸드 파스퇴르 후레쉬우유 1800ml","maker":"롯데웰푸드(주)","spec":"1800ml","big":"식품","mid":"생수/음료/주류","sub":"우유·요거트·치즈","g":4990,"c":5745,"q":1,"rate":-13.1,"diff":-755,"conv":"환산 — 1.8L 가 없어 2.3L 를 환산. 180ml 10개들이(11,680)는 소포장이라 안 썼다","nm":0,"rv":190408,"hb":"롯데웰푸드 파스퇴르 후레쉬우유 1800ml 파스퇴르 후레쉬우유(1.8l) 롯데웰푸드(주) 1800ml","hx":"37178 밀크 우유 요거트 치즈 ","a":"https://link.coupang.com/a/haWLpruH8K"},{"no":1217,"p":"36082","name":"깨끗한나라 순수한면 제로 오버12P","maker":"깨끗한나라(주)","spec":"12p","big":"생활용품","mid":"생리대/성인기저귀","sub":"생리대·기저귀","g":2000,"c":3800,"q":1,"rate":-47.4,"diff":-1800,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 같은 상품 1개 값 (9/27 기준)","rv":189544,"hb":"깨끗한나라 순수한면 제로 오버12p 순수한면 제로 오버12p 깨끗한나라(주) 12p","hx":"36082  생리대 기저귀 ","a":"https://link.coupang.com/a/haWMyXLTl6"},{"no":473,"p":"37468","name":"유한킴벌리 좋은느낌 오리지널 수퍼롱 20 20개입","maker":"유한킴벌리","spec":"20개입","big":"생활용품","mid":"생리대/성인기저귀","sub":"생리대·기저귀","g":4950,"c":6110,"q":3,"rate":-19.0,"diff":-1160,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 슈퍼롱 20개입 3개 18,330원을 1개로 나눈 값 (9/27 기준)","rv":189044,"hb":"유한킴벌리 좋은느낌 오리지널 수퍼롱 20 20개입 좋은느낌 오리지널 수퍼롱 20 유한킴벌리 20개입","hx":"37468  생리대 기저귀 ","a":"https://link.coupang.com/a/haWKRkvvX2"},{"no":2067,"p":"4782","name":"매일유업 피크닉 사과 200ML","maker":"매일유업(주)","spec":"200ML","big":"식품","mid":"생수/음료/주류","sub":"주스·음료","g":310,"c":326,"q":48,"rate":-4.9,"diff":-16,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 200ml 48개 15,660원을 1개로 나눈 값 (9/27 기준)","rv":187415,"hb":"매일유업 피크닉 사과 200ml 피크닉 사과 매일유업(주) 200ml","hx":"4782  주스 음료 ","a":"https://link.coupang.com/a/haWOufCUbA"},{"no":1057,"p":"34600","name":"코코도르 퍼퓸 디퓨저_양재동꽃시장 200ml","maker":"코코도르(주)","spec":"200ml","big":"생활용품","mid":"모기퇴치/제습/탈취","sub":"생활잡화","g":3270,"c":6400,"q":2,"rate":-48.9,"diff":-3130,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 200ml 2개 12,800원을 1개로 나눈 값 (9/27 기준)","rv":185950,"hb":"코코도르 퍼퓸 디퓨저_양재동꽃시장 200ml 코코도르 퍼퓸 디퓨저_양재동꽃시장 코코도르(주) 200ml","hx":"34600  생활잡화 ","a":"https://link.coupang.com/a/haWMcz00qG"},{"no":1209,"p":"36272","name":"미래생활 잘풀리는집 리얼실키 250매3입","maker":"미래생활(주)","spec":"250매 3입","big":"생활용품","mid":"화장지/물티슈","sub":"휴지·티슈","g":4260,"c":5810,"q":1,"rate":-26.7,"diff":-1550,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 같은 상품 1개 값 (9/27 기준)","rv":178659,"hb":"미래생활 잘풀리는집 리얼실키 250매3입 잘풀리는집 리얼실키 250매3입 미래생활(주) 250매 3입","hx":"36272  휴지 티슈 ","a":"https://link.coupang.com/a/haWMyxENoa"},{"no":1019,"p":"3082","name":"농심 신라면컵 65g","maker":"(주)농심","spec":"65g","big":"식품","mid":"라면/즉석밥/통조림","sub":"라면","g":850,"c":977,"q":30,"rate":-13.0,"diff":-127,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 65g 30개 29,300원을 1개로 나눈 값 (9/27 기준)","rv":176002,"hb":"농심 신라면컵 65g 신라면컵 (주)농심 65g","hx":"3082 면 라면 ","a":"https://link.coupang.com/a/haWL6Nz1VI"},{"no":1859,"p":"31214","name":"동아오츠카 나랑드사이다 1.5l","maker":"동아오츠카(주)","spec":"1.5l","big":"식품","mid":"생수/음료/주류","sub":"탄산음료","g":930,"c":1293,"q":12,"rate":-28.1,"diff":-363,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 1.5L 12개 15,520원을 1개로 나눈 값 (9/27 기준)","rv":171946,"hb":"동아오츠카 나랑드사이다 1.5l 나랑드사이다(1.5) 동아오츠카(주) 1.5l","hx":"31214  탄산음료 ","a":"https://link.coupang.com/a/haWN0Mwemy"},{"no":75,"p":"31082","name":"농심 김치사발면 86g","maker":"(주)농심","spec":"86g","big":"식품","mid":"라면/즉석밥/통조림","sub":"라면","g":600,"c":867,"q":12,"rate":-30.8,"diff":-267,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 86g 12개 10,400원을 1개로 나눈 값 (9/27 기준)","rv":170397,"hb":"농심 김치사발면 86g 김치사발면 (주)농심 86g","hx":"31082  라면 ","a":"https://link.coupang.com/a/haWJXupyMe"},{"no":683,"p":"31474","name":"켄뷰코리아판매 리스테린 액 쿨민트 750ml","maker":"켄뷰코리아판매 유한회사","spec":"750ml","big":"생활용품","mid":"구강/욕실용품","sub":"가글·치실","g":3230,"c":6275,"q":2,"rate":-48.5,"diff":-3045,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 750ml 2개 12,550원을 1개로 나눈 값 (9/27 기준)","rv":167794,"hb":"켄뷰코리아판매 리스테린 액 쿨민트 750ml 리스테린 액 쿨민트 750ml 켄뷰코리아판매 유한회사 750ml","hx":"31474  가글 치실 ","a":"https://link.coupang.com/a/haWLl0OKVU"},{"no":251,"p":"2190","name":"오리온 초코파이 468g","maker":"(주)오리온","spec":"468g","big":"식품","mid":"과자/초콜릿/디저트","sub":"과자","g":2920,"c":4240,"q":1,"rate":-31.1,"diff":-1320,"conv":"","nm":0,"b":"쿠팡 검색 2위 · 같은 상품 1개 값 (9/27 기준)","rv":165811,"hb":"오리온 초코파이 468g 초코파이 (주)오리온 468g","hx":"2190  과자 ","a":"https://link.coupang.com/a/haWKlZbeHQ"},{"no":229,"p":"32806","name":"농심켈로그 오곡으로만든 첵스초코 570g","maker":"농심켈로그(주)","spec":"570g","big":"식품","mid":"과자/초콜릿/디저트","sub":"시리얼","g":4470,"c":5880,"q":1,"rate":-24.0,"diff":-1410,"conv":"","nm":0,"b":"쿠팡 검색 1위 · 같은 상품 1개 값 (9/27 기준)","rv":163164,"hb":"농심켈로그 오곡으로만든 첵스초코 570g 오곡으로만든 첵스초코 농심켈로그(주) 570g","hx":"32806  시리얼 ","a":"https://link.coupang.com/a/haWKi7B0we"}]},"pics":{"28438":"UklGRlQBAABXRUJQVlA4IEgBAADwCQCdASpAAEAAPt1mrVCopSQipAtpEBuJYgDUB6HHJIqs039+2daCt1ymeNKJPSC8OJeHGRndxL4Afmkh5rA4xBM7GnePzWbHwpS0pphC7GpKuUtns8AAAP75WJeLmBsy8XMl4yKbKbvrFnUABUo7q+EmIg3BkVp3+dZVllsasmUZy6HbM/0xV1mdMAYAAX5JapWjKtkcbhP09Ym1ib9En91vcgGvynKANfmMJ6zfhkPromYvKSi8w+gdsHpU4voffkmQzgVnaHwF95QRj+sQT/BGKFEY6Np0W2XlmCW2XgKr09osRYBbYapbUjl+bfGLJNw8x4IS7ZNzpxQZxCqdb5pYXZB600TMks2Qajip3avGuqOQvLBvTJrGdcC1mgWl9njSXQCqlyWgdhtLwTwm64Dmo10tvK+3uQt2dQnW1KOkofnFgAAA","35032":"UklGRl4BAABXRUJQVlA4IFIBAADwCACdASpAAC0APt1qqlKopaOipXgJmRAbiWcA0Ybztdq1pTxEmLCKLXdbuMKE2BPtUXfJMQQ9uamFDbjP2KyzpOCgsi+0LIE9ncZVhDLsAAD++yhZC94KLlktFQkwu8gYVK8p5Nns5D3Xjk8W290cZjysJy6r8FcNO376xK9mPnQ7Q1ME+dRGCTrfFAI6rjvjWjpgPm5BoWagbd8KEME4ClvKqej8ucrhFQt/6AKEFnNW6mbZegOjSb4PRo2JUOcdl2dv9Vs/okdbzN6VSOVyaFdcT3LWGgp5d5qMKTkDHUKa0dJGnkrauCDvHQ4Ed8UEqJssvvyGSCsNMtivuy5EE9VDC51Uk86yQFcOhbD6p0FvGQCgH4AaqhoCUsfJOMcOGhuLImZop5DouwMw/qEGrszRYfbEK1+eP2VEKKpyIW+aZiBnVyU5UkJ/Lw0yxjgAAA==","3098":"UklGRuYDAABXRUJQVlA4INoDAADwEgCdASo1AEAAPt1YoUyopSMiMBv8ARAbiWwAnTmN175q/h+UA5R8mHC27PmA/YD1jvwA923+q9JnqXPQA6XGfX8xNp/v7TpnKawaaf5bare3Nuf41Go444pH9XyPFLstVmbZCCRA7ZHRsw4MSxPiYthHSzdCYgC14BOOdvcMFo3LA3og2RVDZDPBW0bbSYwznPnk99RKkBImbGm6AhXAAPw4mHG6c7WcN2rHKjokKrmtRzhwqVaC0VqNU3Fw3Po2LYD8kxUK1KMfZUKxlrVj0z/qMAyU/m3d2/9ZbifT3nO3h09bgEzXwR04p8eFj5ByXDfswjvtZSVSCmqh34YqAohzBs3dM5/71BUDJmpf/izUc1G6crDRcg+REUUAk25MA1o5bg5LHcuGP/TfG+RbIY/qjkyIdpvnFDRG9dlGsQWSgQuCLT9odf+O0iDvF0QD8Yd1t16PHC8dOa8HGivCoEf5GfTnfJvuf2dbjaz3RwZ8vJa8tBjvI1JJwaGFFOE4wdw3GZ7oW8McL1v7aYD3LbZWH4osC0zavvZdgmRRAUmHhcvtvEx1xcp2LDHZ204oYFghePz4kM8uqMhs3vxHrPbqjzU9A8mSF1fIS2PgbmSmBxaCBE32DeSdt/hidx4ADSaMGa1Wu6LdeLeBtOn78jmVLQanJJ0vBl000vLLeBqO8v4jqKMHeyjxjkbzV6vbLviklntfIC2HQsGb8zLUbML8+UIegM5jXTpDB1mY6XwOLXWeXNZxsBlRbdU4+LDFd+k/4KhVLliTOb2zCQ1dvzBlpWbviurq8A6hqInFBfcaRb+PQ4HWjsc+0dfajkx7zhzn6q/2XFD7lu3Ejl3o+rYr6TEkEk8yA5py9egMlhoM3FgjKx8+U4NXbxbIgGNjw9I9nSzg6xNijX9eP2fxUF0P0xDy7P9tkwS4vCyHfau7tK+nzehJVTH3GlHbhXXGrhw1idOjjuGON6cn/6IklI1Ownh6od+QA8Sm1zWiYO+KC5KSCBg9nYXTg2DGukhyR+XymnHpV6NfxovhbnqAfmWlbFdlarRGs5eDRbL2TlIWpoAiFTBFEATfss4m6fBe8zDtLrsD7qhpgj29//Gzpxte5Qj7V9TfXi7nUHT/CL+gwQbada6yTlESNmHd813vLgafUhonJeRrAI4RZsADRVwkdwS2bybIp6LJno89iU6WwC4fYTsKyABJf4EPwC3rQQTXTUpTBxNTKBEXhwshMEgmQ9vZlqHoTM4OSIRLjRgcXTeB0D90ul+9EMM12zfnY2d/Mh0o0zM/lmH2xGwW8SypPWaoduAAAA==","27928":"UklGRkICAABXRUJQVlA4IDYCAACQDgCdASpAAD8APt1gqE+opSOiKhZsWRAbiWwAx2Re09egogrzW3j70D3zNMl3nRHYIdIOA0MjB6dI4axW5ZI0dXlWtktLWnLZKWppYey5qWk6Rqi3YSb032zy/JhIMf2xKIuewbbEDHdeUdEOPSOdD5k+/LHgPRQz0zeAAAD+/So2H4Vm0wu114xr1ur17qdEEomVV+0rJ59bYU2j7Q2YfzGLTh6U57lG3+vZQw2a1RrxL9tBr2MDX/8nWBK63+h3TtPc/KbT2f7ZfpnjIq17jCzqmfGE+Gd31pSTUEtz+CFRQ09USkK0HAAUPBQSjDAdLZUssSsPIO8b82It55fO2ehaZ9NgjY07kjEZp4lvsbasBxQeYccfuT+7cLGnzP3/fzw7DrWdONFtBGWDBZnjs5tleawgu/5vOYsHUVqisT+wukLG6nO1OLhpLQPCqN51ZwgEMx5RIJPbdg3ppjT5Gfv721+qClQPVZg2dTP1Q/FtEerv8F8dNaeB6h70qfjXihR3TWSBdJNVM9CynkaBi38uaa3069sk2buEcbAeCA5W2CsUFulyQyP4zel8GRc2ughCkF/LcW7m+TK/VrYYgI033vGFrQr2/Rae3AGiz+NPsUmfE+Wo36bk4rAa+94NBQJQvhNVucWnmFtrLhjvo9jyD0qAkJKrgc5uOJw8tx4/lsv/JZ4v23tmKRcARnviUfhiwUfO9Q4HiUD7KXA18QUOx0G1X4Hv+fKhAJPDZxta3AAAAA==","37840":"UklGRgIBAABXRUJQVlA4IPYAAABwCACdASpAAEAAPt1urVIopqQipBgKSRAbiWdrcl3PEeLq6N+K5p3ZElGCw4mMVrFa07/YV05T8zenicT5XAKLS2zDSq6wSS4M0XkAAP71CWcpluNT/FGCedeQ9jE9cDLKKUd1feGqLhGXRrc+D0rePC2IxMef187+6HME+c3gGT1p9Ai4JuyoRWtrmcbSBcajKDi4LsozNdgvCnos1CtP7Eg14zlrxECt4E0izdRMcxznMoNlVAu1I2I8GzpO8+UpPfdMx1KyxjVKkC2NiKjbyqyND5mT3k4ZZtRBfWGpTEw4F280BeVySTd1XJZ/PP1zEuI0qAA=","3030":"UklGRuYCAABXRUJQVlA4INoCAABQDwCdASpAAEAAPt1eqE4opKOiLBgMARAbiWwAyugrTUlCvBv44LG3g8QD1ZtMtbFlsBdvLM02zRSniAVw5Zk0RzWp+rPZ5QU2ETzb6qu1rGQVnHAD0a8iTV10z85SfsZWGmibqbhSgcOE71bJj1Wzd4E6GkVET2e9FjTqgEGJT3CQAAD+/i/f9mLhF7sz3iK++PpQO14Ev5+if0ws0QMr7dvY4PIbNPwifHnhHJwFqqmtM0OWFo50BKYMpzWpEDGk8XoYyzXFMrccSApr3Q2a92BIgbj/rCKCkR+T1C90vvGq4q8+4NoPnQxuL86BNP9PdspBt3+8nX4lF3ls+EziWij64svXME5L2bivF/wPunWt/KNwbt6o3i8xXqkq4KK4UgpO3K8iRufBewldZOCpMFOLiSgpkEgvxiKC2MVkLNDFQAEySjKH5n7dzoY0VmB3Mr+RI2Twx+PuM5172sK0qZ4Ckf0hP+RZKoCpqgpVgGE/W3lnHXqVagK5fjBgSEMx5KKif5B4Ut+pDpQXmey5T+fjBaWK4BOjDZBBp1Z/uHDpOkD636leEGTwW21r8IxA/dWl2vA6H3Y8x1VRTy3LsPrSdKT2oC0X4IrIVCId7mhWx/z2141GzcY0wNsUy/SBZZupTDknqsSVsClmEQb8XVKOvp3+dOgMUIO9tnsJTlV8wVjBOzHgk3JVave8Q6KspBcfFBI0T86bw/sYBzZRwOcRcE81o8gFqcIUvoxLCs4wPnt3M5FxCauDBCzO9/GUJ/yvByMozVmxYP0EddN2Dq5TqSWOjXmL+kPr63jUKmHTxcpNGWIThW5FMsvlJ6xAmKxTNLE4rc7J8IT39SX6RkQZ2B33FfIz7NN1+pHPJT7rThMHZtdJulAQK30GeFGYkUdCjkDnjrW8tRPBNp71wLMswLj0LsCKPFwo6kALHPDMI1TRVzKlT+hFWzuIi1L/9QNG/eqPAAAA","4666":"UklGRpQBAABXRUJQVlA4IIgBAABQCQCdASpAAEAAPt1qr1EopiQiqBQJWRAbiWMAVLHjuKbnzbem9IjpPefqk5pXOVuIyGy/ryex76oH0zynVVMYuSbM3YfHWlfnZZ1K/dej8E6iAAD++PSOiJpUqOUG2JN15IuJVbTM60KTSkzNVNzodiieEm2pINEc8DczGjs6er7YB5SPxiPtfpREMP2uZyCoxP3wpkm0D2hVSUv1MaPTxRqLMh6F2G7F6mQpjXsG5QhS4VW2XgaY7duO69/7ecd16qJaMfA/eFdjBr1I52SHnTpY15YNjIsWmFA6HApmvYVuinA9FZ4C5FlRVzYB4vD9jIegI/V3d0kDoUz0kyM0eIoSs3vIpsdMpaYAI2pxolwOakshmtSnPJAFu0Ki0TUYlcRmDnPblLrSH7Ao5YVXYkwtLu8yEQfOXBIOk6GUXG/DMZ/OI6P+j+Lo7affqsb7TPtmIpTaGWiHrr6RLJEZM3h62M+o5Q8EeeWJfIIG3wjFxZ5PqouwlXAAPSFKpq0d2ltESAAAAA==","27930":"UklGRgAEAABXRUJQVlA4IPQDAADwEQCdASpAADAAPs1Ym0ynpaIiNV36APAZiWwAnTMl/tkT89vS7Pnos223mA817/Rep/eRfQd6V7/N2lw021Mkp3hbh08kcarC5pnlGwLa7gu7nOb/i5p7r3aTsCzbuvRi5a96TZeoX/ZTG5/ibq5bS8MJAd7w5jX6QSE5Omld3JQt+it03BMSrgZ8RVOej0KQfeXCRwhgAAD+/cdMCXtGzOv8KmLdnevyGUikITYBPuOJzpCXXF5frHAiJ3PbyoPdCiBY0hQNOlRe+f+wEv670dZX2GyOvqMm8o6ja8Pj+THsiVb7bico2rpedYyu73u97auNnx6G1jVLsUsdikNudNYVVN7dMiI5ySegXMESnfLX9D0XwqqZLWu8rm8HKdqtv3Li63jV+xz38x/zQLOrSjFU3whjz6u8leHyvq8ubQmRiqmVa9hf/qfy8hDoqjT9aDMqg4E/ip8650d7sOtyM7EEnSF9jO4JvIDBAuuisHTXS2M1+u+mxRT0nnig5Vkxdr7UefSKe0zK03YrYP8uBCwKp2V8Fzs6J41SVtpnI5qbB5W9NBgP1wHfVrDeVbcc17F2ciiwwEejON6Kr+cMaSkY0x/OyRO465L8PEQZFWtwKOzNcHz1Hq7hjASPkVCarjZpS4ra9b6Wvmbmk3Q899mpxG2hfOhSmu3uoNEgZ1V37ocMjilGOAEyO7Vx/2kOWNVUOwcsqwbFQODczVocFMlw/thFoGFwqkvZxIKKdc9cU3GG1QfWXD92HG8Wq9uupj+9nRp/vsOq2thsaXi/Y591J1IShihOds1m/HsXzLuB66ehCXBzQzKsQkbH8XGVktYa6E42+nKmXA96bMIAX+ina/6tQFgw/AywYZZYuagWv+v9YAn+rVtlfsEfZto+l4FPJ/8BY/lz5H/Mz5f2K3etj89aqdPlKJ/eamySPZxQ78yDH0g5B6ccNDv1dyoUf5zrTcFL/Cn1R2kxYtqqWke80qc+0k4SzLix3SAcEwmhQQ/81s2EySBemnHEr5qwupI//4aI95h7r4c/iYuv/1rNOrPnjcyoYMSnZOwkAT6uCCy5X++/loizXTaKU3qos/dCzmtLG2wDY9IfWbYH68Zvna0Lf+8KChBtpjngvl7kzZRbZXl5sVdsufmWkcf/FpyJeu/3ZThoGfhKmW8tZ6ynY8RM8R3t2Cua511CiqaWjOZ32fUS69w0pMy1ISbMHA0gw3xRjVf0aXWwDTAPIJDqihekiCGE2tF0Nlkh/fC6tw3GkDhA00UzWDZM1XOLogsInwDQRmbVNoxThOm9AvlvekQF9xLjR9qPZQ5EeanFmzN3WePGRdOTNfrUUK+qyOAA","27484":"UklGRqgEAABXRUJQVlA4IJwEAAAwFACdASpAADUAPs1SnkynpKKiM/zNUPAZiWwAsv/kDRFQe1vm7SvoZ203mA81jdc/VV9AD9Zutf/cz0iqxTzvht8x2ZI5Sc1q2ZoHkt+rPYMOS2VDzkuEYIi9CxdmoNwNwkGpSvrFJa8yvg1vW2zGsev+kGw9f3haRe9pQUQu64vd2vyY40xcvXbuUgNDo+JKR2dxQ20shBtFF97lPcmI4KBSKeW4Mr6SAAD++NuZNW82VFP4PfDJZPiVju8+Unc7gLO3k0IjG4VBeYNMDAIy59fXyjwe6Aq5oUEa7XFiR9/ddq4IA716P5b/MDDcrVJiI+ztr3NHxAtjYRz8659z2ZqzbwMqCZ+gla7NaG8zSkxZ0AV2c36RDlXnoTzFVicHtGab/eCB+DGux7TWsBkepUWmuf4m6O8XaD9+sWdzgMkmS/9NNWq3/sY1qOptMsR1wGnJVy2lLUhFtVA7b14tE3zrs9w1lPIdraBz4P4eBi7denRVkZn+ulzQPpa29W5X1WsAVjIvgQ8o0hOV12ZMGMFE3EOBdCZPKwTL37bhWBw7z98mX8LYYfDTFzA1krgynW2Y2h09875avMB8E7OEZuIIHBgUNc/9FE3gBex9r1pPzGCKb5P2HGlrR8HDCXV7CfRCDYdcpKz+aGFf851ZywqURMHTkmj691So3Ue/MffWPLpnb5b6/Wuhv7umVtvNxPcfSzsJ2Hv/O5h2PCFGhoR1c84/jP99B9hGSXdMvfvqU4wIRtfAa7oMjAwmHcZ5gjcCjOw/K+cSqITDrRE9TR0+bsbruKxqbkryEoZz1cfMAB0pZ/pI2B+92SNlN25PFrxllqUoAx4ZWkTFGO65AuKGv3zTNJIOhXt2mxxNo4n9/VTvkdGb33OtVv5hoMf/NxDsx3lRCE9+5sNQUqL9y//cmVyqmarwhMMp4O9I9yH67Ee+yJk+NgqIE1CuLPGpQGCNmODa8R2NyMbzVceGfTw8dJOtKBxeWbibSgbYmk9DoxYkacFn3H7Xhf3p0LDexWdZK6jWy2JbEBYT8EqjNwQdewaZ3Zq4PzRtC29x113WceBIxWtqbTqWePKmbyDen525Di/7w44q7dPj1DzsPO2qwoaQ5s/FCx/0AySOXqt2J3yOjIDXn+vvx+3BfsE3viwu1F8cq75Q2HgIibY2hLNe5ODbfxWLvgrB397SDTJFUl9MR1KolMvDtvprG1OwDleswn+piL3eaDTnoE6tJfRSkbiVsO17JlfxaGNLyyljH65/pOWkv0R+qU5gw+aG+tXOm6v+x79rXDiX+GeP/VOXvtGfr8dbrzePb9oQ6tjNBrQNq6sDwrPaWWphxg3JTEB6uZy2JmhmbWKpGJqr/4JnGQW67WR14w1/x30r2KEHyUJtJwEpKRzvBA7O/A2EpuZlV8lMH8iy/EIPQ1COJLp31otXk/2tO+5UwS5SgMb5SFI5J8I5rXAJe2tx8h0dM1+uWOXKzxONvTWvo0gPJUg+wkn05mIw/ATnv84Znowkbsz18BzKtCid8bDNaxjE2C/x0fqSjR4OQSa2AxOfcfHJhtFElsq0AAAA","20502":"UklGRuADAABXRUJQVlA4INQDAABQEgCdASo9AEAAPtlapkyoJSOiMfjraQAbCWwAvNehiqyWbT25I50KDbdc8V6Ov9Lvqu8+f5ygfNLiiJ4s4vioPCSM2aD0ttdbeFI/tRPTULaAd5sjifY0Tw6TpjC3gn0K0/bHduETFGbfQ5PS21Fb56+yeOKuYyACTa1y1LSZvDFyFJaPspaPx42FUTqhrOukWAVECU9Qsw2YAAD+/pOqZT2o+f3psMTRWcVjAQofuKiK07XmYsfc9eKdvtwjMBQa+VyBBwcIul6RCUWftsKPcFguNDGnH2qUuXvl5MBaHlBLKw0arz/vzkI4mMSbr9iM1adyME1q95vrxZc/QqP4rTzeO8IxunqPu23FAM+EGhxU/uqOVY7QhM/uFEZWfC0NfkaHCmbZIgg74CDRq/XTG+YiHPw7o6C7cCPmyoVA8Dt4522dE2VeuXJYJYnOFhcY1nAJV+ZatodEOmBOu7Z+DKUpknpxR92k0iEShNp4IHpJTLW4NAHKrvAVUDmqVqpUCcKa5zhCU3XJfbPnHWMVzq/upluwjBwGkPU+ruuPVT41T5on7SwD6vcdvxOt/7akGsiqyvDo4DA1dHeT1u2wupbSYpvrdhLU+MTxlxlvg5etBXgZx+3zsBY4uZpmyi1OQHKpWTENMwd/mDF71O54GzluctUltrSPsWxZTbD4TqWEE3W/f95Q9U4Q+5CqDD5w6tXFSEiAoNxPfzXGvG/UxwBUKUOQO1MbyeJzdkf+Xk0sIM0iRqc4M1qKgdYt8erxRD9COD3A9FEhfSo6gwTHHfJ9bTUBE0ozeMIKiNq/H+uWytbbxTuySNx582gjjVxRTd9+BX31eww0zc5VkdstmeBYHKJBplx0piKtNy2XuNFTAUw53Jb08ZOdXi+nJ9/BybTtJc9EPNv2+YPGpNGFhw12M/KWZqflnyTMxDrljY5F7Fxw6++F6EfPwUTOaleuh9IYn6AVm6vFARzKawCEHhhgTUem7az2kvjSgmrEhVummrWcUwd8ju9+rWtU8fQTsOkYECXMkMHid1oRfV+7E3rK3a27RAF0wK544CGlBBCYN3eKRCY7024hLXTyHNNSHN3iuhmtFQH63q2eSgWe9KpQSxe9q6F1yAHdw9I+UHmqV74iJZViMvNEEBABtqR2gXbQUi7QpGYkCuX3tIEUq761ggSPWa3MNKPA4mU3jSZCdVIx4kTRfegr1afuL2haiwusIFs89rkhXZ5Zm7L9x9PErOrJ9JY2y/LSILNptvakgNgxhZTGcwnrq1vrk98ZF8WVSDawQ7IVZ68gHmJK93wAAA==","2946":"UklGRhYDAABXRUJQVlA4IAoDAACwDwCdASpAAEAAPt1ip0+opSMiKAtREBuJaADMT/p8VdXt5LuAgUT0sxTsrTQVaQ1DyVfUKcSdA1Tiw+YdIX9fy2Mo+a324ZY7DR43+654zyIM6tXNLlXxHUE4LXrewyN/bOGiEOKFibNnTEQSyWS8N29veMA6L+7XcrLfsGfgxbUQmlU4AAD+/XvROdfqJ8rYxBSxuEJ9/ftr+v5eT8hAPzdq96SH/Irp1y2T1t09NscadWbkklufGx5y3ptZmI1PzAZbdBlOe0nw97c4H4Vl+SMY8AJBpf8qscNjxEfmNqbrMl+k75ZQbyLD+yQal7gdx6adbz/z/18yopbf95cncGROBN7arrJbMb5yV2gDEHpyaX0pGPRT3jz+ULqUVIz/R0skoFFMcJh/ahR3ys+P0UCFVwYZfMqKqaT8n0I2fWdX2SpT9qVsaEwqOqcrUGIgWDziEv5FGm19DutfCUfpHrahIB6Nu72yD6kfREDyn/gkTL9iR4PgcJtfVBw79Uiaqa14bk7lfyfF2njVuzypyTksiEl5IqVuhCvbZByCqvFoW767+m7krBM60yH+lZeEf/94xQuRGPmbO5u/Hvh5sc6U4I+drJm08L2sPvNRkkpZ+Y2qsciNtt2xoldLRjOVMw+df645tK57WG6xdpCJ4QLU2uFYoq64Sr77BG6mWfXkvAW2xFjryYgGKQ9Xv9ujgdzeRSrV/Rf6V7hEuSPvkw58ymvyWwM0CRHxaFR3u1P48n9/EY1jfoe9zr5erZlPbqWW9P2YTDHmt0Q4PGckU/aBFXm6LIcmVv1EIbLh6C2wyPStOQ38mr7nUl3+Z/4fpTy6qmEWxpm6n1bZ4aZCC04TQNaUAgMJxvAJsroO6GLP13dGqfynuyopGSDfxobfLymCWxjnSnDev1/PdttrSgYsLN3W2NDcPygauQlW1q21YF/AdmXFDxl2VhJxdA5wS4o2sRMcecykd/NWw+dpAO+y2qsHvKIVM/kd4cc6DHktNypngMII8S5WcKYai9k22YNoepNAAAAA","3008":"UklGRuwDAABXRUJQVlA4IOADAAAQEgCdASpAADYAPt1Qo00opCMiMBn8+RAbiWwAvN2u134hfkuTz336fHC29HmA8170P70V6AH63dbnPw8jssf8rjTWfCgJ9n2guu3/4F0v0MJ8j8xWetSlAK1g+v7QzzUCssKn9x4rualA7DgMeCnjzAYaPMzMzS8gxh+8VLn1MzrqapOiM5zAZP/Xn1QofoJXKXGnYEVnGQAA/vhAX/wLXYncqYa9WML/6Vp6VlCHljzRqdS3jwpEvsARdHeEsEnugKnMQo42ix7VzwLLp9oZBh9xzDgjmotxS7WnBH5qBbmdOfz4ihZbeDLv3NHutsfH1qGQaUoWqRyb0gT4q8T5IDexIghAfEylVewMiygNL5Ho9RHxnO2+k69hWr9iAIjSKMa7a6G5RrP2U5faB/cSGgryAZZ370KsfWD2CwXpkW2ZrSS2NVAljKjAlcg9AcZa93HP9+zE0lMZdoHc3cbGYRSo7zYPByUFNmVs/85RsSKravzTkiIP+lmW4R7nJwKzZrfgdr1rf7RJoZWPqXvG4fK6rYNuqbJSEf2tqCNqlSUb6CiZl614bwhaqysH1A0fCvYZ4NFN5dAT25yp9X8PiV1vimO+fTg7B5ix+eiO+fxq63EN99f4dp3a+h4h1m5bf1YfKPK3ZnGqHTOL3wfLUuY7wH+zL+dHXH4N+n4qb2o79lXQQoIx8NNwlvPmnjn6+qQwGQ74mR+4tVTbmzECGGbS6uPjHkzk+ln31OUtFlXnzmpCLqWp4a1/9ETc2div4w8R7wwWBWQTVeJGawSxCmUMb4jec783W+NXIhD2X4HP9xhkwT7dCMHa9kUDGor9c8Y3382su9H+XIIy2QR16KCY9HcQJVmKnFl+6/aA6GCD0PccF9LA8gPkD9FsXKlYwSmhEg0Oh/be/SfYMNeHd7W6L4jLu4M6FR9ffO2EpK5dj1TSe3EWzAmUWTh3lQotURANgivvwiHUdspjSemUba3u+zBln5IMO7F6SjtXG84zmvSl4mcW/upptCzICSe7KLt/dUERHYUDEI/DUaoukWN08ayjCs8pTm4PwfIf8QvZNAFCYINEIfIaQMlcgNb8ol5rv4SrKevEUtqP5tAWJkzr4vguPeYvcJwXb4GEzBgVQEp69V3INcnJnMOtXe2cSq6wxL1h45Flh8xRphrlc+nLUw/KlKypDE8s3Q9ZU7ow7jn1UGmzlmmcWXteStSRj1xNGu7IZ5o1v3IA53PcRzY/SP3Sdfp7TVGOsBtEoDraGrt3BZezcLJchEzSD3nM0bG+zGhDRzdWMHXIA7BaA3TD1gDuMgcXIMKh6wAAAA=="}}</script>
 <script>
-/* ============================ 잠금 풀기 ============================ */
 const KEY_NAME = "gmpx-key";
 const OPEN = true;   /* --공개 로 구우면 true 가 박힌다 */
 const $ = s => document.querySelector(s);
@@ -792,13 +597,6 @@ async function derive(pw, salt){
 let KEY = null;
 
 async function unlock(pw, remember){
-  /* 공개판은 잠긴 것이 없다. 그냥 받아서 읽는다. */
-  /* ★ `referrerPolicy: "same-origin"` 을 지우지 마라 (2026-09-27).
-     이 페이지는 `<meta name="referrer" content="no-referrer">` 라 리퍼러를 안
-     보낸다. 요즘 폰은 대신 `Sec-Fetch-Site` 를 붙여서 자료 가드를 지나지만
-     **옛 아이폰(iOS 16.3 이하)과 일부 앱 속 브라우저는 둘 다 안 보내서
-     403 으로 막혔다.** 우리 파일을 부를 때만 우리 주소를 붙인다. 쿠팡으로
-     갈 때는 지금처럼 아무것도 안 붙는다. */
   if (OPEN) return await (await fetch("data.json?v=f52f69d242",
                                       {referrerPolicy: "same-origin"})).json();
   const buf = await (await fetch("data.bin", {cache:"no-cache"})).arrayBuffer();
@@ -812,18 +610,9 @@ async function unlock(pw, remember){
   return data;
 }
 
-/* 사진은 목록이 뜬 뒤에 받는다. 전 품목이면 8MB 가 넘어서, 같이 기다리면
-   폰에서는 흰 화면만 한참 본다. 실패해도 목록은 멀쩡해야 하므로 조용히 넘어간다. */
 async function loadPics(){
   try {
     if (OPEN) {
-      /* ★ 처음 온 사람에게 이 7MB 는 30초가 넘는다 (2026-09-26 실측 32.6초).
-         우리 서버가 한국 손님을 LA 로 붙이기 때문이다. 그 30초 동안 화면에
-         보이는 사진이 **같은 길에서 굶는다.** 그래서 가진 게 없으면 보이는
-         사진부터 받게 3초 비켜 주고, 낮은 순서로 받는다.
-         한 번 받은 사람은 1년 캐시에 있으니 기다리지 않고 곧바로 쓴다. */
-      /* 받아 본 적이 있는지는 적어 둔 표시로 안다. `only-if-cached` 로
-         물어보면 없을 때 콘솔에 빨간 오류가 한 줄 찍혀서 이렇게 한다. */
       const u = "pics.json?v=8d836ccc02", PK = "gmpx-pics";
       let seen = false;
       try { seen = localStorage.getItem(PK) === u; } catch (e) {}
@@ -844,43 +633,25 @@ async function loadPics(){
     for (const el of document.querySelectorAll("img.thumb:not([src])")) paint(el);
   } catch (e) { /* 사진 없이 그냥 쓴다 */ setTimeout(warmAll, 3000); }
 }
-/* ★ 사진이 없을 때 넣는 **투명한 한 점**.
- *
- * `src` 를 아예 안 주면 브라우저가 제 나름의 **자리표시 아이콘**을 그린다.
- * 깨진 그림처럼 보여서 사장님이 잡아내셨다. 투명한 1픽셀을 넣으면 그릴
- * 것이 없어서 `.thumb` 의 제 배경색만 남는다 — 하얗게 빈 칸이 된다. */
 const BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 let PICSDONE = false;      // 사진 뭉치를 다 받았나
 
 function paint(el){
   const b = PICS[el.dataset.p];
   if (b) el.src = "data:image/webp;base64," + b;
-  // 다 받고도 없으면 그 상품은 사진이 없는 것이다. 2,263건 중 4건.
   else if (PICSDONE){ el.src = BLANK; el.dataset.nopic = "1"; }
 }
 
-$("#go").addEventListener("click", async () => {
+if ($("#go")) $("#go").addEventListener("click", async () => {
   const pw = $("#pw").value;
   if (!pw) return;
   $("#go").disabled = true; $("#err").textContent = "여는 중…";
   try { start(await unlock(pw, $("#keep").checked)); }
-  catch (e) { $("#err").textContent = "비밀번호가 다릅니다"; $("#pw").select(); }
+  catch (e) { $("#err").textContent = "맞지 않습니다"; $("#pw").select(); }
   finally { if ($("#go")) $("#go").disabled = false; }
 });
-$("#pw").addEventListener("keydown", e => { if (e.key === "Enter") $("#go").click(); });
+if ($("#pw")) $("#pw").addEventListener("keydown", e => { if (e.key === "Enter") $("#go").click(); });
 
-/* 비밀번호를 기억해 둔 기기에서는 **잠금 화면을 아예 안 보여 준다.**
- *
- * 자료를 받아 풀기까지 0.7초쯤 걸리는데, 그동안 잠금 화면이 떠 있다가
- * 사라졌다. 쿠팡으로 넘어갈 때처럼 페이지가 다시 열리는 순간마다 비밀번호
- * 창이 번쩍여서, 마치 로그인이 풀린 것처럼 보였다.
- *
- * 열쇠가 있으면 곧 열릴 것이 확실하니 빈 화면으로 기다린다.
- * 풀지 못했을 때만 잠금 화면을 도로 내놓는다. */
-/* ★ 정렬 칸(select, 12.5px)도 아이폰에서 누르면 사파리가 확대한다. 16px 로
- * 올리면 정렬 줄이 넘치므로, **아이폰에서 누르는 그 순간만** 확대를 잠갔다가
- * 고르고 나면 푼다. 늘 잠가 두면 카톡 안 브라우저에서 손가락 확대까지 막힌다.
- * (2026-09-28) */
 (function(){
   const ios = /iP(hone|od|ad)/.test(navigator.userAgent)
            || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -898,31 +669,7 @@ $("#pw").addEventListener("keydown", e => { if (e.key === "Enter") $("#go").clic
 
 (async function auto(){
   let pw = null;
-  /* 공개판이면 구울 때 심어 둔 비밀번호로 바로 연다.
-     `--공개` 로 구우면 아래 자리에 값이 박히고, 그냥 구우면 빈 값이라
-     예전처럼 잠금 화면이 뜬다. 되돌리려면 다시 구우면 그만이다.
-     **이러면 자료가 사실상 공개다.** 소스만 보면 열쇠가 보인다. */
   if (OPEN) {
-    /* 공개판 — 비밀번호를 묻지 않고 바로 연다.
-     *
-     * **`#lock` 을 여기서 지우면 안 된다.** `start()` 끝에 `$("#lock").remove()`
-     * 가 있어서, 먼저 없애 버리면 거기서 `null.remove()` 로 터진다. 그러면
-     * `$("#app").hidden = false` 까지 못 가서 **화면이 빈 채로 남는다.**
-     * 실제로 그렇게 만들었다가 제목만 바뀌고 본문이 안 뜨는 것을 봤다.
-     * 잠금 화면은 숨기기만 하고 치우는 건 `start()` 에 맡긴다. */
-    /* ★ 첫 화면 먼저 (2026-09-27 사장님 지시).
-     *
-     * 한국 손님은 LA 를 거쳐서 '화면 파일 → 글자 자료' 를 차례로 왕복했다.
-     * 화면 파일 안에 첫 화면 60개(`#first`)를 실어 두고, 그걸로 먼저 그린다.
-     * 전체 자료는 **지금 바로** 부르기 시작해서 오면 이어 붙인다(`upgrade`).
-     *
-     * 이 길은 **주소에 아무것도 안 붙었을 때만** 탄다. `#p=`·검색어·분류나
-     * 카톡에서 넘어온 `?h=`·`?imp=` 는 60개 안에 없을 수 있어서 예전처럼
-     * 전체 자료를 기다린다. 쿠팡에 다녀온 뒤(`gmpx-state`)도 그렇다.
-     *
-     * `start()` 는 **스크립트가 다 읽힌 뒤**에 부른다 — 아래쪽(두 번째
-     * 스크립트 포함)에 정의된 것들을 쓴다. 전체 자료를 기다리던 예전 길은
-     * 그 사이 저절로 늦게 불렸지만, 이 길은 기다릴 것이 없어서 챙겨야 한다. */
     const full = unlock(null, false);
     let first = null;
     try {
@@ -939,15 +686,11 @@ $("#pw").addEventListener("keydown", e => { if (e.key === "Enter") $("#go").clic
       start(first.data);
       $("#wait").style.display = "none";
       try { upgrade(await full); }
-      // 못 받았으면 60개만 있는 채로 둔다. PARTIAL 을 그대로 둬야 60개로 센
-      // 거짓 건수·통계가 안 뜬다.
       catch(e){ toast("목록을 다 못 불러왔어요 · 새로고침해 주세요"); }
       return;
     }
     try { start(await full); }
     catch(e){
-      /* 공개판에 비밀번호는 없다. 못 받았으면 그렇다고 말하고 다시 열게 한다.
-         전에는 여기서 잠금 화면을 꺼내서 **비밀번호 창이 그대로 남았다.** */
       $("#wait").innerHTML = "<div>불러오지 못했어요</div>"
         + '<button type="button" onclick="location.reload()">다시 열기</button>';
       return;
@@ -957,7 +700,7 @@ $("#pw").addEventListener("keydown", e => { if (e.key === "Enter") $("#go").clic
   }
   try { pw = localStorage.getItem(KEY_NAME) || sessionStorage.getItem(KEY_NAME); } catch(e){}
   if (!pw) {                       // 잠긴 판 · 처음 온 사람 — 이때만 잠금 화면
-    $("#lock").style.visibility = "visible";
+    if ($("#lock")) $("#lock").style.visibility = "visible";
     $("#wait").style.display = "none";
     return;
   }
@@ -972,9 +715,6 @@ $("#pw").addEventListener("keydown", e => { if (e.key === "Enter") $("#go").clic
   $("#wait").style.display = "none";
 })();
 
-/* ============================ 한글 찾기 ============================ */
-/* '참' 만 쳐도, '참ㄱ' 까지 쳐도, 'ㅊㄱㄹ' 로도 걸리게 한다.
-   한글을 자모로 풀어 두고 이어 붙인 뒤 통째로 포함되는지만 본다.      */
 const CHO  = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
 const JUNG = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ";
 const JONG = " ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ";
@@ -1004,38 +744,19 @@ function toCho(s){
 const CHO_ONLY = /^[ㄱ-ㅎ0-9a-z]+$/i;
 const noSpace = s => toJamo(String(s).replace(/\s+/g, ""));
 
-/* ============================ 화면 ============================ */
 let PARTIAL = false;   // 첫 화면 자료로만 그린 동안 — 건수·통계를 안 적는다
 let DATA = [], VIEW = [], BIG = "전체", SHOWN = 0, CP = "", WAIT = "", PICS = {};
-/* ★ `온라인` — 합계·요약에서 부르는 이름. 줄 하나는 **환산(it.conv)일 때만**
- * `온라인` 이다 — 같은 상품이 없어 네이버·다나와 시세나 비슷한 상품 값을 쓴 줄은
- * 쿠팡 값이 아니다. 나머지는 실제로 쿠팡에서 본 값이라 `쿠팡` 그대로 (2026-09-28). */
 const ONL = "온라인";
-/* ★ 담배·술은 온라인에서 못 판다 (2026-09-29 사장님, 네이버 광고 심사 앞두고).
- *   담배 → `정가` (전국 같은 값을 썼다) · 주류 → `시중가` (마트·전문점·편의점 값이 섞였다).
- *   앱에서만 바꿨다 — 검색용 페이지의 제목·본문은 아직 `쿠팡`·`온라인` 이다. */
 const srcOf = it => it.sub === "담배" ? "정가" : it.big === "주류" ? "시중가"
                   : it.conv ? ONL : CP;
-/* 받침이 있으면 `이`, 없으면 `가` — `쿠팡이 · 온라인이 · 정가가 · 시중가가` */
 const iGa = w => { const c = w.charCodeAt(w.length - 1) - 0xAC00;
                    return c >= 0 && c < 11172 && c % 28 ? "이" : "가"; };
-/* 공유 주소(#p=코드)로 들어왔을 때 그 한 줄만 보여 준다. 받은 사람이
-   2,263줄 맨 위부터 뒤지게 하면 공유한 뜻이 사라진다. */
 let ONLY = "";
-/* ★ 공유받은 찜 목록 (`#w=코드-코드-…`, 2026-09-26). 그 상품들만 보여 준다.
-   받는 사람의 찜(`CART`)은 건드리지 않는다 — `내 찜에 담기` 를 눌러야 더한다. */
 let WLIST = null;
-/* ★ 고른 세부 종류(소분류). 분류(`BIG`)를 바꾸거나 검색어를 바꾸면 풀린다 (2026-09-28) */
 let SUB = "";
-/* 세부 종류 하나가 전체 자료에 몇 개인가 — 상품 메뉴의 `같은 종류 더 보기 · 선크림 13개` */
 const subN = k => DATA.reduce((n, x) => n + (x.sub === k ? 1 : 0), 0);
-/* ★ 앱 안 브라우저에서 넘어왔을 때 실려 온 것 (2026-09-27).
-   `?h=` 는 보던 화면(원래 `#` 뒤), `?imp=` 는 찜·넣은 값. `h` 는 **지금 바로**
-   `#` 로 되돌려 놓는다 — 아래 `start()` 가 늘 `#` 에서 읽기 때문이다.
-   찜은 목록이 준비된 뒤 `start()` 에서 푼다(여기서는 아직 찜 목록이 없다). */
 let CARRY = null;
 (function(){
-  // 방문 수 — 두 번째 방문부터 홈 화면 추가를 권한다
   try {
     if (!sessionStorage.getItem("gmpx-sess")){
       sessionStorage.setItem("gmpx-sess", "1");
@@ -1044,8 +765,6 @@ let CARRY = null;
   } catch(e){}
   try {
     const q = new URLSearchParams(location.search);
-    // ★ 홈 화면 아이콘으로 열면 `?home=1` 이 온다(manifest start_url · 안내 때
-    //   잠깐 붙인 주소). 이미 넣은 사람이니 다시 권하지 않는다.
     if (q.get("home") === "1"){
       try { localStorage.setItem("gmpx-home", "1"); } catch(e){}
       if (!q.get("h") && !q.get("imp")){
@@ -1062,7 +781,6 @@ let CARRY = null;
 let TITLE0 = document.title;   // 공유로 바꾼 탭 제목을 되돌릴 때 쓴다
 const won = n => n == null ? "–" : n.toLocaleString("ko-KR") + "원";
 const pct = n => (n > 0 ? "+" : "") + n.toFixed(1) + "%";
-/* 군마트가 싸면 음수다. 기준이 쿠팡가이기 때문(프로그램의 calc() 과 같다). */
 const wonDiff = n => (n > 0 ? "+" : "") + n.toLocaleString("ko-KR") + "원";
 
 function prepItems(items){
@@ -1070,19 +788,12 @@ function prepItems(items){
     const all = it.hb + " " + it.hx;
     it._b = noSpace(it.hb);   it._x = noSpace(all);
     it._cb = toCho(it.hb);    it._cx = toCho(all);
-    // ★ 낱말 경계를 살린 것도 따로 둔다 (2026-09-24).
-    //
-    // toCho 는 띄어쓰기를 지운다. 그래서 `농심켈로그 콘푸로스트` 가
-    // `ㄴㅅㅋㄹㄱㅋㅍㄹㅅㅌ` 이 되고 그 안에 `ㅅㅋㄹ` 이 박힌다.
-    // `ㅅㅋㄹ` 로 선크림을 찾으면 선크림이 18번째로 밀렸다.
-    // 낱말마다 따로 두면 첫머리에서 맞았는지 알 수 있다.
     it._bw  = it.hb.split(/\s+/).map(noSpace).join(" ");
     it._cbw = it.hb.split(/\s+/).map(toCho).join(" ");
   }
 }
 
 function start(d){
-  // 페이지를 열기 전에는 제목조차 알 수 없어야 한다. 잠긴 자료에서 꺼내 온다.
   DATA = d.items;
   document.title = TITLE0 = d.title;
   $("#foot").innerHTML = d.foot;
@@ -1094,11 +805,6 @@ function start(d){
       '<option value="' + o[0] + '">' + o[1] + "</option>").join("");
   WAIT = d.wait;
   for (let i = 0; i < 3; i++) $("#c" + (i + 1)).textContent = d.caps[i];
-  // 본문(이름·업체·규격)과 곁들이(분류·상품코드·다른 말)를 따로 둔다.
-  // 둘 다 뒤지되, 본문에 맞은 것을 위로 올린다.
-  //
-  //   '오일' 로 찾으면 중분류가 '오일/소스/양념' 인 것이 120건 걸린다.
-  //   정작 이름이 '올리브오일' 인 것이 그 사이에 파묻혀 있었다.
   prepItems(DATA);
   applyMine();
   const bigs = ["전체", ...d.bigs];
@@ -1122,20 +828,10 @@ function start(d){
     runFresh();
     toTop();
   });
-  $("#lock").remove();
+  const _lk = $("#lock"); if (_lk) _lk.remove();        // 공개판엔 처음부터 없다
   $("#app").hidden = false;
-  // 주소 뒤에 짐이 실려 왔으면 먼저 푼다
   const raw = location.hash.slice(1);
-  // 공유 주소. `#p=32912` 처럼 온다. 검색어 해시와 섞이지 않도록
-  // '문자 p, 등호, 숫자만' 일 때로 못박는다.
   const shared = /^p=[0-9]+$/.test(raw) ? raw.slice(2) : "";
-  /* ★ `#c=식품` — **분류를 골라 둔 채로** 연다 (2026-09-25).
-   *
-   * 유입 페이지의 `식품 1,263` 칸이 여기로 온다. 전에는 우리 분류 페이지로
-   * 보냈는데, 그 영역은 통째로 앱으로 보내는 자리라 일관되게 맞췄다.
-   *
-   * **검색어 해시로 보내면 안 된다.** `#식품` 이면 이름에 `식품` 이 든 것까지
-   * 섞여서 1,263개가 안 나온다. 분류는 칩으로 걸러야 정확하다. */
   const wantBig = raw.indexOf("c=") === 0
                 ? decodeURIComponent(raw.slice(2)) : "";
   const sIt = shared ? DATA.find(x => x.p === shared) : null;
@@ -1162,18 +858,6 @@ function start(d){
   if (sIt){
     ONLY = shared;
     $("#onlybar").style.display = "flex";
-    /* ★ 이 띠는 **주소에 `#p=상품코드` 가 붙어 들어왔을 때만** 뜬다.
-     * 2,263개 중 한 개만 걸러 보여 주는 중이라는 것을 알리는 자리다.
-     * 안 알리면 "왜 하나밖에 없지" 하고 앱이 고장 난 줄 안다.
-     *
-     * 그렇게 들어오는 길은 둘이다. **둘 다 눌러서 오는 길**이다.
-     *
-     *   ① 유입 페이지의 미리보기 카드를 눌렀을 때
-     *   ② 예전에 공유한 링크(`#p=`)를 눌렀을 때
-     *
-     * 처음엔 `공유받은 상품입니다` 였는데, 공유를 `/p/코드/` 로 바꾸면서
-     * 대부분 공유가 아니라 카드로 들어오게 되어 안 맞는 말이 됐다.
-     * 사장님이 `눌러서 들어온 상품이에요` 로 정하셨다 — 담백하고 둘 다 참이다. */
     $("#onlytext").textContent = "눌러서 들어온 상품이에요";
     document.title = sIt.name;
   }
@@ -1200,16 +884,13 @@ function start(d){
     try { history.replaceState({}, "", location.pathname); } catch(e){}
     setTimeout(() => alert(msg), 300);
   } else if (wantBig) {
-    // 분류 해시다. 검색칸에는 아무것도 안 넣는다.
     BIG = wantBig;
     $("#chips").querySelectorAll(".chip").forEach(
         c => c.classList.toggle("on", c.dataset.b === wantBig));
   } else if (!sIt && !WLIST) {
-    // 공유 주소일 때는 넣으면 안 된다. `p=28438` 이 검색어로 들어간다.
     const h = decodeURIComponent(raw);
     if (h) $("#q").value = h;
   }
-  // 쿠팡에 다녀온 뒤라면 보던 자리로 되돌린다
   let back = null;
   try {
     back = JSON.parse(sessionStorage.getItem(STATE_KEY) || "null");
@@ -1227,27 +908,16 @@ function start(d){
   setMode(GAL);
   run();
   if (back && back.y){
-    // 60개씩 그리므로, 보던 높이까지 먼저 채운 뒤에 내려야 한다
     let guard = 0;
     while (document.body.offsetHeight < back.y + innerHeight && SHOWN < VIEW.length
            && guard++ < 80) more();
     window.scrollTo(0, back.y);
   } else if (matchMedia("(hover:hover) and (pointer:fine)").matches) {
-    // ★ 커서는 **PC 에서만** 넣는다. 아이폰은 다른 앱을 쓰다 오면 탭을 새로
-    // 불러오는 일이 잦아서, 그때마다 검색창에 커서가 들어가 (자판도 안 뜨는데)
-    // 사파리가 확대까지 했다 (2026-09-28).
     $("#q").focus({preventScroll:true});
   }
   loadPics();
 }
 
-/* 브랜드를 누르면 **처음 접속한 그 화면**으로 돌아간다.
- *
- * 검색어·분류·정렬·보기·공유 상태를 한꺼번에 되돌린다. 주소에 붙은 해시도
- * 지운다 — `#크림` 이 남아 있으면 새로 고쳤을 때 다시 크림만 뜬다.
- *
- * **밝게/어둡게와 갤러리 보기는 안 건드린다.** 그건 상태가 아니라 그 사람이
- * 정해 둔 설정이라, 홈으로 간다고 되돌리면 빼앗는 것이 된다. */
 function goHome(){
   ONLY = "";
   WLIST = null; $("#onlytake").hidden = true;
@@ -1270,14 +940,7 @@ function goHome(){
 }
 $("#home").addEventListener("click", e => { e.preventDefault(); goHome(); });
 
-/* ★ 목록이 새로 바뀌면 **맨 위부터** 보여 준다 (2026-09-28 사장님). 스크롤을 내린 채
- * 검색하면 결과 중간부터 보이고 머리도 숨은 채였다. 검색어·분류·세부 종류·줄 세우기를
- * 바꿀 때만 올린다 — 찜하기·수량·샀어요, 쿠팡·찜 화면에서 돌아올 때는 보던 자리 그대로. */
 function toTop(){ if (scrollY > 0) scrollTo(0, 0); }
-/* ★ 찜 화면에서 분류 칩이나 검색을 쓰면 **찜 화면을 나간다** (2026-09-28 사장님).
- * 칩·검색칸이 그대로 보여서 손님은 '전체 상품을 보는 것' 으로 알고 누르는데, 찜 안에서만
- * 걸러져 갇힌 느낌이었다. 칩은 늘 전체 상품을 보는 칩, 한 가지 뜻만 갖는다.
- * 찜 화면 표시(`{cart:1}`)는 지운다 — 남기면 뒤로가기가 찜 화면을 되살린다. */
 function leaveCart(){
   if ($("#view").value !== "cart") return false;
   $("#view").value = "all"; PREV = null;
@@ -1294,14 +957,8 @@ $("#q").addEventListener("input", () => { SUB = ""; leaveCart(); runFresh(); toT
     sp.style.height = hd.offsetHeight + "px";
   };
   window.fitHead = fit;
-  // 펴진 채로 높이가 바뀔 때만(세부 칩이 생기고 사라질 때) 빈칸을 맞춘다.
-  // 줄어든 동안에는 안 맞춘다 — 맞추면 그만큼 목록이 밀린다.
   if (window.ResizeObserver) new ResizeObserver(() => { if (scrollY < 8) fit(); }).observe(hd);
   fit();
-  /* ★ 머리는 **손가락에 붙어서** 움직인다 (2026-09-28 사장님). 처음엔 '내렸다' 고
-   판단하는 순간 0.22초에 휙 올라가서 튕기는 느낌이었다. 이제 10px 내리면 10px
-   올라가고, 올린 만큼만 내려온다. 스크롤이 멈췄는데 반쯤 걸쳐 있으면 절반을
-   기준으로 마저 숨기거나 마저 보인다(0.15초). 맨 위 근처는 제자리에 붙은 것처럼. */
   let off = 0, lastY = Math.max(0, scrollY), idle = 0;
   const apply = anim => {
     const h = hd.offsetHeight;
@@ -1337,20 +994,7 @@ $("#q").addEventListener("input", () => { SUB = ""; leaveCart(); runFresh(); toT
     set(false);                                   // 글자 — 칩을 다시 펼친다
   });
 })();
-/* ★ 줄 세우기는 **`SORTK` 하나**가 쥔다 (2026-09-25).
- *
- * 고르는 자리가 셋이다 — 붙박이 단추 둘과 셋째 칸 드롭다운. 어디서 골랐든
- * 결국 `SORTK` 하나만 바뀌고, 세 칸 중 고른 것 하나만 파래진다.
- *
- * `직접 입력한 것` 만 줄 세우기가 아니라 **거르기**다. 그때는 `SORTK` 를
- * 안 건드리고 `#view` 를 바꾼다 — 나올 때 줄 차례가 그대로 돌아온다.
- *
- * `#view` 는 숨겨서 그대로 둔다. 찜 단추·빈 화면 안내·홈 단추가 다 쓴다. */
 let SORTK = "rv";
-/* ★ 정렬 기준을 **화면에 맞춰 놓기만** 한다 (그리지는 않음). 2026-09-29 사장님이 잡으셨다 —
- * 쿠팡·찜에 다녀오면 드롭다운 글자만 되살리고 SORTK 는 안 되살려서, 드롭다운은
- * `할인율 높은 순` 인데 목록은 랭킹순이고 파란 표시는 어디에도 없었다.
- * 저장할 때는 **SORTK 를** 적고, 되살릴 때는 이 함수를 부른다. */
 function useSort(k){
   const sel = $("#sort");
   if (!k || k === "mine") k = SORTK || "rv";          // 옛 기록(드롭다운 빈 값) · 거르기는 정렬이 아니다
@@ -1368,10 +1012,8 @@ function setSort(k){
   } else {
     SORTK = k;
     if (was === "mine") $("#view").value = "all";
-    // 붙박이 단추를 눌렀으면 드롭다운은 안 고른 상태로 되돌린다.
     if (sel.querySelector('option[value="' + k + '"]') === null) sel.value = "";
   }
-  // 고른 칸 하나만 파랗게. 드롭다운 칸은 무언가를 고른 동안만.
   for (const b of document.querySelectorAll(".sortbar .sb[data-k]"))
     b.classList.toggle("on", !sel.value && b.dataset.k === SORTK);
   $(".sortbar .selwrap").classList.toggle("on", !!sel.value);
@@ -1386,7 +1028,6 @@ $("#clr").addEventListener("click", () => { $("#q").value = ""; run(); toTop(); 
 function themeLabel(){
   const el = $("#themelb");
   if (!el) return;
-  // 바뀔 쪽을 적는다 — 지금 모습을 적으면 무엇이 눌리는지 모른다.
   el.textContent =
       document.documentElement.getAttribute("data-theme") === "dark"
       ? "라이트" : "다크";
@@ -1398,13 +1039,6 @@ $("#theme").addEventListener("click", () => {
   try { localStorage.setItem("gmpx-theme", next); } catch(e){}
   themeLabel();
 });
-/* ★ 처음 열면 **무조건 밝게** (2026-09-24).
- *
- * 전에는 정해 둔 것이 없으면 폰 설정(`prefers-color-scheme`)을 따랐다.
- * 그러면 어두운 폰에서 처음 들어온 사람이 **까만 화면**을 만난다. 상품
- * 사진이 흰 바탕이라 따로 놀고, 값 비교표도 첫인상이 무겁다.
- *
- * 한 번이라도 바꾸면 그다음부터는 그 사람 것을 따른다. */
 try {
   const t = localStorage.getItem("gmpx-theme");
   document.documentElement.setAttribute("data-theme", t || "light");
@@ -1415,8 +1049,6 @@ function run(){
   const raw = $("#q").value.trim();
   $("#clr").style.display = raw ? "block" : "none";
   try {
-    // 공유받아 들어온 주소(#p=코드)는 그대로 둔다. 여기서 다시 쓰면
-    // `#p%3D28438` 로 인코딩돼 그 주소를 또 공유하면 안 열린다.
     if (!ONLY && !WLIST)
       history.replaceState(history.state, "", raw ? "#" + encodeURIComponent(raw) : " ");
   } catch(e){}
@@ -1429,15 +1061,10 @@ function run(){
 
   const view = $("#view").value || "all";
 
-  // **거르는 판단을 함수로 떼어 둔다.** 아무것도 안 걸렸을 때 '분류만
-  // 풀면 몇 건인가' 를 세려면 같은 판단을 조건만 바꿔 다시 돌려야 한다.
-  // 두 벌로 베껴 두면 한쪽만 고쳐져 안내가 거짓말을 하게 된다.
   const pass = (it, big, vw, scoring) => {
     if (ONLY) return it.p === ONLY;      // 공유받은 한 줄만
     if (WLIST) return WLIST.has(it.p);   // 공유받은 찜 목록만
     if (big !== "전체" && it.big !== big) return false;
-    // 찜한 것 보기는 빼고(거기서 빼면 바로 사라지는 게 맞다),
-    // 나머지 보기에서는 방금 손댄 줄을 남겨 둔다.
     if (vw !== "cart" && !KEEP.has(it.p)){
       if (vw === "done" && it.rate == null) return false;
       if (vw === "none" && !it.nm) return false;
@@ -1450,8 +1077,6 @@ function run(){
       const inBody = t.cho ? it._cb.includes(t.c) : it._b.includes(t.j);
       const inAll  = t.cho ? it._cx.includes(t.c) : it._x.includes(t.j);
       if (!inBody && !inAll) return false;
-      // 낱말 첫머리에서 맞았으면 두 배를 더 준다. 초성은 짧아서 낱말
-      // 한가운데에도 잘 박히는데, 그러면 정작 찾던 것이 뒤로 밀린다.
       const head = t.cho ? (" " + it._cbw).includes(" " + t.c)
                          : (" " + it._bw ).includes(" " + t.j);
       score += head ? 4 : (inBody ? 2 : 1);
@@ -1464,49 +1089,21 @@ function run(){
   subChips(BASE, raw, view);
   curTag();
 
-  // ★ 할인율로 줄 세울 때는 **비교군 없음을 아예 뺀다** (2026-09-25).
-  //
-  // 할인율이 없는 줄(`rate == null`)을 섞으면 `할인율 낮은 순` 맨 앞이
-  // 통째로 `비교군 없음` 257건으로 찬다. 쿠팡보다 비싼 것을 보려고 고른
-  // 건데 정작 그게 한참 뒤에 나온다.
-  //
-  // 뒤로 미는 것으로는 모자란다. **할인율을 묻는 자리에 할인율이 없는
-  // 줄은 답이 아니다.** 건수(`#hits`)도 뺀 뒤로 센다.
   if (SORTK === "rate" || SORTK === "rate_up")
     VIEW = VIEW.filter(it => it.rate != null);
 
   const k = SORTK;
   const big = 1e12;
   VIEW.sort((a, b) => {
-    // 잘 맞은 것 먼저 — **랭킹순(기본)일 때만.** 손님이 `할인율 높은 순` 처럼 직접 고르면
-    // 그 순서가 이긴다 (2026-09-29 사장님: `홍삼` 을 할인율 순으로 세웠는데 순서가 섞여 보였다).
     if (toks.length && k === "rv" && b._s !== a._s) return b._s - a._s;
     const A = a.rate == null ? big : a.rate, B = b.rate == null ? big : b.rate;
     switch (k){
-      // 많이 팔린 순. 리뷰수는 그 상품을 몇 사람이 샀는지에 가장 가까운
-      // 숫자다. 첫 화면을 이걸로 여는 건 **처음 들어온 사람이 아는 물건을
-      // 먼저 보게** 하려는 것이다. 할인율로 열면 맨 위가 면세담배와
-      // 리뷰 0짜리 기획세트라 무슨 사이트인지 알기 어렵다.
-      //
-      // 리뷰수가 없는 줄(아직 안 본 것, 예전에 넣은 것)은 0 으로 쳐서
-      // 뒤로 간다. 그게 맞다 — 근거가 없는 줄이 맨 위에 올 이유가 없다.
       case "rv":      return (b.rv || 0) - (a.rv || 0);
       case "rate":    return A - B;
       case "rate_up": return (a.rate == null ? -big : -a.rate) - (b.rate == null ? -big : -b.rate);
       case "diff":    return (a.diff == null ? big : a.diff) - (b.diff == null ? big : b.diff);
       case "gm_dn":   return b.g - a.g;
       case "gm_up":   return a.g - b.g;
-      // 이름순으로 세우면 **같은 것끼리 저절로 묶인다.**
-      //
-      // 이름이 `업체명 + 상품명 + 규격` 이라(copy_text) 가나다순으로만 세워도
-      // 업체 → 시리즈 → 맛 차례가 된다. 하겐다즈 일곱 개가 쭉 이어진다.
-      //
-      //   받아 온 분류로는 안 된다. 같은 하겐다즈가 `스낵과자`·`아이스크림`·
-      //   `비스킷·파이`·`초콜릿·캔디` 에 갈려 있고, 비알코리아 슈팅스타는
-      //   중분류가 `키보드` 다. 이름은 적어도 거짓말을 안 한다.
-      //
-      // `localeCompare` 를 안 쓰는 건 **프로그램과 같은 차례**를 내려는 것이다.
-      // 파이썬 쪽은 글자 코드 순으로 비교한다. 한글은 그게 곧 가나다순이다.
       case "name":    return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
       default:        return a.no - b.no;
     }
@@ -1517,7 +1114,6 @@ function run(){
   $("#cartbtn").classList.toggle("on", view === "cart");
   bar.dataset.mode = view;
   bar.children[0].style.display = view === "mine" ? "none" : "";   // 공유하기
-  // 가운데 단추: 찜 화면은 `찜 가져오기`, 직접 넣은 값 화면은 `복사`
   bar.children[1].textContent = view === "mine" ? "직접 입력한 값 복사" : "찜 가져오기";
   bar.children[1].dataset.act = view === "mine" ? "copyall" : "importcart";
   bar.children[3].style.display = view === "mine" ? "none" : "";
@@ -1536,47 +1132,27 @@ function run(){
   scheduleTips();
 }
 
-/* 아무것도 안 걸렸을 때 **왜 없는지와 어디로 가면 되는지**를 말해 준다.
- *
- * 그냥 '찾는 것이 없습니다' 만 띄우면 막다른 골목이다. 실제로는 분류나
- * 보기를 하나 풀면 나오는 경우가 대부분이다. `참기름` 을 치고 분류를
- * `화장품` 으로 눌러 둔 채라면, 없는 게 아니라 거기에 없는 것뿐이다.
- *
- * 세는 방법은 `run()` 의 `pass()` 를 조건만 바꿔 다시 돌리는 것이다.
- * 판단을 베껴 쓰지 않으므로 한쪽만 고쳐져 안내가 어긋날 일이 없다.
- */
 function emptyHTML(raw, view, pass){
   const vName = n => {
     const o = [...$("#view").options].find(o => o.value === n);
     return o ? o.textContent : n;
   };
   const outs = [];
-  // 1) 분류만 풀면?
   if (BIG !== "전체"){
     const n = DATA.filter(it => pass(it, "전체", view, false)).length;
     if (n) outs.push({n, label: "전체에서 보기 (" + n.toLocaleString("ko-KR") + "건)",
                       act: "big"});
   }
-  // 2) 보기만 풀면?
   if (view !== "all"){
     const n = DATA.filter(it => pass(it, BIG, "all", false)).length;
     if (n) outs.push({n, label: vName("all") + " (" + n.toLocaleString("ko-KR") + "건)",
                       act: "view"});
   }
-  // 3) 둘 다 풀면?
   if (BIG !== "전체" && view !== "all"){
     const n = DATA.filter(it => pass(it, "전체", "all", false)).length;
     if (n && !outs.some(o => o.n === n)) outs.push({
       n, label: "둘 다 풀기 (" + n.toLocaleString("ko-KR") + "건)", act: "both"});
   }
-  // 받침을 보고 조사를 고른다. '참기름 는' 처럼 나오면 읽는 사람이 먼저
-  // 어색함을 느낀다. 한글 음절은 (코드-0xAC00)%28 이 0 이면 받침이 없다.
-  //
-  // **따옴표가 아니라 낱말에서 받침을 읽어야 한다.** `참기름’` 의 끝 글자를
-  // 보면 그건 따옴표라 늘 받침 없는 쪽이 나온다. 한 번 그렇게 틀렸다.
-  //
-  // `으로/로` 는 받침 유무만으로 안 갈린다. **ㄹ 받침은 `로` 다** —
-  // '없는말으로' 가 아니라 '없는말로'. 종성 번호 8 이 ㄹ 이다.
   const jo = (w, withT, noT, lIsNo) => {
     const c = w.charCodeAt(w.length - 1);
     if (c < 0xAC00 || c > 0xD7A3) return noT;
@@ -1608,12 +1184,6 @@ function median(a){
   const m = a.length >> 1;
   return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
 }
-/* 요약 세 칸. 목록을 다시 그리지 않고 숫자만 고칠 때도 쓴다. */
-/* 전체 자료가 오면 이어 붙인다 (2026-09-27).
- *
- * 손님이 그 사이 아무것도 안 건드렸고, 이미 그린 60개가 전체로 세운 차례와
- * **똑같으면** 카드를 그대로 두고 자료만 갈아 낀다 — 깜빡이지 않는다.
- * 그 사이 검색·분류·줄 세우기를 건드렸으면 그냥 다시 그린다. */
 function upgrade(d){
   const firstCodes = VIEW.map(i => i.p);
   DATA = d.items;
@@ -1638,29 +1208,15 @@ function upgrade(d){
 function stats(){
   if (PARTIAL){ $("#hits").textContent = ""; return; }
   $("#hits").textContent = VIEW.length.toLocaleString("ko-KR") + "건";
-  // 값이 들어 있는 줄만으로 센다. 안 본 줄을 섞으면 숫자가 거짓이 된다.
   const done = VIEW.filter(i => i.rate != null);
   $("#s1").textContent = done.length.toLocaleString("ko-KR") + " / "
       + VIEW.length.toLocaleString("ko-KR");
-  // **합계 금액은 크기만 하고 뜻이 없다.** 2,263건을 한 번에 다 사는 사람은
-  // 없으니 '460만원 아꼈다' 는 아무에게도 해당되지 않는 숫자다.
-  // 가운데 값(중앙 할인율)은 '보통 이만큼 싸다' 로 바로 읽힌다.
-  //
-  // 평균이 아니라 중앙값인 까닭 — -92% 짜리 기획세트 하나가 평균을 통째로
-  // 끌어내린다. 절반이 이보다 싸고 절반이 이보다 비싸다는 말이 정직하다.
   const rates = done.map(i => i.rate).sort((a, b) => a - b);
   $("#s2").textContent = rates.length ? pct(median(rates)) : "–";
   $("#s3").textContent = done.length
       ? Math.round(100 * done.filter(i => i.rate < 0).length / done.length) + "%" : "–";
 }
 
-/* 값을 넣은 그 줄만 다시 그린다.
- *
- * `아직 안 본 것` 으로 걸러 놓고 값을 넣으면, 목록을 다시 거르는 순간 그
- * 줄이 조건에서 벗어나 눈앞에서 사라진다. 얼마나 싼지 확인할 새가 없다.
- * 그래서 거르지도 줄 세우지도 않고 그 칸만 갈아 끼운다. 자리도 그대로다.
- * 다음에 검색어·분류·보기를 건드리면 그때 정리된다.
- */
 function refreshCard(p){
   const it = DATA.find(x => x.p === p);
   const el = document.querySelector('.item[data-p="' + p + '"]');
@@ -1683,23 +1239,15 @@ function hi(name, raw){
 }
 
 function card(it, raw){
-  // 아직 안 본 줄이 2,000건 넘게 섞여 있다. rate 가 null 인 채로 pct() 에
-  // 넘기면 그 자리에서 죽는다. 등급도 값도 없으면 회색으로만 둔다.
   const cls = it.nm ? "b-none b-nm"
             : it.rate == null ? "b-none"
             : it.rate < 0 ? "b-good"
             : it.rate === 0 ? "b-mid" : "b-bad";
-  // 아랫줄(차액)은 값이 없어도 자리를 비워 둔다. 값을 넣는 순간 줄이 하나
-  // 늘어나면 카드가 커지고, 아래 있던 것들이 그만큼 밀려 내려간다.
-  // 보던 자리가 흔들리는 것보다 빈 줄이 낫다.
   const badge = '<span class="badge ' + cls + '">' +
       (it.nm ? "비교군 없음" : it.rate == null ? WAIT : pct(it.rate)) + "</span>" +
       '<span class="gap">' +
       (it.rate == null ? "&nbsp;" : wonDiff(it.diff)) + "</span>";
   const tags = [];
-  // 면세는 맨 앞이다. 해외파병 같은 특정 대상만 살 수 있는 값이라,
-  // 일반 상품과 나란히 -82% 로 떠 있으면 아무나 그 값에 살 수 있는 것처럼
-  // 읽힌다. 할인율보다 먼저 눈에 들어와야 한다.
   if (it.df) tags.push('<span class="tag tag-df" title="' +
       esc(it.df === 2 ? "해외파병용입니다. 일반 판매가 아닙니다."
                       : "면세품입니다. 살 수 있는 사람이 정해져 있습니다.") +
@@ -1708,7 +1256,6 @@ function card(it, raw){
   if (it.mine) tags.push('<span class="tag tag-mine">폰에서 넣음</span>');
   if (it.q > 1) tags.push('<span class="tag">' + it.q + "개들이에서 낱개</span>");
   if (it.sub) tags.push('<span class="tag">' + esc(it.sub) + "</span>");
-  // 공유받은 찜 목록은 수량을 보여 주기만 한다(바꾸는 건 내 찜에 담은 뒤)
   if (WLIST && qtyOf(it.p) > 1) tags.unshift('<span class="tag tag-qty">' + qtyOf(it.p) + "개</span>");
   const mine = !WLIST && $("#view").value === "cart";
   const cq = mine ? '<div class="cq"><button class="qb" data-q="-1" aria-label="하나 빼기">&minus;</button>' +
@@ -1719,10 +1266,7 @@ function card(it, raw){
   const img = '<img class="thumb" loading="lazy" alt="" data-p="' + it.p +
       '" data-nm="' + esc(it.name) + '"' +
       (b ? ' src="data:image/webp;base64,' + b + '"'
-         // 사진 뭉치를 다 받았는데도 없으면 그 상품은 사진이 없는 것이다.
          : (PICSDONE ? ' src="' + BLANK + '" data-nopic="1"' : "")) + ">";
-  // 사진 아래에 파란 '쿠팡이동' 단추가 있었다. 카드 오른쪽 위에 화살표가
-  // 생기면서 같은 일을 하는 길이 셋(화살표·메뉴·이 단추)이 되어 걷어냈다.
   const left = '<div class="left">' + img + "</div>";
   return '<article class="item' + (mine && isGot(it.p) ? " bought" : "") + '" data-p="' + it.p + '">' +
     '<i class="cpg" title="쿠팡에서 보기">' + OUT + "</i>" +
@@ -1751,17 +1295,11 @@ addEventListener("scroll", () => {
       innerHeight + scrollY > document.body.offsetHeight - 700) more();
 }, {passive:true});
 
-/* ========================= 사진 크게 보기 ========================= */
-/* 작은 그림을 먼저 띄워 기다림이 없게 하고, 원본이 오면 조용히 바꿔 끼운다. */
 const BIGPIC = {};
-/* quiet 를 주면 받아만 두고 크게 보기 창은 건드리지 않는다. 갤러리에서
-   사진을 또렷하게 갈아 끼울 때 쓴다. 닫힌 창에 그림을 밀어 넣을 까닭이
-   없고, 창이 열린 채로 뒤에서 목록이 채워지면 보던 사진이 바뀌어 버린다. */
 async function showBig(p, quiet){
   if (BIGPIC[p]) { if (!quiet) $("#zoom img").src = BIGPIC[p]; return; }
   try {
     if (OPEN) {
-      /* 그냥 jpg 라 브라우저가 알아서 받고 캐시한다. 풀 것도 없다. */
       BIGPIC[p] = "big/" + p + ".jpg";
       if (!quiet && $("#zoom").style.display === "flex") $("#zoom img").src = BIGPIC[p];
       return;
@@ -1774,16 +1312,6 @@ async function showBig(p, quiet){
   } catch (e) { /* 작은 그림 그대로 둔다 */ }
 }
 
-/* ================== 다른 주소로 옮기기 · 백업 ==================
- *
- * 찜한 것과 넣은 값은 **주소마다 따로** 쌓인다. 브라우저가 그렇게 막아 둔
- * 것이라 `gunmart.netlify.app` 으로 옮기면 `demanico1.github.io` 것이
- * 안 보인다. 우회할 수 있는 성질이 아니다.
- *
- * 대신 통째로 싸서 옮기는 길을 낸다. 짐을 주소 뒤에 실어 보내고, 받는 쪽이
- * 열리자마자 풀어 넣는다. 브라우저를 갈아탈 때도, 실수로 사이트 데이터를
- * 지웠을 때도 같은 길로 되살린다.
- */
 function b64enc(str){
   const bytes = new TextEncoder().encode(str);
   let out = "";
@@ -1804,8 +1332,6 @@ function unpack(text){
   const at = t.indexOf("#import=");
   const data = JSON.parse(b64dec(at >= 0 ? t.slice(at + 8) : t));
   if (!data || data.v !== 1) throw new Error("모양이 다릅니다");
-  // 두 번 가져와도 겹치지 않게 넣고, 알릴 때는 '받은 짐' 전체를 센다.
-  // 이미 있던 것만 들어왔을 때 '0건' 이라고 하면 실패한 줄 안다.
   for (const p of (data.c || [])) if (!inCart(p)){
     CART.push(p);
     if (data.q && data.q[p] > 1) CQ[p] = data.q[p];
@@ -1819,25 +1345,14 @@ const ICO_BOOK = '<svg viewBox="0 0 24 24"><path d="M12 6.5C10.5 5.3 8.3 4.8 4 5
 const ICO_ADDHOME = '<svg viewBox="0 0 24 24"><path d="M8 3h8a1.5 1.5 0 0 1 1.5 1.5v15A1.5 1.5 0 0 1 16 21H8a1.5 1.5 0 0 1-1.5-1.5v-15A1.5 1.5 0 0 1 8 3zm4 6v6m-3-3h6" stroke-linecap="round"/></svg>';
 function openMove(){
   const n1 = CART.length, n2 = Object.keys(MINE).length;
-  /* ★ 2026-09-24 — 메뉴를 둘로 줄였다.
-   *
-   * `옮길 링크 복사`·`붙여넣어 가져오기`·`쿠팡이 안 열릴 때` 는 **한 번도
-   * 안 쓰이면서 처음 온 사람을 겁줬다.** 대신 `사용방법` 을 넣는다.
-   * 지운 것은 동작(`movelink`·`movein`·`noapp`)이 그대로 남아 있으니
-   * 단추만 되살리면 다시 쓸 수 있다. */
   openSheet("<h3>메뉴</h3>" +
     '<p class="note">찜한 것 ' + n1 + "건 · 넣은 값 " + n2 + "건</p>" +
-    // ★ 아이콘은 둘 다 같은 굵기의 선 그림 (2026-09-27). `?` 하나만 붙어
-    //   있어서 어색했다 — 사장님이 짚으셨다. 펼친 책 · 폰에 더하기.
     '<button class="go" data-act="help"><i class="ico">' + ICO_BOOK + "</i>사용방법</button>" +
     (STANDALONE ? "" : '<button data-act="install"><i class="ico">' + ICO_ADDHOME +
                        "</i>홈 화면에 추가</button>"));
 }
 $("#more").addEventListener("click", openMove);
 
-/* 이미 이 페이지를 보고 있는데 주소창에 옮길 링크를 붙여 넣으면 `#` 뒤만
-   바뀐다. 그때는 페이지가 다시 열리지 않아 아래 풀어 넣는 자리를 지나치지
-   않는다. 그래서 주소가 바뀌는 것도 따로 지켜본다. */
 addEventListener("hashchange", () => {
   const raw = location.hash.slice(1);
   if (raw.indexOf("import=") !== 0) return;
@@ -1851,11 +1366,6 @@ addEventListener("hashchange", () => {
   alert(msg);
 });
 
-/* ========================= 찜하기 ========================= */
-/* 폰으로 보다가 '이건 쿠팡에서 확인해 보자' 싶은 것을 담아 두는 곳이다.
-   이 기기의 브라우저에만 남는다. 지우면 사라진다. */
-/* 하트 하나를 만들어 두고 카드마다 같은 것을 쓴다. */
-/* 밖으로 나가는 화살표. 링크가 이 페이지를 떠난다는 뜻으로 널리 쓰인다. */
 const OUT = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
   '<path d="M14 5h5v5M19 5l-8 8M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8' +
   'a2 2 0 0 1 2-2h4"/></svg>';
@@ -1868,14 +1378,7 @@ const HEART = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
   '4.5 2.4C13.2 5.8 14.8 4.9 16.5 4.9 19 4.9 21 6.8 21 9.4c0 3.7-3.6 7.1-9 11z" ' +
   'stroke-linejoin="round"/></svg>';
 
-/* ===================== 목록 ⇄ 갤러리 =====================
- *
- * 사진을 크게 늘어놓고 훑는 보기. 검색·분류·정렬·보기·찜은 그대로 쓰고
- * **카드의 겉모양만** 바뀐다(`#list.gal`). 어느 쪽으로 봤는지는 기억해 둔다.
- */
 const GAL_KEY = "gmpx-gal";
-/* ★ 처음 열면 **무조건 갤러리** (2026-09-24). 사진이 커야 무엇을 파는
- * 곳인지 한눈에 안다. 한 번이라도 바꾸면 그다음부터는 그 사람 것을 따른다. */
 let GAL = true;
 try {
   const g = localStorage.getItem(GAL_KEY);
@@ -1896,8 +1399,6 @@ const ICO_LIST = '<svg viewBox="0 0 24 24" fill="currentColor">' +
 function setMode(on){
   GAL = !!on;
   $("#list").classList.toggle("gal", GAL);
-  // 단추에는 **바뀔 모습**을 그린다. 지금 모습을 그리면 무엇이 눌리는지 모른다.
-  // 단추에는 **바뀔 모습**을 그린다. 이름표도 같이 바뀐다.
   $("#mode").innerHTML = (GAL ? ICO_LIST : ICO_GAL) +
       '<em>' + (GAL ? "리스트" : "갤러리") + "</em>";
   $("#mode").title = GAL ? "목록으로 보기" : "갤러리로 보기";
@@ -1906,10 +1407,6 @@ function setMode(on){
 }
 $("#mode").addEventListener("click", () => setMode(!GAL));
 
-/* 갤러리에서는 목록용 120px 사진이 흐리다. **보이는 것만** 원본(긴 변 300px)
-   으로 갈아 끼운다. '사진 크게 보기' 가 쓰는 통로 그대로라 새로 만들 게 없고,
-   한 장 14KB 남짓이라 지나간 것만 받으면 부담이 없다.
-   원본도 300px 이 끝이다 — 받아 온 사진이 그 크기다. 2열이 한계인 이유. */
 const PICOBS = ("IntersectionObserver" in window) ? new IntersectionObserver(es => {
   for (const e of es){
     if (!e.isIntersecting) continue;
@@ -1918,17 +1415,6 @@ const PICOBS = ("IntersectionObserver" in window) ? new IntersectionObserver(es 
   }
 }, {rootMargin: "1200px 0px"}) : null;
 
-/* ★ 사진이 없는 상품이 4건 있다 (원본 2,259장 / 상품 2,263건).
- *
- * 갤러리에서 `big/<코드>.jpg` 로 갈아 끼우는데 그 파일이 없으면 404 가 나고
- * **깨진 그림 아이콘**이 뜬다. 목록에서는 작은 사진도 없어 빈 칸이다.
- *
- * 못 받으면 `src` 를 아예 떼어 버린다. 그러면 브라우저가 다시 받으려 하지
- * 않고 깨진 아이콘도 안 그린다. 칸은 `.thumb` 의 제 배경색(갤러리는 흰색)
- * 으로 **하얗게** 남는다. `data-nopic` 을 찍어 두어 다시 시도하지 않는다.
- *
- * 손짓은 `#list` 에 한 번만 건다. `error` 는 위로 안 올라오므로
- * **잡아채는 단계(capture)** 로 받아야 한다 — 마지막 `true` 가 그것이다. */
 $("#list").addEventListener("error", e => {
   const el = e.target;
   if (el.tagName !== "IMG") return;
@@ -1936,17 +1422,6 @@ $("#list").addEventListener("error", e => {
   el.src = BLANK;
 }, true);
 
-/* ★ 흐린 사진을 먼저, 선명한 사진은 **다 받은 뒤에만** (2026-09-26).
- *
- * 전에는 원본 주소를 곧바로 `src` 에 넣었다. 받는 동안의 틈이 그대로
- * 보였다. 지금 우리 서버는 한국 손님을 LA 로 붙여서 한 장에 0.3~1초라
- * 스크롤하면 사진이 전혀 못 따라왔다 — 사장님이 잡아내셨다.
- *
- * 이제는 따로 받아서 **그릴 준비가 끝났을 때만** 바꿔 낀다. 그동안은
- * 있던 흐린 사진이 그대로 남는다.
- *
- * **리스트·갤러리 둘 다** 바꿔 낀다. 흐린 사진은 64px 로 작게 만들어서
- * 잠깐 자리만 지킨다. 선명한 사진은 1년 보관이라 한 번만 받는다. */
 const SHARP = new Set();          // 다 받아서 곧바로 그릴 수 있는 원본
 const NOPIC = new Set();          // 원본이 없는 상품 (4건) — 다시 묻지 않는다
 const BUSY  = new Set();          // 미리 받기가 지금 받고 있는 것
@@ -1957,12 +1432,6 @@ async function sharpen(img){
   if (!SHARP.has(p)) {
     await showBig(p, 1);
     if (!BIGPIC[p]) return;
-    // 못 받으면 있던 것 그대로 둔다. 다시 시도하지 않게 표시만 한다 —
-    // 사진이 없는 상품 4건이 스크롤할 때마다 404 를 내지 않게.
-    //
-    // `decode()` 를 쓰지 마라. 탭이 가려져 있으면 크롬이 그림 풀기를 미뤄서
-    // **끝나지 않는다** — 폰에서 잠깐 다른 앱을 봤다 오면 사진이 영영 안
-    // 바뀐다. `onload` 는 받기만 끝나면 온다. 300px 사진이라 푸는 건 순식간이다.
     const ok = await new Promise(done => {
       const pre = new Image();
       pre.onload = () => done(true);
@@ -1982,27 +1451,6 @@ function sharpen_all(){
   }
 }
 
-/* ★ 접속한 동안 선명한 사진을 **전부** 미리 받아 둔다 (2026-09-26 사장님 지시).
- *
- * 전에는 화면 근처만 받아서, 처음 내려 보는 곳은 늘 흐렸다. 이제는 흐린
- * 사진 뭉치가 온 뒤부터 뒤에서 받아 둔다. 선명한 사진은 1년 보관이라 한 번
- * 받으면 끝이고, 중간에 나가도 받은 것은 남아 다음 방문에 이어서 받는다.
- *
- * - 순서: 지금 보고 있는 목록(VIEW) 먼저, 그다음 나머지(DATA).
- *   검색을 바꾸면 **다음 장부터** 새 목록 순서를 따른다
- * - **50장씩**, 낮은 순서로. 사장님 브라우저에서 600장으로 잰 것이다.
- *
- *       2장씩   초당 6.5장 — 2,259장에 5분 반
- *       4장씩   초당 13.6장
- *       50장씩  6.5초 (초당 90~190장) · 실패 0 · 그 사이 화면 사진은 평소와 같음
- *       100장씩 13.3초 — 오히려 느리다. 길이 막힌다
- *       전부    **실패** — 브라우저가 요청을 버린다 (`Failed to fetch`)
- *
- *   사진이 작아서 막는 건 양이 아니라 **LA 왕복 시간**이다. 한 번에 여럿을
- *   보내면 같은 왕복에 많이 실어 온다. "네 장이면 길이 꽉 찬다" 고 짐작했다가
- *   재 보고 틀린 걸 알았다. 늘릴 때는 늘 다시 재라.
- * - 전부 26MB · 15~25초. 폰의 '데이터 절약' 이 켜져 있으면 안 한다
- * - 잠긴 판(`OPEN` 아님)에서는 안 한다. 원본이 한 장씩 잠겨 있어 풀 열쇠가 든다 */
 let WARMING = false;
 function warmAll(){
   if (WARMING || !OPEN) return;
@@ -2011,8 +1459,6 @@ function warmAll(){
   const next = () => {
     for (const list of [VIEW, DATA])
       for (const it of list)
-        // 흐린 사진 뭉치에 없는 상품은 원래 사진이 없는 것이다(4건). 묻지 않는다 —
-        // 물으면 들어올 때마다 404 가 네 줄씩 콘솔에 찍힌다.
         if (!SHARP.has(it.p) && !NOPIC.has(it.p) && !BUSY.has(it.p)
             && !(PICSDONE && !PICS[it.p])) return it.p;
     return null;
@@ -2026,7 +1472,6 @@ function warmAll(){
     pre.onload = () => {
       BUSY.delete(p); SHARP.add(p);
       BIGPIC[p] = BIGPIC[p] || "big/" + p + ".jpg";
-      // 이미 그려진 카드면 곧바로 바꿔 낀다
       for (const img of document.querySelectorAll('#list img.thumb[data-p="' + p + '"]'))
         if (!img.dataset.nopic) img.src = BIGPIC[p];
       lane();
@@ -2040,33 +1485,16 @@ function warmAll(){
 const CART_KEY = "gmpx-cart";
 let CART = [];
 try {
-  // 예전에는 {p, name, g} 를 통째로 담았다. 상품코드만 남기고 나머지는
-  // 그릴 때 원래 줄에서 가져온다. 그래야 사진도 값도 목록과 똑같이 나온다.
   CART = (JSON.parse(localStorage.getItem(CART_KEY) || "[]") || [])
       .map(x => (x && x.p) ? x.p : x).filter(Boolean);
 } catch(e){}
 
 function inCart(p){ return CART.indexOf(p) >= 0; }
 
-/* ★ 찜을 장바구니처럼 쓴다 (2026-09-28 사장님).
- *
- * 수량(`CQ`)과 샀어요 표시(`GOT`)는 **찜 목록과 따로** 저장한다. 찜 목록
- * 모양(상품코드 배열)을 바꾸면 예전에 찜해 둔 사람의 목록이 깨진다.
- * 수량이 1이면 안 적는다 — 적힌 게 없으면 1이다.
- *
- * 합계는 찜 화면에서만 보여 준다. 첫 화면에서 '2,263개 다 사면' 을 안 보이는
- * 까닭(stats 의 주석)과 반대로, 찜은 **그 사람이 실제로 살 물건**이라
- * 'PX 가면 얼마 들고 얼마 아낀다' 가 바로 쓸모 있는 답이다. */
 const CQ_KEY = "gmpx-cart-q", GOT_KEY = "gmpx-cart-got";
-/* (ONL 은 맨 위 CP 옆에 있다) ★ 합계에서는 `쿠팡` 이 아니라 **`온라인`** 이라 부른다 (2026-09-28 사장님).
- * 비교 값의 대부분은 쿠팡이지만, 같은 상품이 없어 네이버·다나와 시세나 비슷한
- * 상품 값으로 넣은 줄(환산)이 섞여 있다. 합계는 그걸 다 더한 것이라 `온라인` 이
- * 참이다. 머리의 `군마트 vs 온라인` 과도 맞다. **카드의 `쿠팡 6,980원` 은 그대로**
- * — 한 줄 한 줄은 실제로 쿠팡에서 본 값이라 출처를 밝히는 게 믿음을 준다. */
 let CQ = {}, GOT = [];
 try { CQ = JSON.parse(localStorage.getItem(CQ_KEY) || "{}") || {}; } catch(e){ CQ = {}; }
 try { GOT = JSON.parse(localStorage.getItem(GOT_KEY) || "[]") || []; } catch(e){ GOT = []; }
-/* 공유받은 찜 목록의 수량. 받은 사람의 것(`CQ`)과 섞지 않는다 */
 let WQ = {};
 function qtyOf(p){ return (WLIST ? WQ[p] : CQ[p]) || 1; }
 function isGot(p){ return GOT.indexOf(p) >= 0; }
@@ -2078,9 +1506,6 @@ function saveCQ(){
     localStorage.setItem(GOT_KEY, JSON.stringify(GOT));
   } catch(e){}
 }
-/* ★ 장보기 목록 — 카톡·메모에 붙여 넣는 글 (2026-09-28 사장님).
- * 원래 `이름 전부 복사` 는 사장님 작업용(프로그램에 붙이기)이었다. 손님이 쓰도록
- * 수량·줄마다 PX 값·합계를 붙였다. `찜 공유하기` 는 링크, 이건 글이다. */
 function shopText(){
   const c = CARTSUM || {};
   const lines = VIEW.map(i => {
@@ -2094,13 +1519,6 @@ function shopText(){
   return "PX 장보기 목록 (" + c.kinds + "가지 · " + c.n + "개)\n" + lines.join("\n")
        + "\n" + tail;
 }
-/* ★ 필요한 자리에 도움말 말풍선 (2026-09-28 사장님).
- *
- * - 그 기능을 **처음 만났을 때** 띄운다
- * - 그 기능을 **한 번 써 보면** 끝(`u`). 아는 사람에게 또 띄울 까닭이 없다
- * - 안 써 보고 닫기만 했으면 **다음 방문에 한 번 더**, 거기까지(`n` 최대 2)
- * - 한 방문에 같은 풍선은 한 번만(sessionStorage)
- * - 다시 보고 싶으면 찜 화면의 `?` 단추가 늘 있다 — '왜 안 뜨지' 를 막는다 */
 const TIP_KEY = "gmpx-tips";
 let TIP_ON = null;
 function tipState(){ try { return JSON.parse(localStorage.getItem(TIP_KEY) || "{}") || {}; } catch(e){ return {}; } }
@@ -2123,7 +1541,6 @@ function showTip(name, el, text, after){
   if (!r.width || r.bottom < 60 || r.top > innerHeight - 20) return false;   // 화면 밖이면 안 띄운다
   t.n = (t.n || 0) + 1; st[name] = t; tipSave(st);
   try { sessionStorage.setItem("gmpx-tip-" + name, "1"); } catch(e){}
-  // 고정된 것(아래 초록 띠)을 가리키면 풍선도 고정 — 안 그러면 스크롤에 떨어져 나간다
   const fixed = getComputedStyle(el).position === "fixed";
   const d = document.createElement("div");
   d.className = "tip"; d.setAttribute("role", "status");
@@ -2139,12 +1556,9 @@ function showTip(name, el, text, after){
   d.style.top = (below ? r.bottom + 10 : r.top - 10 - d.offsetHeight) + (fixed ? 0 : scrollY) + "px";
   d.style.setProperty("--ax", Math.max(16, Math.min(w - 16, r.left + r.width / 2 - left)) + "px");
   TIP_ON = {name: name, d: d, after: after};
-  // ★ **눌렀을 때만** 닫는다. 처음엔 pointerdown 이라 스크롤하려고 손가락만 대도
-  //   사라졌다(2026-09-28 사장님). click 은 스크롤에서는 안 온다.
   setTimeout(() => document.addEventListener("click", closeTip, {capture: true, once: true}), 60);
   return true;
 }
-/* 풍선이 스크롤로 화면 밖으로 멀리 나가면 조용히 닫는다 */
 addEventListener("scroll", () => {
   if (!TIP_ON) return;
   const r = TIP_ON.d.getBoundingClientRect();
@@ -2175,13 +1589,6 @@ function scheduleTips(){
   }, 1500);
 }
 
-/* ★ 세부 종류 칩 — 세 가지 중 둘이 여기서 난다 (2026-09-28 사장님).
- * ① 분류를 고르면 그 안의 종류를 많은 순으로: `전체 212 · 크림 37 · 바디 25 …`
- * ② `전체` 에서 검색하면 결과에 섞인 종류를 많은 순으로 넷까지: `이 종류에서 크림 9 …`
- *    결과가 한 종류뿐이면 안 띄운다 — 띄워 봐야 쓸모가 없다.
- * (③ 상품 메뉴의 `같은 종류 더 보기` 는 `sameSub()`)
- * 개수는 세부 종류로 거르기 **전**(`BASE`)에서 센다. 고른 뒤에도 옆 칸 개수가 보여야
- * 옮겨 갈 수 있다. 찜·공유받은 목록·상품 하나 보기에는 안 띄운다. */
 function subChips(base, raw, view){
   const box = $("#subchips");
   if (!box) return;
@@ -2203,7 +1610,6 @@ function subChips(base, raw, view){
   box.classList.add("on");
 }
 
-/* 줄어든 머리의 검색칸 안 꼬리표 — 지금 보는 분류·종류 */
 function curTag(){
   const hd = $("header"), t = $("#curtag");
   if (!hd || !t) return;
@@ -2212,11 +1618,9 @@ function curTag(){
   const on = !!txt && !ONLY && !WLIST && view !== "cart" && view !== "mine";
   t.querySelector(".t").textContent = txt || "";
   hd.classList.toggle("tagged", on);
-  // 목록을 새로 그릴 때 맨 위 근처면 머리 아래 빈칸을 맞춘다 — 칩 줄이 생기고 사라져 머리 높이가 바뀐다
   if (window.fitHead && scrollY < 8) fitHead();
 }
 
-/* ③ 상품 메뉴의 `같은 종류 더 보기` — 그 상품의 분류·세부 종류를 골라 둔 채로 연다 */
 function sameSub(it){
   if ($("#view").value === "cart" || $("#view").value === "mine") $("#view").value = "all";
   ONLY = ""; WLIST = null; $("#onlytake").hidden = true;
@@ -2232,8 +1636,6 @@ function sameSub(it){
 
 function cartMode(){ return !!WLIST || $("#view").value === "cart"; }
 
-/* 합계 띠. 쿠팡 값이 없는 줄은 쿠팡 합계에서 빼고 몇 개인지 알린다.
- * 쿠팡 값이 비슷한 상품 값(환산)인 줄이 섞이면 '약' 을 붙인다. */
 function cartSum(){
   const box = $("#cartsum");
   if (!box) return;
@@ -2252,7 +1654,6 @@ function cartSum(){
   }
   const gap = cp - pxC, about = conv ? "약 " : "";
   CARTSUM = {px, cp, gap, n, kinds, noC, conv, left, leftN, gotN, about};
-  // 샀어요를 누른 게 있으면 **남은 것**을 보여 준다 — 장 보는 중엔 그게 궁금하다
   const cnt = gotN ? "남은 " + leftN + "개" : n + "개";
   const l = !cp ? "<b>" + cnt + "</b>"
     : "<small>" + cnt + " · " + ONL + "보다</small>" + (gap >= 0
@@ -2262,7 +1663,6 @@ function cartSum(){
   box.innerHTML = '<span class="l">' + l + "</span>" + '<span class="tot">' + tot + "</span>";
 }
 var CARTSUM = null;   // var — 첫 화면이 이 줄보다 먼저 cartSum 을 부를 수 있다
-/* 띠를 누르면 자세히 */
 function openCartSum(){
   const c = CARTSUM; if (!c) return;
   const row = (k, v, cls) => "<tr" + (cls ? ' class="' + cls + '"' : "") + "><td>" + k + "</td><td>" + v + "</td></tr>";
@@ -2280,19 +1680,6 @@ function openCartSum(){
     (notes.length ? '<p class="note">' + notes.join("<br>") + "</p>" : ""));
 }
 
-/* ===================== 폰에서 넣은 값 =====================
-   서버가 없으므로 이 기기의 브라우저에만 쌓인다. 화면에는 바로 반영되고,
-   나중에 한 번 복사해서 프로그램의 `여러 건 넣기`(Ctrl+B)에 붙이면 DB 로 간다. */
-/* 방금 값을 넣은 줄은 보기 조건에서 벗어나도 남겨 둔다.
- *
- * `아직 안 본 것` 으로 걸러 놓고 값을 넣으면 그 줄은 더 이상 '안 본 것' 이
- * 아니다. 거르는 순간 눈앞에서 사라져 얼마나 싼지 볼 새가 없다.
- * 그 칸만 갈아 끼우는 것으로는 부족했다 — 쿠팡에 다녀오면 목록을 처음부터
- * 다시 그리므로 그때 사라졌다. 그래서 **어느 줄을 남겨 둘지 따로 적어 둔다.**
- *
- * sessionStorage 에 두는 이유가 있다. 쿠팡에 다녀오는 동안 살아남아야 하고,
- * 창을 닫으면 없어지는 게 맞다. 검색어·분류·보기를 건드리면 그때 비운다.
- */
 const KEEP_KEY = "gmpx-keep";
 let KEEP = new Set();
 try { KEEP = new Set(JSON.parse(sessionStorage.getItem(KEEP_KEY) || "[]")); } catch(e){}
@@ -2305,7 +1692,6 @@ function keepClear(){
   KEEP.clear();
   try { sessionStorage.removeItem(KEEP_KEY); } catch(e){}
 }
-/* 목록을 처음부터 다시 볼 때. 남겨 둔 것을 비우고 그린다. */
 function runFresh(){ keepClear(); run(); }
 
 const MINE_KEY = "gmpx-mine";
@@ -2318,20 +1704,14 @@ function saveMine(){
   markMine();
 }
 
-/* 폰에 쌓인 것은 이 브라우저에만 있다. 프로그램으로 옮기기 전까지는
-   몇 건이 기다리고 있는지 눈에 보여야 잊지 않는다. */
 function markMine(){
   const n = Object.keys(MINE).length;
-  // 드롭다운이 하나로 합쳐졌으니 거기에 적는다. 숨긴 `#view` 쪽도
-  // 같이 맞춰 둔다 — 나중에 되살릴 때 헷갈리지 않게.
   for (const sel of ["#sort", "#view"]){
     const opt = $(sel).querySelector('option[value="mine"]');
     if (opt) opt.textContent = n ? "직접 입력한 것 " + n + "건" : "직접 입력한 것";
   }
 }
 
-/* 넣은 값을 줄에 덮어씌운다. 원래 값은 c0·r0… 에 따로 둬서 지우면 되돌아간다.
-   셈은 프로그램의 calc() 과 똑같다 — 낱개 = 금액 ÷ 수량, 할인율은 쿠팡 기준. */
 function applyMine(){
   for (const it of DATA){
     if (it.c0 === undefined){
@@ -2353,7 +1733,6 @@ function applyMine(){
   }
 }
 
-/* 프로그램의 `여러 건 넣기` 가 그대로 알아듣는 글로 만든다. */
 function mineText(){
   return Object.keys(MINE).map(p => {
     const m = MINE[p];
@@ -2366,27 +1745,7 @@ function saveCart(){
   n.textContent = CART.length;
   n.style.display = CART.length ? "block" : "none";
 }
-/* 쿠팡은 **같은 창에서** 연다.
-   새 탭으로 띄우면 폰에서 뒤로가기를 눌러도 이 목록으로 안 돌아온다.
-   돌아올 때를 대비해 보고 있던 자리를 적어 둔다. 브라우저가 화면을
-   통째로 기억해 두면(bfcache) 이건 쓰이지 않고, 아니면 이걸로 되살린다. */
 const STATE_KEY = "gmpx-state";
-/* 파트너스 링크가 있으면 그걸로 간다(`it.a`). 없으면 평범한 검색 주소로.
-   링크는 구울 때 PC 에서 만들어 잠긴 자료에 넣어 둔 것이다 — 키는 여기 없다.
-
-   **같은 창에서 간다.** 새 창으로도 해 봤지만 사장님이 같은 창을 골랐다.
-   브라우저에 머무는 경우에는 뒤로가기 한 번으로 보던 자리에 돌아온다.
-   폰에서 앱이 열리면 그 창을 앱이 가져가므로 돌아올 곳이 없어지는데,
-   브라우저를 다시 열고 주소를 열면 적어 둔 자리로 되살아난다.
-
-   틀(iframe) 안에 쿠팡을 띄우는 건 안 된다. 쿠키가 안 따라 들어가서
-   '사용권한이 없습니다' 가 뜬다. 홈을 먼저 거쳐도 마찬가지였다. */
-/* 앱이 깔려 있는지 물어보는 단계를 뒀다가 걷어냈다.
- *
- * 그 장치가 쓸모 있는 경우는 '앱도 없고 + 그 브라우저로 쿠팡이 처음' 인
- * 사람뿐인데, 그러자고 모두에게 탭을 한 번 더 시켰다. 게다가 오류를
- * 만나도 ⋯ 의 '쿠팡이 안 열릴 때' 로 스스로 고칠 수 있다.
- * 드문 경우를 막으려고 늘 쓰는 길을 불편하게 만들면 안 된다. */
 function coupang(name, link){
   hideOverlays();                       // 덮개는 그냥 감춘다 (뒤로가기 말고)
   try { history.replaceState({}, ""); } catch(e){}   // 덮개 발자국을 지운다
@@ -2399,16 +1758,9 @@ function coupang(name, link){
   const url = link || ("https://www.coupang.com/np/search?q="
                        + encodeURIComponent(name));
 
-  /* `intent://` 로 앱을 지목해 보냈더니 **앱이 깔려 있는데도** 안내 화면으로
-     떨어졌다. 쿠팡 앱이 그 모양의 주소를 안 받는 것이다. 폰에서 확인하고
-     되돌렸다. 평범한 주소로 보내면 안드로이드가 알아서 앱을 띄운다.
-
-     앱이 없는 사람은 ⋯ 메뉴의 '쿠팡이 안 열릴 때' 로 안내를 볼 수 있다. */
   location.href = url;
 }
 
-/* 앱이 없어 되돌아왔을 때. 쿠키만 생기면 웹으로도 멀쩡히 보이므로
-   '쿠팡 홈 한 번 열기' 가 사실상의 해결책이다. */
 function openNoApp(){
   openSheet("<h3>쿠팡 앱이 없습니다</h3>" +
     '<p class="note">앱이 없으면 쿠팡 웹으로 가는데, 이 브라우저로 쿠팡이 ' +
@@ -2418,9 +1770,6 @@ function openNoApp(){
     '<button data-act="cpginstall">쿠팡 앱 설치하기</button>');
 }
 
-/* 폰의 뒤로가기는 덮개(확대·고르기)가 떠 있으면 **그것만** 닫아야 한다.
-   그냥 두면 페이지를 통째로 떠나 버려서 보던 목록이 사라진다.
-   덮개를 열 때 발자국을 하나 남기고, 뒤로가기가 오면 그걸 닫는 데 쓴다. */
 function markOverlay(){
   if (!(history.state && history.state.ov)) {
     try { history.pushState({ov:1}, ""); } catch(e){}
@@ -2453,10 +1802,6 @@ function openSheet(html, cls){
 }
 function closeSheet(){ dismiss(); }
 
-/* 사용방법 — 처음 온 사람에게 무엇을 어떻게 쓰는지 알려 준다.
- * ★ 2026-09-27 사장님 확인을 받고 새로 썼다. 번호마다 끊어 필요한 것만 찾아
- * 읽게 했다. 화면의 단추 이름과 글자가 **똑같아야** 한다 — 단추 이름을
- * 바꾸면 여기도 같이 바꿔라. */
 function openHelp(sec){
   const ico = d => '<span class="hic"><svg viewBox="0 0 24 24">' + d + "</svg></span>";
   const I = {
@@ -2594,8 +1939,6 @@ $("#sheet").addEventListener("click", e => {
     else setTimeout(() => { if ($("#view").value !== "cart" && CART.length) openCart(); }, 400);
     return;
   }
-  // 여기서 closeSheet() 를 부르면 안 된다. 그건 history.back() 이라서
-  // 방금 시킨 쿠팡 이동을 취소해 버린다. 실제로 그래서 안 넘어갔다.
   if (act === "coupang"){
     const it = DATA.find(x => x.p === b.dataset.p);
     return coupang(b.dataset.q, it && it.a);
@@ -2608,29 +1951,6 @@ $("#sheet").addEventListener("click", e => {
   if (act === "share"){
     const it = DATA.find(x => x.p === p);
     if (!it) return;
-    /* ★ 2026-09-25 — **상품 페이지 주소**를 보낸다.
-     *
-     * 전에는 `#p=코드` 를 보냈다. 그런데 `#` 뒤는 카톡이 안 읽어서
-     * 미리보기에 **늘 앱 소개 카드**가 떴다. 삼다수를 보냈는데 받는 사람
-     * 화면에는 `군마트 값, 온라인과 비교` 가 뜬다.
-     *
-     * `/p/<코드>/` 는 그 상품만의 페이지라 제목·설명·**사진**이 다 그
-     * 상품 것이다(`상품페이지_만들기.py` 의 `og:` 들). 받는 사람이 무엇을
-     * 받았는지 바로 안다.
-     *
-     * ★ **주소 끝에 `/` 가 없을 때를 조심해라** (2026-09-25 사장님이 잡아
-     * 주셨다). 전에는 `pathname.replace(/[^/]*$/, "")` 한 줄로 끝 토막을
-     * 잘라냈는데, 그러면 이렇게 된다.
-     *
-     *     /n-3c7570/            →  /n-3c7570/p/35032/   ✓
-     *     /n-3c7570             →  /p/35032/            ✗ 404
-     *     /n-3c7570/index.html  →  /n-3c7570/p/35032/   ✓
-     *
-     * `n-3c7570` 을 **파일 이름으로 보고 잘라낸 것**이다. 슬래시 없는
-     * 주소는 홈 화면에 붙여 두거나 손으로 칠 때 흔하다. 실제로 삼다수를
-     * 공유했더니 받는 쪽에서 안 열렸다.
-     *
-     * 그래서 **점(.)이 있으면 파일, 없으면 폴더**로 가른다. */
     let path = location.pathname;
     if (!path.endsWith("/")){
       const cut = path.lastIndexOf("/");
@@ -2638,14 +1958,7 @@ $("#sheet").addEventListener("click", e => {
            ? path.slice(0, cut + 1)      // 파일 이름이다 — 턴다
            : path + "/";                 // 폴더다 — 슬래시를 붙인다
     }
-    /* ★ 2026-09-26 — `/p/` 가 아니라 **공유 전용 `/s/`** 를 보낸다.
-     * `/p/` 로 보냈더니 받은 사람이 앱이 아니라 상품 페이지로 갔다 — 사장님이
-     * 잡아 주셨다. `/s/<코드>/` 는 미리보기는 그 상품 것으로 보여 주고,
-     * 누르면 곧바로 이 앱 `#p=<코드>` 로 넘어온다 (`상품페이지_만들기.py`). */
     const url = location.origin + path + "s/" + p + "/";
-    /* 글은 담백하게. 얼마나 · 몇 % 싼지만 적는다.
-     * **이름을 여기 또 넣지 마라** — `title` 에 이미 있어서 카톡에 두 번
-     * 찍힌다. 실제로 상품명이 두 줄로 겹쳐 나왔다. */
     const gap = it.c == null ? null : Math.round(it.c - it.g);
     const line = it.rate == null
       ? "군마트 " + won(it.g)
@@ -2654,13 +1967,10 @@ $("#sheet").addEventListener("click", e => {
             + won(gap) + "(" + Math.abs(Math.round(it.rate)) + "%) 저렴"
           : "군마트 " + won(it.g) + " — " + srcOf(it) + iGa(srcOf(it)) + " "
             + won(-gap) + "(" + Math.round(it.rate) + "%) 저렴");
-    // 안드로이드·아이폰은 navigator.share 로 카톡·문자에 바로 보낸다.
-    // 데스크톱 크롬은 이게 없어서 주소를 복사해 준다.
     if (navigator.share){
       navigator.share({title: it.name, text: line, url: url}).catch(() => {});
       return;
     }
-    // 복사할 때는 제목이 따로 안 붙으니 이름을 앞에 넣는다.
     try { navigator.clipboard.writeText(it.name + "\n" + line + "\n" + url); }
     catch(e){}
     b.textContent = "주소를 복사했습니다";
@@ -2672,7 +1982,6 @@ $("#sheet").addEventListener("click", e => {
     return;
   }
   if (act === "install"){ closeSheet(); return setTimeout(openInstall, 260); }
-  // 크롬으로 이 주소를 다시 연다. 거기서는 홈 화면 추가가 단추 하나다.
   if (act === "addchrome") return openIn("com.android.chrome");
   if (act === "noapp") return openNoApp();
   if (act === "cpghome"){ location.href = "https://www.coupang.com/"; return; }
@@ -2713,14 +2022,8 @@ $("#sheet").addEventListener("click", e => {
   }
 });
 
-/* 찜한 것은 따로 만든 창이 아니라 **목록의 한 보기**다. 그래야 사진도
-   값도 할인율도 목록에서 보던 그대로 나온다. 검색·정렬도 그대로 듣는다. */
-/* 자리는 우리가 되돌린다. 이걸 끄지 않으면 뒤로가기 때 브라우저가 제
-   기록대로 스크롤을 다시 맞춰 버려서, 우리가 옮겨 놓은 자리가 0 으로 덮인다. */
 try { history.scrollRestoration = "manual"; } catch(e){}
 
-/* 찜한 것을 열면 보던 화면을 적어 둔다. 하트를 한 번 더 누르거나 폰
-   뒤로가기를 누르면 그 자리로 되돌아온다. 잠깐 들렀다 오는 곳이라서다. */
 let PREV = null;
 
 function fillTo(y){
@@ -2751,10 +2054,6 @@ function restorePrev(){
   }
 }
 
-/* ★ 찜 가져오기 (2026-09-28 사장님). 받은 찜 주소나 장보기 목록 글을 붙여 넣으면
- * 상품번호·수량을 찾아 **내 찜에 더한다** — 있던 찜은 안 지운다.
- * 아이폰은 사파리와 홈 화면 웹 앱의 찜이 따로 저장되는데(webAppNote), 복사한
- * 글은 둘이 함께 쓰므로 이걸로 옮긴다. 폰↔PC, 가족이 보낸 목록도 같은 길이다. */
 function openImport(){
   openSheet("<h3>찜 가져오기</h3>" +
     '<p class="note">받은 찜 주소나 장보기 목록 글을 통째로 붙여 넣으세요. ' +
@@ -2808,7 +2107,6 @@ function openCart(){
   scrollTo(0, 0);
   try { history.pushState({cart:1}, ""); } catch(e){}
 }
-/* 쿠팡에서 값을 보고 온 참에 바로 넣는 자리. 두 칸이면 충분하다. */
 function openPrice(p){
   const it = DATA.find(x => x.p === p); if (!it) return;
   const m = MINE[p] || {};
@@ -2828,31 +2126,18 @@ function openPrice(p){
   setTimeout(() => { const el = $("#pin"); if (el) el.focus(); }, 60);
 }
 
-/* 카톡·인스타 같은 앱 안의 브라우저는 저장하는 곳이 따로다. 거기서 넣은 값은
-   크롬을 열면 하나도 안 보인다. 모르고 하루치를 날리지 않도록 막아 준다. */
 const UA = navigator.userAgent;
 const IN_APP = /KAKAOTALK|Instagram|FBAN|FBAV|NAVER\(inapp|Line\/|DaumApps|;wv\)/i.test(UA);
 const IOS = /iPhone|iPad|iPod/i.test(UA);
 
-/* 안드로이드는 `intent://` 로 원하는 브라우저를 지목해 띄울 수 있다.
-   주소에 붙은 `#검색어` 는 떼어내야 한다. intent 주소도 # 로 옵션을 붙이는
-   문법이라, 그대로 두면 서로 엉켜 열리지 않는다. */
 function openIn(pkg){
   const bare = location.href.split("#")[0].replace(/^https?:\/\//, "");
-  // `browser_fallback_url` 을 붙여 둔다. **그 브라우저가 안 깔려 있으면**
-  // 안드로이드가 오류 화면을 내거나 플레이 스토어로 튄다. 그 대신
-  // 지금 보던 주소로 돌아오게 한다 — 아무 일도 안 일어난 것처럼.
   location.href = "intent://" + bare +
       "#Intent;scheme=https;package=" + pkg +
       ";S.browser_fallback_url=" + encodeURIComponent(location.href.split("#")[0]) +
       ";end";
 }
 
-/* 어느 브라우저인가. **한국은 크롬이 아닌 경우가 많다** — 삼성 인터넷이
-   특히 그렇다. 메뉴 이름과 자리가 브라우저마다 달라서, 한 가지 안내문을
-   모두에게 보여 주면 아무도 못 따라온다.
-   차례가 중요하다 — 삼성·웨일·엣지 UA 에는 `Chrome` 도 같이 들어 있어서
-   크롬을 먼저 보면 전부 크롬으로 읽힌다. */
 function browserKind(){
   const u = navigator.userAgent;
   if (/SamsungBrowser/i.test(u)) return "samsung";
@@ -2863,24 +2148,6 @@ function browserKind(){
   if (/Chrome|CriOS/i.test(u))   return "chrome";
   return "";
 }
-/* ★ 앱 안 브라우저 → **그 폰의 기본 브라우저**로 (2026-09-27 사장님 지시).
- *
- * 카톡·네이버 앱·인스타 안의 브라우저는 저장하는 곳이 따로라, 거기서 한 찜은
- * 사파리·삼성 인터넷·크롬에서 안 보인다. 홈 화면 추가도 안 된다. 그래서
- * 기본 브라우저로 넘기기를 권한다 — **그 사람이 평소 쓰는 브라우저**다.
- * 안드로이드를 전부 삼성 인터넷으로 박으면 삼성폰이 아니거나 크롬을 쓰는
- * 사람이 어긋난다.
- *
- *   카톡      `kakaotalk://web/openExternal?url=` — 아이폰은 사파리, 안드로이드는 기본 브라우저
- *   라인      주소에 `openExternalBrowser=1` 을 붙이면 라인이 밖으로 연다
- *   안드로이드 그 밖   `intent://` 에 **앱을 지목하지 않고** 보낸다 → 기본 브라우저
- *   아이폰 그 밖       웹에서 사파리를 부를 길이 없다 → 여는 법 + 주소 복사
- *
- * **넘길 때 보던 화면과 찜·넣은 값을 싣는다** (`?h=` · `?imp=`). 넘어간 쪽에서
- * `CARRY` 가 풀어 넣고 `카톡에서 찜한 3개를 가져왔어요` 를 띄운다.
- * `#` 가 아니라 `?` 인 까닭 — `intent://` 는 `#` 뒤를 제 옵션 자리로 쓴다.
- *
- * ★ 카톡 주소는 **실제 폰에서 확인해야** 한다. 여기서는 못 돌려 본다. */
 const APP = /KAKAOTALK/i.test(UA) ? "kakao"
           : /NAVER\(inapp/i.test(UA) ? "naver"
           : /Instagram/i.test(UA) ? "insta"
@@ -2891,12 +2158,10 @@ const APP = /KAKAOTALK/i.test(UA) ? "kakao"
           : IN_APP ? "app" : "";
 const APP_NAME = {kakao: "카톡", naver: "네이버 앱", insta: "인스타", fb: "페이스북",
                   line: "라인", band: "밴드", daum: "다음 앱", app: "이 앱"};
-/* 아이폰에서 사파리를 곧바로 부를 수 있는 건 카톡·라인뿐이다 */
 const OUT_DIRECT = APP === "kakao" || APP === "line" || !IOS;
 const OUT_WORD = IOS ? "사파리" : "브라우저";
 let OUT_URL = "";
 
-/* 넘길 주소 — 지금 보던 곳(`h`)과 찜·넣은 값(`imp`)을 싣는다 */
 function outURL(){
   const q = new URLSearchParams();
   const h = location.hash.slice(1);
@@ -2916,8 +2181,6 @@ function goOut(){
     return;
   }
   if (!IOS){
-    // 앱을 지목하지 않는다 — 안드로이드가 그 사람의 기본 브라우저로 연다.
-    // 못 열면 지금 주소로 되돌아온다(아무 일 없던 것처럼).
     location.href = "intent://" + url.replace(/^https?:\/\//, "") +
         "#Intent;scheme=https;S.browser_fallback_url=" + encodeURIComponent(url) + ";end";
     return;
@@ -2931,7 +2194,6 @@ function goOut(){
     (CART.length ? "<br>찜한 것도 같이 옮겨져요." : "") + "</p>");
 }
 
-/* 아래 띠. `mode` — "ask" 는 처음 권유, "jit" 는 찜을 누른 그 순간 */
 function inbar(mode){
   let bar = $("#inbar");
   if (!bar){
@@ -2946,8 +2208,6 @@ function inbar(mode){
         return openInstall();
       }
       if (e.target.closest(".x")){
-        // ✕ 는 **7일** 기억한다. 공유받은 링크를 열 때마다 뜨면 짜증 난다.
-        // 대신 찜을 누를 때는 따로 한 번 짚어 준다(`jit`) — 실제로 손해 보는 순간이다.
         if (bar.dataset.mode === "ask")
           try { localStorage.setItem("gmpx-inbar", String(Date.now() + 7 * 864e5)); } catch(err){}
         bar.classList.remove("on");
@@ -2970,8 +2230,6 @@ function inbar(mode){
       "<span>찜한 상품이 저장되고, 홈 화면에서 바로 열 수 있어요.</span></div>" +
       '<button class="go">' + OUT_WORD + (OUT_DIRECT ? "로 열기" : "로 여는 법") + "</button>" +
       '<button class="x" aria-label="닫기">&#10005;</button>';
-  // `requestAnimationFrame` 을 쓰지 마라. 탭이 가려져 있으면 안 와서 띠가
-  // 영영 안 올라온다. 붙인 뒤 한 박자 쉬었다 켜면 올라오는 움직임도 산다.
   setTimeout(() => {
     bar.classList.add("on");
     document.body.style.paddingBottom = (bar.offsetHeight + 24) + "px";
@@ -2983,7 +2241,6 @@ function inbarOff(){
 }
 if (IN_APP && !inbarOff()) setTimeout(() => inbar("ask"), 2500);
 
-/* 찜을 누른 그 순간 — 이번 방문에 한 번만 */
 function inappJit(){
   if (!IN_APP) return;
   try {
@@ -2993,7 +2250,6 @@ function inappJit(){
   inbar("jit");
 }
 
-/* 짧게 알리고 사라지는 한 줄 */
 function toast(msg){
   let t = $("#toast");
   if (!t){ t = document.createElement("div"); t.id = "toast"; document.body.appendChild(t); }
@@ -3003,20 +2259,10 @@ function toast(msg){
   toast._t = setTimeout(() => t.classList.remove("on"), 3500);
 }
 
-/* ★ 찜 목록 공유 (2026-09-26 사장님 지시).
- *
- * `/w/?c=코드-코드-…` 를 보낸다. `#` 가 아니라 `?` 인 까닭은 카톡이 `#` 뒤를
- * 안 읽어서다 — `/w/` 는 클라우드플레어 서버 기능(`functions/w/index.js`)이
- * 받아 **미리보기(몇 개 · 첫 상품 사진)** 를 만들고, 사람이 누르면 이 앱
- * `#w=…` 로 넘긴다. 찜 목록은 어디에도 저장하지 않는다. 주소에 실려 갈 뿐이다.
- *
- * 앱 주소 뒤에 폴더가 붙어 있어도(예전 깃허브 주소) 맞게 가도록 상품 공유와
- * 같은 방식으로 뿌리를 찾는다. */
 function cartUrl(){
   const have = new Set(DATA.map(x => x.p));
   const codes = CART.filter(p => have.has(p));
   if (!codes.length) return null;
-  // ★ 수량도 싣는다 (2026-09-28): `32814x2-36874` — 1개면 코드만
   const toks = codes.map(p => CQ[p] > 1 ? p + "x" + CQ[p] : p);
   let path = location.pathname;
   if (!path.endsWith("/")){
@@ -3025,9 +2271,6 @@ function cartUrl(){
   }
   return {url: location.origin + path + "w/?c=" + toks.join("-"), n: codes.length};
 }
-/* ★ `찜 공유하기` 하나로 **장보기 목록 글 + 찜 주소**를 같이 보낸다 (2026-09-28 사장님).
- * 받은 사람은 글로 바로 읽고, 주소를 눌러 사진·값을 보고 `내 찜에 담기` 까지 한다.
- * 앱에 따라 글을 버리고 주소만 받기도 하는데, 주소만으로도 목록·합계가 다 보인다. */
 function shareCart(b){
   const u = cartUrl(); if (!u) return;
   const title = "PX 찜 목록 " + u.n + "개";
@@ -3052,7 +2295,6 @@ $("#cartbar").addEventListener("click", e => {
   if (b.dataset.act === "clear"){
     if (mine){ MINE = {}; saveMine(); }
     else {
-      // 실수로 누르면 되돌릴 길이 없다. 한 번 묻는다 (2026-09-28)
       if (!confirm("찜 " + CART.length + "개를 모두 지울까요?")) return;
       CART = []; saveCart(); saveCQ();
     }
@@ -3068,11 +2310,6 @@ $("#cartbar").addEventListener("click", e => {
 });
 saveCart();
 
-/* ========================= 목록에서 누를 때 ========================= */
-/* 카드를 길게 누르면 곧장 값 넣는 자리로 간다.
-   훑으면서 넣을 때 메뉴를 한 번 거치지 않아도 된다.
-   아이콘 위에서는 안 되게 한다 — 거기는 저마다 할 일이 있다.
-   손가락이 10px 넘게 움직이면 목록을 넘기려는 것이므로 그만둔다. */
 $("#onlytake").addEventListener("click", e => {
   if (!WLIST) return;
   tipUsed("wtake");
@@ -3095,8 +2332,6 @@ $("#onlyall").addEventListener("click", () => {
   run();
 });
 
-/* 빈 화면의 안내 단추. 목록에 위임해 둔다 — 안내는 그릴 때마다 새로
- * 만들어지므로 단추마다 붙이면 붙인 것이 계속 쌓인다. */
 $("#list").addEventListener("click", e => {
   const b = e.target.closest(".e-go");
   if (!b) return;
@@ -3111,20 +2346,12 @@ $("#list").addEventListener("click", e => {
   run();
 });
 
-/* ★ 길게 눌러 값 넣기를 걷어냈다 (2026-09-24).
- *
- * **배운 사람만 아는 손짓이라 아무도 안 썼다.** 게다가 훑어 내리다 손가락이
- * 멈추면 엉뚱하게 값 넣기 창이 떴다. 값은 상품명을 눌러 나오는 자리에서
- * 넣는다 — 거기에 글자로 적혀 있어 처음 온 사람도 찾는다.
- *
- * 되살리려면 `백업/웹4차_20260924/웹틀.html` 에 그대로 있다. */
 $("#list").addEventListener("click", e => {
   const card = e.target.closest(".item"); if (!card) return;
   const p = card.dataset.p;
   const it = DATA.find(x => x.p === p); if (!it) return;
 
   if (e.target.closest(".cpg")) return coupang(it.name, it.a);
-  // 수량 −/+ · 샀어요. 다시 그리지 않고 그 카드와 합계만 바꾼다 — 보던 자리가 안 튄다
   const qb = e.target.closest(".qb");
   if (qb || e.target.closest(".got")) tipUsed("cartq");
   if (qb){
@@ -3146,16 +2373,10 @@ $("#list").addEventListener("click", e => {
     if (inCart(p)) CART = CART.filter(x => x !== p);
     else { CART.push(p); inappJit(); homeHint(); tipUsed("heart"); }
     saveCart(); saveCQ();
-    // 찜한 것 보기에서는 줄이 빠져야 하니 다시 그리고, 아니면 하트만 바꾼다
     if ($("#view").value === "cart") return run();
     cartIcon.classList.toggle("on", inCart(p));
     return;
   }
-  // ★ 갤러리에서는 사진이 이미 크다. 또 키워 봐야 얻는 것이 없어서,
-  // 누르면 **이름을 누른 것과 같게** 아래 창으로 내려보낸다 (2026-09-24).
-  // 목록에서는 사진이 작으니 그대로 '크게 보기' 다.
-  //
-  // 사진이 없는 줄은 크게 보기를 안 연다 — 빈 창이 뜨고 거기서 또 깨진다.
   let img = GAL ? null : e.target.closest(".thumb");
   if (img && (img.dataset.nopic || !img.getAttribute("src"))) img = null;
   if (img){
@@ -3166,14 +2387,10 @@ $("#list").addEventListener("click", e => {
     showBig(p);
     return;
   }
-  // 상품명 쪽을 누르면 무엇을 할지 고르게 한다
-  // 이미 한 일인지 아닌지가 글자와 그림에 같이 드러나야 헷갈리지 않는다.
   const on = inCart(p);
   openSheet("<h3>" + esc(it.name) + "</h3>" +
     '<p class="note">군마트 ' + won(it.g) +
       (it.c != null ? " · " + srcOf(it) + " " + won(it.c) : "") + "</p>" +
-    /* ★ 근거 한 줄 (2026-09-29 사장님 시안) — 손님이 바로 아래 단추로 쿠팡에 가서
-       같은 판매글을 맨 위에서 확인할 수 있게. 목록 카드에는 안 싣는다(지저분해서). */
     (it.b && it.c != null ? '<p class="note basis">' + esc(it.b) + "</p>" : "") +
     '<button class="go" data-act="coupang" data-p="' + p + '" data-q="' +
       esc(it.name) + '"><i class="ico cpg-img"></i>' + CP + " 가격 확인하기</button>" +
@@ -3183,8 +2400,6 @@ $("#list").addEventListener("click", e => {
     '<button data-act="' + (on ? "del" : "add") + '" data-p="' + p + '">' +
       '<i class="ico' + (on ? " on" : "") + '">' + HEART + "</i>" +
       (on ? "찜하기 취소" : "찜하기") + "</button>" +
-    // 공유는 찜하기 바로 아래다. 길게 누르기로만 열리던 자리에 두었더니
-    // 아무도 못 찾았다 — 길게 누르기는 배운 사람만 아는 손짓이다.
     '<button data-act="share" data-p="' + p + '"><i class="ico share">↗</i>' +
       "공유하기</button>" +
     '<button data-act="price" data-p="' + p + '"><i class="ico won">₩</i>' +
@@ -3193,42 +2408,16 @@ $("#list").addEventListener("click", e => {
 $("#zoom").addEventListener("click", dismiss);
 </script>
 <script>
-/* 홈 화면에 추가해 두면 앱처럼 열린다. 그러려면 서비스워커가 하나 있어야
-   한다(크롬의 설치 조건).
-   ★ **캐시를 먼저 보게 하면 안 된다.** 이 화면 파일은 옛것이 남아 사람들
-   폰에서 잠금 화면이 계속 떴던 적이 있다(head 의 주석). 그래서 워커는
-   **늘 네트워크를 먼저** 보고, 못 받을 때만 캐시를 내준다. */
 if ("serviceWorker" in navigator)
   addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 
-/* 안드로이드·데스크톱 크롬은 설치할 수 있게 되면 이 신호를 준다.
-   아이폰 사파리는 신호가 없어서 직접 알려 줘야 한다. */
-/* `beforeinstallprompt` 는 이제 안 온다 — manifest 가 display:browser 라서다
-   (북마크 방식, 2026-09-27). 받아 두던 코드는 걷어냈다. */
 const STANDALONE = matchMedia("(display-mode: standalone)").matches
                 || navigator.standalone === true;
 
-/* 권유 띠를 보일지 정한다.
- *
- * **네 번 물어야 한다.**
- *   1) 이미 홈 화면에서 열고 있나 — 그러면 권할 게 없다
- *   2) 영영 안 보겠다고 했나 — `localStorage`
- *   3) 이번에만 닫았나 — `sessionStorage`. 다음에 들어오면 다시 뜬다
- *   4) 앱 안의 브라우저인가 — 카톡 안에서는 홈 화면 추가가 아예 안 된다
- *
- * ★ **✕ 는 '이번만' 이다.** 처음엔 ✕ 를 영영 안 보이게 만들어 뒀는데,
- * 잘못 눌렀거나 나중에 마음이 바뀐 사람에게 다시 권할 길이 사라진다.
- * 영영 끄는 것은 사람이 그렇게 말했을 때만 한다 — 닫을 때 한 번 물어본다.
- *
- * 안드로이드 크롬은 `beforeinstallprompt` 가 늦게 온다. 그래서 그 신호를
- * 기다리지 않고 먼저 띄운다 — 눌렀을 때 신호가 없으면 하는 법을 알려 준다.
- * 아이폰은 신호 자체가 없으므로 처음부터 그 길뿐이다.
- */
 function addOff(){
   try {
     if (localStorage.getItem("gmpx-add") === "no") return true;
     if (sessionStorage.getItem("gmpx-add") === "skip") return true;
-    // 안내를 봤으면 30일 동안 안 권한다. 아이폰은 넣었는지 알 길이 없다.
     if (Date.now() < Number(localStorage.getItem("gmpx-add-until") || 0)) return true;
   } catch(e){}
   return false;
@@ -3240,14 +2429,9 @@ function visits(){
 function showAdd(){
   const bar = $("#addbar");
   if (!bar) return;
-  // ★ 처음 온 사람에게는 안 권한다 (2026-09-27). 값 하나 보러 온 사람에게
-  //   들어오자마자 '홈 화면에 추가' 는 귀찮기만 하다. 두 번째 방문부터.
   bar.hidden = STANDALONE || addOff() || IN_APP || homeHave() || visits() < 2;
 }
 
-/* ✕ 를 눌렀을 때. 띠를 바로 없애지 않고 **한 줄로 줄여** 물어본다.
-   묻는 자리가 여기여야 한다 — 닫겠다고 마음먹은 그 순간이 아니면
-   '다시 보지 않기' 를 찾아갈 사람이 없다. 6초 뒤 저절로 사라진다. */
 function addLater(){
   try { sessionStorage.setItem("gmpx-add", "skip"); } catch(e){}
   const bar = $("#addbar");
@@ -3261,22 +2445,6 @@ function addLater(){
   setTimeout(() => { bar.hidden = true; }, 6000);
 }
 
-/* ★ 홈 화면에 추가 — **북마크 방식 + 화살표 안내** (2026-09-27 사장님 결정).
- *
- * 앱 방식(standalone)은 삼성 인터넷 등에서 '신뢰할 수 없는 앱' 경고가 떴고,
- * 열 때마다 로딩 화면이 떴고, 아이폰은 찜을 사파리와 따로 저장했다. 그래서
- * **모든 브라우저에서 바로가기(북마크)** 로 넣는다(`manifest` 의 display:browser).
- *
- * 잃은 것은 크롬의 '설치 창 한 번에' 다. 그 자리를 **그 브라우저의 실제 메뉴
- * 자리를 가리키는 화살표**로 메운다. 글로 '메뉴를 찾아 누르세요' 는 나이 드신
- * 분이 따라오지 못한다(예전에 그래서 되돌렸던 적이 있다).
- *
- * **다른 브라우저로 보내지 않는다.** 보내면 경고가 뜨고 찜이 따라오지 않는다.
- *
- * 메뉴 자리는 브라우저 판마다 바뀐다. 확실한 것만 화살표를 달고(`pos`),
- * 나머지는 순서만 적는다. 아이폰 사파리는 iOS 26 부터 공유가 `⋯` 안으로
- * 들어갔다 — UA 의 `Version/26` 으로 가른다(iOS 26 은 OS 번호를 18_6 에 묶어
- * 둬서 OS 번호로는 못 가른다). */
 const SHARE_ICO = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">' +
   '<path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M6 11H5v10h14V11h-1" fill="none" ' +
   'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -3336,7 +2504,6 @@ function guideFor(){
             chip("추가") + " 를 누르면 끝이에요."]};
 }
 
-/* 이미 홈 화면에 넣은 사람인가 — 아이콘으로 열면 `?home=1` 이 붙어 온다 */
 function homeHave(){
   try { return localStorage.getItem("gmpx-home") === "1"; } catch(e){ return false; }
 }
@@ -3348,10 +2515,6 @@ function openInstall(){
       + '<p class="note">이미 홈 화면에서 열고 있어요.</p>');
   closeSheet();
   const g = guideFor();
-  /* ★ 지금 주소에 `?home=1` 을 잠깐 붙인다. 브라우저에 따라 아이콘이
-     **지금 주소**를 기억하는데, 이 표시가 있어야 아이콘으로 열었을 때
-     '이미 넣은 사람' 으로 알아본다. 보던 상품(`#p=`)은 떼서, 아이콘이
-     늘 전체 목록으로 열리게 한다. 닫으면 되돌린다. */
   GUIDE_BACK = location.pathname + location.search + location.hash;
   try { history.replaceState(history.state, "", location.pathname + "?home=1"); } catch(e){}
   let el = $("#guide");
@@ -3383,13 +2546,11 @@ function closeGuide(done){
   if (el) el.className = "";
   document.documentElement.classList.remove("sheet-on");
   try { history.replaceState(history.state, "", GUIDE_BACK || location.pathname); } catch(e){}
-  // 안내를 봤으면 30일 동안 다시 권하지 않는다. 아이폰은 넣었는지 알 길이 없다.
   try { localStorage.setItem("gmpx-add-until", String(Date.now() + 30 * 864e5)); } catch(e){}
   $("#addbar").hidden = true;
   if (done) toast(GUIDE_DONE);
 }
 
-/* 처음 찜했을 때 한 번 — 필요를 느낀 그 순간이다 */
 function homeHint(){
   if (IN_APP || STANDALONE || homeHave() || addOff()) return;
   try {
@@ -3401,19 +2562,12 @@ function homeHint(){
 
 $("#addgo").addEventListener("click", openInstall);
 $("#addno").addEventListener("click", addLater);
-// 설치가 끝나면 띠를 내린다. 이미 넣은 사람에게 계속 권하지 않는다.
-// **이것만 영영 끈다.** 실제로 넣었으니 더 권할 게 없다.
 addEventListener("appinstalled", () => {
   $("#addbar").hidden = true;
   try { localStorage.setItem("gmpx-add", "no"); } catch(e){}
 });
 showAdd();
 
-/* ★ 아이폰에서 **웹 앱으로** 열렸을 때 한 번 알린다 (2026-09-28).
- * iOS 26 은 '홈 화면에 추가' 에서 '웹 앱으로 열기' 가 기본으로 켜져 있다. 그대로
- * 추가하면 아이콘이 사파리와 **다른 저장 공간**을 써서, 사파리에서 찜한 것이
- * 안 보이고 반대도 그렇다. 우리 쪽에서 합칠 길이 없어 다시 추가하는 법을 알린다.
- * 이 표시는 웹 앱 쪽 저장 공간에 남으므로 사파리 쪽 안내와 안 섞인다. */
 function webAppNote(){
   if (!IOS || !STANDALONE) return;
   try {
