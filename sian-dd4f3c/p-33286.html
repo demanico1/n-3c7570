@@ -30,7 +30,7 @@ img{display:block;max-width:100%}
 .sub{font-size:16px;color:#4B5563;text-align:center;margin-top:16px;line-height:1.55}
 /* ① 배너 */
 .hero{position:relative;height:100svh;min-height:640px;margin-top:-108px;overflow:hidden;background:#000}
-.hero .bg{position:absolute;inset:-40px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;transform:rotate(-8deg) scale(1.15);filter:blur(1.5px) saturate(.9)}
+.hero .bg{position:absolute;inset:-40px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;transform:rotate(-8deg) scale(1.15)}
 .hero .bg img{width:100%;aspect-ratio:1;object-fit:contain;background:#fff;border-radius:14px}
 .hero .dim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.58) 50%,rgba(0,0,0,.7))}
 .hero .phone{position:absolute;left:50%;top:150px;width:300px;height:600px;margin-left:-190px;border-radius:40px;background:#fff;
@@ -87,7 +87,8 @@ img{display:block;max-width:100%}
 .chartbox h4{font-size:14px;font-weight:700}
 .duo{margin-top:16px;display:flex;align-items:flex-end;gap:26px;height:150px;padding:0 34px;border-bottom:1px solid #E5E7EB;position:relative}
 .duo .col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
-.duo .b{width:100%;border-radius:10px 10px 0 0;transition:height 1s cubic-bezier(.2,.8,.2,1);height:0}
+.duo .b{width:100%;border-radius:10px 10px 0 0;transform-origin:bottom;transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.slides .duo .b{transform:scaleY(0)}.slides .duo .b.on{transform:none}
 .duo .v{font-size:12px;font-weight:700;margin-bottom:6px}
 .duo .k{font-size:11px;color:#9CA3AF;margin-top:6px}
 .rows{margin-top:12px;background:#fff;border-radius:16px;padding:6px 16px}
@@ -112,7 +113,8 @@ img{display:block;max-width:100%}
 .after{font-size:22px;font-weight:800;line-height:1.4;margin-top:40px;letter-spacing:-.4px}
 /* ⑤ 어두운 사진 — 모음 */
 .photo{position:relative;overflow:hidden;padding:90px 16px 110px;background:#111}
-.photo .pbg{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;filter:blur(2px) brightness(.45)}
+.photo .pbg{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.photo .pbg::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.58)}
 .photo .pbg img{width:100%;aspect-ratio:1;object-fit:contain;background:#fff}
 .photo .h2{color:#fff;position:relative}
 .float{position:relative;margin-top:36px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -279,8 +281,10 @@ document.querySelectorAll('.up').forEach(el=>io.observe(el));
  m.querySelector('.sum .t').textContent=w(g);})();
 // 비교 카드 넘김 — 4초 자동 · 점 · 막대 자라기
 (function(){const s=document.querySelector('.slides');if(!s)return;const sl=[...s.children];const dots=[...document.querySelectorAll('.dots i')];let cur=0,t;
- const grow=el=>el.querySelectorAll('.b').forEach(b=>b.style.height=b.dataset.h+'%');
- const go=i=>{sl[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});};
+ const grow=el=>el.querySelectorAll('.b').forEach(b=>b.classList.add('on'));
+ // ★ scrollIntoView 를 쓰지 마라 — 카드 줄만이 아니라 **페이지 전체를 위아래로 끌어당겨** 스크롤이 덜컹거렸다 (2026-09-30)
+ const go=i=>{const r=sl[i].getBoundingClientRect(),rs=s.getBoundingClientRect();s.scrollBy({left:r.left-rs.left-(rs.width-r.width)/2,behavior:'smooth'});};
+ sl.forEach(x=>x.querySelectorAll('.b').forEach(b=>b.style.height=b.dataset.h+'%'));
  const ob=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){cur=sl.indexOf(e.target);dots.forEach((d,k)=>d.classList.toggle('on',k===cur));grow(e.target);}}),{root:s,threshold:.6});
  sl.forEach(x=>ob.observe(x));
  const vis=new IntersectionObserver(es=>es.forEach(e=>{clearInterval(t);if(e.isIntersecting)t=setInterval(()=>go((cur+1)%sl.length),4000);}),{threshold:.3});vis.observe(s);})();
