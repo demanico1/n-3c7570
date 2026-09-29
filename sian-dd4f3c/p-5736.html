@@ -5,7 +5,7 @@ html{-webkit-text-size-adjust:100%}
 body{font-family:Pretendard,system-ui,-apple-system,sans-serif;color:#000;background:#F9FAFB;word-break:keep-all}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
-.page{max-width:600px;margin:0 auto;background:#fff;min-height:100vh;position:relative}
+.page{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;position:relative}   /* 폴센트 max-w-page = 768px */
 /* 머리 — 홈은 검정, 모아보기는 흰색 */
 .hd{position:sticky;top:0;z-index:50}
 .hd .row1{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
@@ -66,6 +66,8 @@ img{display:block;max-width:100%}
 .toast .tx{position:relative;flex:1;height:46px;overflow:hidden}
 .toast .t{position:absolute;inset:0;font-size:14px;line-height:23px;color:#111;transition:transform .5s ease,opacity .5s ease}
 .toast .t b{font-weight:700}
+.toast .l1{display:flex;min-width:0}.toast .l1 b{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toast .l2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .toast .t.out{transform:translateY(-100%);opacity:0}.toast .t.pre{transform:translateY(100%);opacity:0}
 /* ② 파란 */
 .blue{background:var(--p);color:#fff;padding:64px 24px}
@@ -157,7 +159,7 @@ img{display:block;max-width:100%}
 .track:hover{animation-play-state:paused}
 @keyframes up{from{transform:translateY(0)}to{transform:translateY(-50%)}}
 .rv{background:#F8F9FA;border-radius:16px;padding:16px;margin-bottom:12px;display:flex;gap:12px}
-.rv .t{font-size:15px;font-weight:800}.rv .b{font-size:13.5px;color:#4B5563;margin-top:6px;line-height:1.55}
+.rv .t{font-size:15px;font-weight:800;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.rv .b{font-size:13.5px;color:#4B5563;margin-top:6px;line-height:1.55}
 .rv img{width:64px;height:64px;object-fit:contain;border-radius:10px;background:#fff;flex:none}
 /* ⑪ 끝 CTA · 바닥 */
 .endcta{background:#F8F9FA;padding:56px 24px;text-align:center}
@@ -198,12 +200,23 @@ img{display:block;max-width:100%}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px 12px;padding:16px 16px 0}
 .grid .hc{flex:none}.grid .hc .ph{width:100%;height:auto;aspect-ratio:1}
 .grid[hidden]{display:none}
+/* 넓은 화면 — 폴센트 sm:(640px↑) 값 그대로 */
+@media (min-width:640px){
+  .hero .in h1{font-size:40px}
+  .toast{width:360px;height:96px;padding:16px 20px;border-radius:24px}.toast .tx{height:52px}.toast .t{font-size:16px;line-height:26px}
+  .blue .h2{font-size:42px}
+  .gray .h2,.white .h2,.photo .h2{font-size:38px}
+  .feat .h2,.dark .h2,.rate .h2,.flow .h2{font-size:56px;line-height:1.3}
+  .band .x,.band .y{font-size:56px;line-height:1.3}
+  .endcta .h2{font-size:52px}
+  .hc{flex-basis:160px}.hc .ph{width:160px;height:160px}.hc .ph img{max-width:132px;max-height:132px}
+}
 /* PXPICK 글자 = 로고와 같은 강조 */
 .pk{font-weight:800;letter-spacing:-.2px;white-space:nowrap}.pk em{font-style:normal;color:#0084FF}
 .cta .pk em,.appbtn .pk em,.btn .pk em,.buybar .r .pk em,.qrside .pk em,.qrside .b .pk em{color:#BFE0FF}
 /* ── PC: 폰 폭 기둥 하나 + 왼쪽 QR 카드 (폴센트와 같은 짜임) */
 .qrside{display:none}
-@media (min-width:1200px){.qrside{display:block;position:fixed;left:48px;top:50%;transform:translateY(-50%);z-index:10;width:240px;
+@media (min-width:1360px){.qrside{display:block;position:fixed;left:calc(50% - 384px - 40px - 240px);top:50%;transform:translateY(-50%);z-index:10;width:240px;
   border-radius:24px;background:var(--p);color:#fff;text-align:center;padding:30px 22px}}
 .qrside .t{font-size:18px;font-weight:700;line-height:1.45;margin-top:12px}
 .qrside .qr{width:172px;height:172px;margin:20px auto 12px;background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center}
@@ -252,7 +265,7 @@ img{display:block;max-width:100%}
 .omore{display:block;text-align:center;font-size:14px;color:#6B7280;padding:14px 0}
 .disc{margin:28px 16px 0;background:#F5F6F8;border-radius:14px;padding:16px 18px;font-size:12.5px;color:#6B7280;line-height:1.7}
 .disc p+p{margin-top:4px}
-.buybar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:600px;display:flex;height:62px;z-index:40}
+.buybar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:768px;display:flex;height:62px;z-index:40}
 .buybar a{display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700}
 .buybar .l{flex:1;background:#F3F4F6;color:#374151}.buybar .r{flex:1.4;background:var(--p);color:#fff;gap:6px}
 .pdpage{padding-bottom:62px}
