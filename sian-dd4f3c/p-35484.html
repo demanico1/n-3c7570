@@ -31,9 +31,9 @@ img{display:block;max-width:100%}
 .sub{font-size:16px;color:#4B5563;text-align:center;margin-top:16px;line-height:1.55}
 /* ① 배너 */
 .hero{position:relative;height:100svh;min-height:640px;margin-top:-108px;overflow:hidden;background:#000}
-.hero .bg{position:absolute;inset:0;background:#000 center/cover no-repeat}   /* 미리 흐리게 구운 한 장 (hero_bg.jpg) */
+.hero .bg{position:absolute;inset:-40px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;transform:rotate(-8deg) scale(1.15)}   /* 사장님이 고른 9/30 새벽 판 — 선명한 격자, 흐림 없음 */
 .hero .bg img{width:100%;aspect-ratio:1;object-fit:contain;background:#fff;border-radius:14px}
-.hero .dim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.62) 50%,rgba(0,0,0,.72))}
+.hero .dim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.58) 50%,rgba(0,0,0,.7))}
 /* 폴센트: 머리(108px) 아래 716px 칸의 가운데에 제목 + 32px 아래 알림 카드(300px) */
 .hero .in{position:absolute;left:0;right:0;top:108px;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 24px;color:#fff;text-align:center}
 .hero .in h1{font-size:32px;font-weight:700;line-height:1.3;letter-spacing:-.8px;text-shadow:0 2px 16px rgba(0,0,0,.35)}
