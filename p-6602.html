@@ -31,7 +31,7 @@ img{display:block;max-width:100%}
 .sub{font-size:16px;color:#4B5563;text-align:center;margin-top:16px;line-height:1.55}
 /* ① 배너 */
 .hero{position:relative;height:100svh;min-height:640px;margin-top:-108px;overflow:hidden;background:#000}
-.hero .bg{position:absolute;inset:-40px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;transform:rotate(-8deg) scale(1.15)}   /* 사장님이 고른 9/30 새벽 판 — 선명한 격자, 흐림 없음 */
+.hero .bg{position:absolute;inset:0;background:#000 center/100% auto no-repeat}   /* 격자를 흐리게 구운 한 장 (hero_grid) — 폭에 맞춰 늘 4칸 */
 .hero .bg img{width:100%;aspect-ratio:1;object-fit:contain;background:#fff;border-radius:14px}
 .hero .dim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.58) 50%,rgba(0,0,0,.7))}
 /* 폴센트: 머리(108px) 아래 716px 칸의 가운데에 제목 + 32px 아래 알림 카드(300px) */
