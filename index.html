@@ -1222,7 +1222,7 @@ function start(d){
     $("#chips").querySelectorAll(".chip").forEach(
         c => c.classList.toggle("on", c.dataset.b === BIG));
     $("#view").value = back.view || "all";
-    $("#sort").value = back.sort || "rate";
+    useSort(back.sort);
   }
   setMode(GAL);
   run();
@@ -1347,6 +1347,19 @@ $("#q").addEventListener("input", () => { SUB = ""; leaveCart(); runFresh(); toT
  *
  * `#view` 는 숨겨서 그대로 둔다. 찜 단추·빈 화면 안내·홈 단추가 다 쓴다. */
 let SORTK = "rv";
+/* ★ 정렬 기준을 **화면에 맞춰 놓기만** 한다 (그리지는 않음). 2026-09-29 사장님이 잡으셨다 —
+ * 쿠팡·찜에 다녀오면 드롭다운 글자만 되살리고 SORTK 는 안 되살려서, 드롭다운은
+ * `할인율 높은 순` 인데 목록은 랭킹순이고 파란 표시는 어디에도 없었다.
+ * 저장할 때는 **SORTK 를** 적고, 되살릴 때는 이 함수를 부른다. */
+function useSort(k){
+  const sel = $("#sort");
+  if (!k || k === "mine") k = SORTK || "rv";          // 옛 기록(드롭다운 빈 값) · 거르기는 정렬이 아니다
+  SORTK = k;
+  sel.value = sel.querySelector('option[value="' + k + '"]') ? k : "";
+  for (const b of document.querySelectorAll(".sortbar .sb[data-k]"))
+    b.classList.toggle("on", !sel.value && b.dataset.k === SORTK);
+  $(".sortbar .selwrap").classList.toggle("on", !!sel.value);
+}
 function setSort(k){
   const was = $("#view").value;
   const sel = $("#sort");
@@ -1465,7 +1478,9 @@ function run(){
   const k = SORTK;
   const big = 1e12;
   VIEW.sort((a, b) => {
-    if (toks.length && b._s !== a._s) return b._s - a._s;   // 잘 맞은 것 먼저
+    // 잘 맞은 것 먼저 — **랭킹순(기본)일 때만.** 손님이 `할인율 높은 순` 처럼 직접 고르면
+    // 그 순서가 이긴다 (2026-09-29 사장님: `홍삼` 을 할인율 순으로 세웠는데 순서가 섞여 보였다).
+    if (toks.length && k === "rv" && b._s !== a._s) return b._s - a._s;
     const A = a.rate == null ? big : a.rate, B = b.rate == null ? big : b.rate;
     switch (k){
       // 많이 팔린 순. 리뷰수는 그 상품을 몇 사람이 샀는지에 가장 가까운
@@ -2378,7 +2393,7 @@ function coupang(name, link){
   try {
     sessionStorage.setItem(STATE_KEY, JSON.stringify({
       q: $("#q").value, big: BIG, sub: SUB, view: $("#view").value,
-      sort: $("#sort").value, y: window.scrollY,
+      sort: SORTK, y: window.scrollY,
     }));
   } catch(e){}
   const url = link || ("https://www.coupang.com/np/search?q="
@@ -2727,7 +2742,7 @@ function restorePrev(){
   $("#chips").querySelectorAll(".chip").forEach(
       c => c.classList.toggle("on", c.dataset.b === BIG));
   $("#view").value = p ? p.view : "all";
-  $("#sort").value = p ? p.sort : "rate";
+  useSort(p ? p.sort : SORTK);
   run();
   if (p && p.y){
     fillTo(p.y);
@@ -2783,7 +2798,7 @@ function openCart(){
       '<button class="go" data-act="import">찜 가져오기</button>');
   }
   PREV = {q: $("#q").value, big: BIG, sub: SUB, view: $("#view").value,
-          sort: $("#sort").value, y: window.scrollY};
+          sort: SORTK, y: window.scrollY};
   $("#view").value = "cart";
   $("#q").value = "";
   BIG = "전체";
