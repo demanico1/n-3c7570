@@ -1,0 +1,135 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>홈 화면 · 밝게 — PXPICK 이용 가이드 (시안)</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"><style>
+:root{--p:#0084FF;--ink:rgba(0,0,0,.85);--dim:rgba(0,0,0,.56);--line:rgba(0,0,0,.08);--sky:#E3F0FF}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:Pretendard,system-ui,-apple-system,sans-serif;color:var(--ink);background:#fff;word-break:keep-all}
+a{color:inherit;text-decoration:none}
+.gh{position:sticky;top:0;z-index:50;height:60px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 16px}
+.gh .lg{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:#000}
+.gh .lg .box{width:36px;height:36px;border-radius:12px;background:var(--sky);display:flex;align-items:center;justify-content:center}
+.gh .ic{margin-left:auto;display:flex;gap:18px;align-items:center}
+.gh .ic button{border:0;background:none;display:flex;cursor:pointer;color:#555}
+.drop{position:fixed;top:60px;left:0;right:0;z-index:49;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 8px 20px rgba(0,0,0,.08);padding:8px 0}
+.drop[hidden]{display:none}
+.drop a{display:block;padding:12px 20px;font-size:16px}
+.drop a.hm{color:var(--p);font-weight:600;border-top:1px solid var(--line);margin-top:6px}
+.wrap{max-width:720px;margin:0 auto}
+/* 첫 화면 */
+.gb{background:linear-gradient(180deg,#C5E3FB 0%,#CFF9FB 100%);padding:56px 16px 56px;text-align:center}
+.gb h1{font-size:32px;font-weight:700;color:#000;letter-spacing:-.5px}
+.gb .sb{margin:40px auto 0;max-width:680px;height:52px;border-radius:12px;background:rgba(255,255,255,.82);border:1px solid rgba(0,0,0,.08);
+  box-shadow:0 2px 6px rgba(0,0,0,.05);display:flex;align-items:center;gap:10px;padding:0 16px}
+.gb .sb input{flex:1;border:0;background:none;font:inherit;font-size:16px;outline:none;color:#000}
+.gb .sb input::placeholder{color:rgba(0,0,0,.4)}
+.ttl{display:flex;align-items:center;justify-content:space-between;padding:0 16px;margin:48px 0 20px}
+.ttl h2{font-size:22px;font-weight:700;color:#000}
+.ttl .nav{display:flex;gap:18px;color:#333;font-size:20px}
+.ttl .nav button{border:0;background:none;font:inherit;cursor:pointer;color:inherit}
+.tp{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 16px 8px;scrollbar-width:none;scroll-padding:0 16px}
+.tp::-webkit-scrollbar{display:none}
+.tp a{flex:0 0 78%;max-width:300px;scroll-snap-align:start}
+.cov{aspect-ratio:16/9;border-radius:12px;background:var(--sky);display:flex;align-items:center;justify-content:center;gap:18px;overflow:hidden}
+.cov .wm{font-size:26px;font-weight:900;color:#1F2937;letter-spacing:-.3px}.cov .wm em{font-style:normal;color:var(--p)}
+.cov .ci{width:74px;height:74px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,132,255,.12)}
+.tp h3{font-size:20px;font-weight:700;color:#000;margin-top:16px;line-height:1.4}
+.ex{font-size:15px;color:var(--dim);line-height:1.6;margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hr{height:1px;background:var(--line);margin:32px 16px 0}
+.cl a{display:flex;gap:16px;align-items:center;padding:24px 16px}
+.cl .tx{flex:1;min-width:0}
+.cl h3{font-size:20px;font-weight:700;color:#000;line-height:1.4}
+.cl p{font-size:15px;color:var(--dim);line-height:1.6;margin-top:6px}
+.cl small{display:block;font-size:13px;color:rgba(0,0,0,.4);margin-top:8px}
+.cl .tile{flex:none;width:92px;height:62px;border-radius:10px;background:var(--sky);display:flex;align-items:center;justify-content:center}
+.res{padding:8px 0}.res[hidden]{display:none}
+.res .no{padding:40px 16px;text-align:center;color:var(--dim)}
+.res a{display:block;padding:20px 16px;border-bottom:1px solid var(--line)}
+.res h3{font-size:18px;font-weight:700;color:#000}
+.res .ex mark{background:#FFF3A3;color:inherit}
+/* 주제 한 장 */
+.ch{padding:40px 16px 24px;border-bottom:1px solid var(--line)}
+.lab{font-size:14px;font-weight:600;color:var(--p)}
+.ch h1{font-size:32px;font-weight:700;color:#000;line-height:1.4;margin-top:8px;letter-spacing:-.5px}
+.ch p{font-size:16px;line-height:1.6;margin-top:10px}
+.al a{display:block;padding:24px 16px 0}
+.al h3{font-size:20px;font-weight:700;color:#000;line-height:1.4}
+.al .ex{max-width:280px}
+/* 글 한 편 */
+.bc{padding:28px 16px 0;font-size:14px;color:rgba(0,0,0,.45)}
+.bc b{font-weight:500;color:rgba(0,0,0,.7)}
+.ar{padding:0 16px 40px}
+.ar .cov{margin-top:20px}
+.ar h1{font-size:32px;font-weight:700;color:#000;line-height:44px;margin-top:28px;letter-spacing:-.5px}
+.ar .ld{font-size:16px;line-height:24px;margin-top:12px}
+.toc{margin-top:24px;border:1px solid rgba(0,0,0,.15);border-radius:10px}
+.toc summary{list-style:none;padding:11px 14px;font-size:15px;display:flex;justify-content:space-between;cursor:pointer}
+.toc summary::-webkit-details-marker{display:none}
+.toc summary:after{content:"";width:8px;height:8px;border-right:1.6px solid #333;border-bottom:1.6px solid #333;transform:rotate(45deg);margin:3px 4px 0 0}
+.toc[open] summary:after{transform:rotate(-135deg);margin-top:8px}
+.toc ol{list-style:none;padding:0 14px 12px}
+.toc li a{display:block;padding:7px 0;font-size:15px;color:var(--dim)}
+.ar .hr{margin:24px 0 0}
+.ar h2{font-size:20px;font-weight:700;color:#000;line-height:1.5;margin-top:36px;scroll-margin-top:76px}
+.ar ul{margin:8px 0 0 22px}
+.ar li{font-size:17px;line-height:27px;margin-top:2px}
+.ar li b{font-weight:700}
+.co{margin-top:16px;border-radius:12px;background:rgba(0,0,0,.03);padding:16px 18px}
+.co b{display:block;font-size:16px;color:#000;margin-bottom:6px}
+.co div{font-size:16px;line-height:1.6}
+.more{margin-top:48px;border-top:1px solid var(--line);padding-top:24px}
+.more h4{font-size:16px;color:rgba(0,0,0,.5);font-weight:600;margin-bottom:6px}
+.more a{display:block;padding:10px 0;font-size:17px;color:#000}
+.kc{display:inline-block;padding:1px 8px;border-radius:6px;background:#F2F4F7;border:1px solid rgba(0,0,0,.1);font-size:15px;font-weight:600;line-height:24px}
+/* 화면 조각 — 폴센트는 캡처 사진을 회색 상자에 담는다. 우리는 앱 모양을 그려서 담는다 */
+.mk{margin-top:16px;border-radius:14px;background:#F2F4F7;padding:18px 16px}
+.mk-s{display:flex;align-items:center;gap:8px;height:42px;border-radius:10px;background:#fff;padding:0 12px;font-size:16px;margin-bottom:10px}
+.pill{display:inline-block;padding:5px 12px;border-radius:999px;background:#fff;font-size:14px;margin-right:6px;color:#374151}
+.pill.on{background:#111827;color:#fff}
+.scs{margin-top:10px;white-space:nowrap;overflow:hidden}
+.sc{display:inline-block;font-size:13px;padding:3px 9px;border-radius:7px;background:#fff;border:1px solid rgba(0,0,0,.08);margin-right:5px}
+.sc i{font-style:normal;color:#9CA3AF;margin-left:3px}.sc.on{border-color:var(--p);color:var(--p)}
+.mk-row{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:10px;padding:10px 12px}
+.sel{font-size:14px;font-weight:600}
+.seg{display:flex;background:#F2F4F7;border-radius:8px;padding:3px}
+.seg b{font-size:13px;font-weight:500;padding:4px 10px;border-radius:6px;color:#6B7280}.seg b.on{background:#fff;color:#000;font-weight:700}
+.mk-card{display:flex;gap:12px;background:#fff;border-radius:12px;padding:12px}
+.mk-card .th{width:64px;height:64px;border-radius:10px;background:#E5E7EB}
+.mk-card .nm{font-size:14px;font-weight:700;margin-bottom:4px}
+.mk-card .rw{display:flex;justify-content:space-between;align-items:center;margin-top:2px}
+.mk-card .rw b{font-size:18px;color:#000}.mk-card .dim{font-size:13px;color:#6B7280}
+.bd{display:inline-block;font-size:12.5px;font-weight:700;padding:2px 7px;border-radius:6px}
+.bd.good{background:#E6F4EC;color:#0b7a4b}.bd.bad{background:#FDECEC;color:#d93025}.bd.none{background:#EEF0F3;color:#6B7280}
+.tg{display:inline-block;font-size:12.5px;padding:2px 7px;border-radius:6px;border:1px solid rgba(0,0,0,.18);color:#4B5563}
+.mk-list div{display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:10px 12px;font-size:14px}
+.mk-list div+div{margin-top:8px}
+.flow{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:12px;padding:14px 8px}
+.flow .st{flex:1;text-align:center;font-size:12.5px;color:#4B5563}
+.flow .v{height:30px;display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+.flow .q{gap:8px}.flow .q i{font-style:normal;width:24px;height:24px;border-radius:50%;border:1px solid rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font-size:14px}
+.flow .got{padding:3px 8px;border-radius:7px;background:#0b7a4b;color:#fff;font-size:11.5px}
+.flow .fa{color:#C0C4CA;font-size:18px}
+.bar{display:flex;align-items:center;justify-content:space-between;background:#0b7a4b;color:#fff;border-radius:14px 14px 0 0;padding:10px 16px;height:58px}
+.bar small{display:block;font-size:12px;opacity:.85}.bar b{font-size:15px}.bar .t{font-size:20px;font-weight:800}
+.btns3{display:flex;gap:6px}.btns3 span{flex:1;text-align:center;background:#fff;border-radius:9px;padding:9px 0;font-size:13px;font-weight:600;border:1px solid rgba(0,0,0,.08)}
+.menu{background:#fff;border-radius:14px;overflow:hidden}
+.menu span{display:block;padding:13px 16px;font-size:15px;border-top:1px solid rgba(0,0,0,.06)}
+.menu span:first-child{border-top:0}.menu .go{color:var(--p);font-weight:700}.menu .ln{color:#4B5563;text-decoration:underline}
+.brandm{font-size:18px;font-weight:900;color:#000}.brandm em{font-style:normal;color:var(--p)}
+.moon{width:34px;height:34px;border-radius:50%;border:1px solid rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;font-size:17px}
+.gf{margin-top:40px;background:#F9FAFB;padding:28px 16px 40px;text-align:center;font-size:12px;color:#9CA3AF;line-height:1.9}
+.gf a{color:#6B7280;text-decoration:underline}
+</style></head><body><header class="gh"><a class="lg" href="guide.html"><span class="box"><svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#0084FF"/><path d="M11.5 20.5l6 6 11-13" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>PXPICK 이용 가이드</a><span class="ic"><button id="sbtn" aria-label="검색"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#555" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button><button id="mbtn" aria-label="메뉴"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></span></header><nav class="drop" id="drop" hidden><a href="guide-c-find.html">상품 찾기</a><a href="guide-c-price.html">가격 보기</a><a href="guide-c-cart.html">찜 · 장바구니</a><a href="guide-c-menu.html">상품 메뉴</a><a href="guide-c-home.html">홈 화면 · 밝게</a><a class="hm" href="index.html">PXPICK 홈으로 ›</a></nav><main class="wrap"><section class="ch"><div class="lab">이용 가이드</div><h1>홈 화면 · 밝게</h1><p>아이콘 하나로 바로 여는 법과 화면 밝기를 알려 드려요.</p></section><div class="al"><a href="guide-a-home-add.html"><h3>홈 화면에 추가하기</h3><p class="ex">메뉴 → 홈 화면에 추가를 해 두면 아이콘 하나로 바로 열려요. 설치나 가입은 없어요. 아래 오른쪽 ⋯ 를 누르세요. 공유 를 누르세요. 조금 내려서 홈 화면에 추가 를 누르세요. 꼭! 웹 앱으로 열기 를 꺼 주세요. 오른쪽 위 추가 를 누르면 끝이에요. ‘웹 앱으로 열기’를 왜 꺼야 하나요? 켜 둔 채 추가하면 사파리에서 찜한 상품이 아이콘에서 안 보여요. 아래 가운데 공유 를 누르세요. 조금 내려서 홈 화면에 추가 를 누르세요. 오른쪽 위 추가 를 누르면 끝이에요. 주소창 오른쪽의 공유 를 누르세요. 조금 내려서 홈 화면에 추가 를 누르세요. 오른쪽 위 추가 를 누르면 끝이에요. 아래 오른쪽 끝 ≡ 를 누르세요. 현재 페이지 추가 를 누르세요. 홈 화면 을 누르면 끝이에요. 오른쪽 위 ⋮ 를 누르세요. 홈 화면에 추가 를 누르세요. 추가 를 누르면 끝이에요. 키보드에서 Ctrl + D (맥은 ⌘ + D) 를 누르세요. 완료 를 누르면 즐겨찾기에 들어가요.</p></a><a href="guide-a-home-theme.html"><h3>밝게 · 어둡게 바꾸기</h3><p class="ex">화면을 밝게도, 어둡게도 볼 수 있어요. 맨 위 ◐ 단추로 밝게 · 어둡게 바꿔요.</p></a></div></main><footer class="gf">PXPICK 피엑스픽 · pxpick.com<br>Contact: leveragekorea@naver.com<br><a href="index.html">PXPICK 홈으로</a></footer><script>
+const $=s=>document.querySelector(s);
+const mb=$('#mbtn'),dr=$('#drop');if(mb)mb.addEventListener('click',()=>{dr.hidden=!dr.hidden;});
+const sb=$('#sbtn');if(sb)sb.addEventListener('click',()=>{const q=$('#q');if(q){q.focus();q.scrollIntoView({block:'center'});}else location.href='guide.html#s';});
+// 가이드 첫 화면 — 글 찾기 (제목·내용에서)
+(function(){const q=$('#q');if(!q)return;const A=JSON.parse($('#arts').textContent),res=$('#res'),main=$('#main');
+ const hi=(t,w)=>t.replace(new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
+ const run=()=>{const w=q.value.trim();if(!w){res.hidden=true;main.hidden=false;return;}
+  const L=A.filter(a=>(a.t+' '+a.x).toLowerCase().includes(w.toLowerCase()));
+  res.innerHTML=L.length?L.map(a=>{const i=a.x.toLowerCase().indexOf(w.toLowerCase());const s=(i>20?'… ':'')+a.x.slice(Math.max(0,i-20),i+60).replace(/^[\s.·—]+/,'');
+    return '<a href="'+a.u+'"><h3>'+hi(a.t,w)+'</h3><p class="ex">'+hi(s,w)+'</p></a>';}).join(''):'<p class="no">찾는 글이 없어요</p>';
+  res.hidden=false;main.hidden=true;};
+ q.addEventListener('input',run);if(location.hash==='#s')q.focus();})();
+// TOP5 화살표
+document.querySelectorAll('.ttl .nav button').forEach(b=>b.addEventListener('click',()=>{const t=$('.tp');t.scrollBy({left:(b.dataset.d==='1'?1:-1)*t.clientWidth*.8,behavior:'smooth'});}));
+</script></body></html>
