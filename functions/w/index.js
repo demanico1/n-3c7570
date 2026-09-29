@@ -40,7 +40,7 @@ export async function onRequest(context) {
     }
     if (!codes.length) return Response.redirect(home, 302);
     const list = toks.join("-");
-    const app = "/#w=" + list;
+    const app = "/app/#w=" + list;   // 앱은 /app/ (2026-09-30)
 
     // 미리보기 사진 — 앞에서부터 사진이 있는 첫 상품 (사진이 없는 상품이 4건 있다)
     let img = "";

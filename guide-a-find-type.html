@@ -1,0 +1,148 @@
+<!doctype html><html lang="ko"><head><link rel="canonical" href="https://pxpick.com/guide-a-find-type"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>종류로 좁혀 보기 — PXPICK 이용 가이드</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"><style>
+:root{--p:#11974B;--ink:rgba(0,0,0,.85);--dim:rgba(0,0,0,.56);--line:rgba(0,0,0,.08);--sky:#E3F5EA}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:Pretendard,system-ui,-apple-system,sans-serif;color:var(--ink);background:#F9FAFB;word-break:keep-all}
+.gpage{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;position:relative}
+.pk{font-weight:800;letter-spacing:-.2px;white-space:nowrap}.pk em{font-style:normal;color:#11974B}
+.qrside .pk em,.cov .pk em{color:#BDEFCF}
+.qrside{display:none}
+@media (min-width:1360px){.qrside{display:block;position:fixed;left:calc(50% - 384px - 40px - 240px);top:50%;transform:translateY(-50%);z-index:10;width:240px;
+  border-radius:24px;background:var(--p);color:#fff;text-align:center;padding:30px 22px}}
+.qrside .t{font-size:18px;font-weight:700;line-height:1.45;margin-top:12px}
+.qrside .qr{width:172px;height:172px;margin:20px auto 12px;background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.qrside small{font-size:12px;opacity:.8}
+.qrside .b{font-size:13px;line-height:1.5;margin-top:14px;opacity:.95}.qrside .b b{font-size:14px}
+a{color:inherit;text-decoration:none}
+.gh{position:sticky;top:0;z-index:50;height:60px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 16px}
+.gh .lg{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:#000}
+.gh .lg .box{width:36px;height:36px;border-radius:12px;background:var(--sky);display:flex;align-items:center;justify-content:center}
+.gh .ic{margin-left:auto;display:flex;gap:18px;align-items:center}
+.gh .ic button{border:0;background:none;display:flex;cursor:pointer;color:#555}
+.drop{position:absolute;top:60px;left:0;right:0;z-index:49;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 8px 20px rgba(0,0,0,.08);padding:8px 0}
+.drop[hidden]{display:none}
+.drop a{display:block;padding:12px 20px;font-size:16px}
+.drop a.hm{color:var(--p);font-weight:600;border-top:1px solid var(--line);margin-top:6px}
+.wrap{max-width:720px;margin:0 auto}
+/* 첫 화면 */
+.gb{background:linear-gradient(180deg,#CDEFD9 0%,#E6FBEC 100%);padding:56px 16px 56px;text-align:center}
+.gb h1{font-size:32px;font-weight:700;color:#000;letter-spacing:-.5px}
+.gb .sb{margin:40px auto 0;max-width:680px;height:52px;border-radius:12px;background:rgba(255,255,255,.82);border:1px solid rgba(0,0,0,.08);
+  box-shadow:0 2px 6px rgba(0,0,0,.05);display:flex;align-items:center;gap:10px;padding:0 16px}
+.gb .sb input{flex:1;border:0;background:none;font:inherit;font-size:16px;outline:none;color:#000}
+.gb .sb input::placeholder{color:rgba(0,0,0,.4)}
+.ttl{display:flex;align-items:center;justify-content:space-between;padding:0 16px;margin:48px 0 20px}
+.ttl h2{font-size:22px;font-weight:700;color:#000}
+.ttl .nav{display:flex;gap:18px;color:#333;font-size:20px}
+.ttl .nav button{border:0;background:none;font:inherit;cursor:pointer;color:inherit}
+.tp{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 16px 8px;scrollbar-width:none;scroll-padding:0 16px}
+.tp::-webkit-scrollbar{display:none}
+.tp a{flex:0 0 78%;max-width:300px;scroll-snap-align:start}
+.cov{aspect-ratio:16/9;border-radius:12px;background:var(--sky);display:flex;align-items:center;justify-content:center;gap:18px;overflow:hidden}
+.cov .wm{font-size:26px;font-weight:900;color:#1F2937;letter-spacing:-.3px}.cov .wm em{font-style:normal;color:var(--p)}
+.cov .ci{width:74px;height:74px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(17,151,75,.12)}
+.tp h3{font-size:20px;font-weight:700;color:#000;margin-top:16px;line-height:1.4}
+.ex{font-size:15px;color:var(--dim);line-height:1.6;margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hr{height:1px;background:var(--line);margin:32px 16px 0}
+.cl a{display:flex;gap:16px;align-items:center;padding:24px 16px}
+.cl .tx{flex:1;min-width:0}
+.cl h3{font-size:20px;font-weight:700;color:#000;line-height:1.4}
+.cl p{font-size:15px;color:var(--dim);line-height:1.6;margin-top:6px}
+.cl small{display:block;font-size:13px;color:rgba(0,0,0,.4);margin-top:8px}
+.cl .tile{flex:none;width:92px;height:62px;border-radius:10px;background:var(--sky);display:flex;align-items:center;justify-content:center}
+.res{padding:8px 0}.res[hidden]{display:none}
+.res .no{padding:40px 16px;text-align:center;color:var(--dim)}
+.res a{display:block;padding:20px 16px;border-bottom:1px solid var(--line)}
+.res h3{font-size:18px;font-weight:700;color:#000}
+.res .ex mark{background:#FFF3A3;color:inherit}
+/* 주제 한 장 */
+.ch{padding:40px 16px 24px;border-bottom:1px solid var(--line)}
+.lab{font-size:14px;font-weight:600;color:var(--p)}
+.ch h1{font-size:32px;font-weight:700;color:#000;line-height:1.4;margin-top:8px;letter-spacing:-.5px}
+.ch p{font-size:16px;line-height:1.6;margin-top:10px}
+.al a{display:block;padding:24px 16px 0}
+.al h3{font-size:20px;font-weight:700;color:#000;line-height:1.4}
+.al .ex{max-width:280px}
+/* 글 한 편 */
+.bc{padding:28px 16px 0;font-size:14px;color:rgba(0,0,0,.45)}
+.bc b{font-weight:500;color:rgba(0,0,0,.7)}
+.ar{padding:0 16px 40px}
+.ar .cov{margin-top:20px}
+.ar h1{font-size:32px;font-weight:700;color:#000;line-height:44px;margin-top:28px;letter-spacing:-.5px}
+.ar .ld{font-size:16px;line-height:24px;margin-top:12px}
+.toc{margin-top:24px;border:1px solid rgba(0,0,0,.15);border-radius:10px}
+.toc summary{list-style:none;padding:11px 14px;font-size:15px;display:flex;justify-content:space-between;cursor:pointer}
+.toc summary::-webkit-details-marker{display:none}
+.toc summary:after{content:"";width:8px;height:8px;border-right:1.6px solid #333;border-bottom:1.6px solid #333;transform:rotate(45deg);margin:3px 4px 0 0}
+.toc[open] summary:after{transform:rotate(-135deg);margin-top:8px}
+.toc ol{list-style:none;padding:0 14px 12px}
+.toc li a{display:block;padding:7px 0;font-size:15px;color:var(--dim)}
+.ar .hr{margin:24px 0 0}
+.ar h2{font-size:20px;font-weight:700;color:#000;line-height:1.5;margin-top:36px;scroll-margin-top:76px}
+.ar ul{margin:8px 0 0 22px}
+.ar li{font-size:17px;line-height:27px;margin-top:2px}
+.ar li b{font-weight:700}
+.co{margin-top:16px;border-radius:12px;background:rgba(0,0,0,.03);padding:16px 18px}
+.co b{display:block;font-size:16px;color:#000;margin-bottom:6px}
+.co div{font-size:16px;line-height:1.6}
+.more{margin-top:48px;border-top:1px solid var(--line);padding-top:24px}
+.more h4{font-size:16px;color:rgba(0,0,0,.5);font-weight:600;margin-bottom:6px}
+.more a{display:block;padding:10px 0;font-size:17px;color:#000}
+.kc{display:inline-block;padding:1px 8px;border-radius:6px;background:#F2F4F7;border:1px solid rgba(0,0,0,.1);font-size:15px;font-weight:600;line-height:24px}
+/* 화면 조각 — 폴센트는 캡처 사진을 회색 상자에 담는다. 우리는 앱 모양을 그려서 담는다 */
+.mk{margin-top:16px;border-radius:14px;background:#F2F4F7;padding:18px 16px}
+.mk-s{display:flex;align-items:center;gap:8px;height:42px;border-radius:10px;background:#fff;padding:0 12px;font-size:16px;margin-bottom:10px}
+.pill{display:inline-block;padding:5px 12px;border-radius:999px;background:#fff;font-size:14px;margin-right:6px;color:#374151}
+.pill.on{background:#111827;color:#fff}
+.scs{margin-top:10px;white-space:nowrap;overflow:hidden}
+.sc{display:inline-block;font-size:13px;padding:3px 9px;border-radius:7px;background:#fff;border:1px solid rgba(0,0,0,.08);margin-right:5px}
+.sc i{font-style:normal;color:#9CA3AF;margin-left:3px}.sc.on{border-color:var(--p);color:var(--p)}
+.mk-row{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:10px;padding:10px 12px}
+.sel{font-size:14px;font-weight:600}
+.seg{display:flex;background:#F2F4F7;border-radius:8px;padding:3px}
+.seg b{font-size:13px;font-weight:500;padding:4px 10px;border-radius:6px;color:#6B7280}.seg b.on{background:#fff;color:#000;font-weight:700}
+.mk-card{display:flex;gap:12px;background:#fff;border-radius:12px;padding:12px}
+.mk-card .th{width:64px;height:64px;border-radius:10px;background:#E5E7EB}
+.mk-card .nm{font-size:14px;font-weight:700;margin-bottom:4px}
+.mk-card .rw{display:flex;justify-content:space-between;align-items:center;margin-top:2px}
+.mk-card .rw b{font-size:18px;color:#000}.mk-card .dim{font-size:13px;color:#6B7280}
+.bd{display:inline-block;font-size:12.5px;font-weight:700;padding:2px 7px;border-radius:6px}
+.bd.good{background:#E6F4EC;color:#0b7a4b}.bd.bad{background:#FDECEC;color:#d93025}.bd.none{background:#EEF0F3;color:#6B7280}
+.tg{display:inline-block;font-size:12.5px;padding:2px 7px;border-radius:6px;border:1px solid rgba(0,0,0,.18);color:#4B5563}
+.mk-list div{display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:10px 12px;font-size:14px}
+.mk-list div+div{margin-top:8px}
+.flow{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:12px;padding:14px 8px}
+.flow .st{flex:1;text-align:center;font-size:12.5px;color:#4B5563}
+.flow .v{height:30px;display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+.flow .q{gap:8px}.flow .q i{font-style:normal;width:24px;height:24px;border-radius:50%;border:1px solid rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font-size:14px}
+.flow .got{padding:3px 8px;border-radius:7px;background:#0b7a4b;color:#fff;font-size:11.5px}
+.flow .fa{color:#C0C4CA;font-size:18px}
+.bar{display:flex;align-items:center;justify-content:space-between;background:#0b7a4b;color:#fff;border-radius:14px 14px 0 0;padding:10px 16px;height:58px}
+.bar small{display:block;font-size:12px;opacity:.85}.bar b{font-size:15px}.bar .t{font-size:20px;font-weight:800}
+.btns3{display:flex;gap:6px}.btns3 span{flex:1;text-align:center;background:#fff;border-radius:9px;padding:9px 0;font-size:13px;font-weight:600;border:1px solid rgba(0,0,0,.08)}
+.menu{background:#fff;border-radius:14px;overflow:hidden}
+.menu span{display:block;padding:13px 16px;font-size:15px;border-top:1px solid rgba(0,0,0,.06)}
+.menu span:first-child{border-top:0}.menu .go{color:var(--p);font-weight:700}.menu .ln{color:#4B5563;text-decoration:underline}
+.brandm{font-size:18px;font-weight:900;color:#000}.brandm em{font-style:normal;color:var(--p)}
+.moon{width:34px;height:34px;border-radius:50%;border:1px solid rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;font-size:17px}
+.gf{margin-top:40px;background:#F8F9FA;padding:32px 16px 40px;text-align:center;font-size:12px;color:#9CA3AF;line-height:1.8}
+.gf .co{color:#6B7280}.gf .co b{color:#374151;font-size:13px}
+.gf .btns{display:flex;justify-content:center;gap:8px;margin-top:14px}
+.gf .btns a{width:104px;height:40px;line-height:40px;background:#EEF0F3;color:#6B7280;border-radius:8px;font-size:13px;font-weight:700}
+.gf .cp{margin-top:14px;font-size:11px;color:#B0B6BF}
+</style></head><body><div class="gpage"><header class="gh"><a class="lg" href="guide.html"><span class="box"><svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#11974B"/><path d="M11.5 20.5l6 6 11-13" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pk">PX<em>PICK</em></span> 이용 가이드</a><span class="ic"><button id="sbtn" aria-label="검색"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#555" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button><button id="mbtn" aria-label="메뉴"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></span></header><nav class="drop" id="drop" hidden><a href="guide-c-find.html">상품 찾기</a><a href="guide-c-price.html">가격 보기</a><a href="guide-c-cart.html">찜 · 장바구니</a><a href="guide-c-menu.html">상품 메뉴</a><a href="guide-c-home.html">홈 화면 · 밝게</a><a class="hm" href="index.html"><span class="pk">PX<em>PICK</em></span> 홈으로 ›</a></nav><main class="wrap"><div class="bc"><a href="guide-c-find.html">상품 찾기</a> › <b>종류로 좁혀 보기</b></div><article class="ar"><div class="cov"><span class="wm">PX<em>PICK</em></span><span class="ci"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#11974B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></span></div><h1>종류로 좁혀 보기</h1><p class="ld">종류 칩과 작은 칩으로 원하는 것만 골라 볼 수 있어요.</p><details class="toc"><summary>목차</summary><ol><li><a href="#s1">1. 종류 칩을 누르세요</a></li><li><a href="#s2">2. 작은 칩으로 더 자세히</a></li><li><a href="#s3">3. 검색하면 ‘이 종류에서’ 칩이 떠요</a></li></ol></details><div class="hr"></div><h2 id="s1">1. 종류 칩을 누르세요</h2><ul><li><span class="kc">화장품</span> 처럼 <b>종류 칩</b>을 누르면 그 종류만 보여요.</li></ul><div class="mk"><div class="mk-s"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>크림</span></div><span class="pill">전체</span><span class="pill">식품</span><span class="pill on">화장품</span><div class="scs"><span class="sc on">전체<i>212</i></span><span class="sc">크림<i>37</i></span><span class="sc">바디<i>25</i></span><span class="sc">선크림<i>13</i></span></div></div><h2 id="s2">2. 작은 칩으로 더 자세히</h2><ul><li>종류 칩 → 아래 <b>작은 칩</b>(<span class="kc">크림</span> 등) → 더 자세한 종류만 보여요.</li></ul><h2 id="s3">3. 검색하면 ‘이 종류에서’ 칩이 떠요</h2><ul><li>검색하면 <span class="kc">이 종류에서</span> 칩이 떠요.</li><li>누르면 그 종류로 좁혀져요.</li></ul><div class="more"><h4>같은 주제의 다른 글</h4><a href="guide-a-find-name.html">이름이나 초성으로 찾기</a><a href="guide-a-find-view.html">랭킹순과 보기 바꾸기</a></div></article></main><footer class="gf"><div class="co"><b><span class="pk">PX<em>PICK</em></span> · 레버리지코리아</b><br>대표자: 김성훈<br>사업자등록번호: 565-07-03143<br>제휴문의: leveragekorea@naver.com</div><div class="btns"><a href="index.html">서비스 소개</a><a href="guide.html">이용 가이드</a></div><div class="cp">© 2026 <span class="pk">PX<em>PICK</em></span>. All rights reserved.</div></footer></div><aside class="qrside"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.6"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18.5h2"/></svg><p class="t">PX 가기 전에<br>폰으로 가격을 확인하세요</p><div class="qr"><svg width="148" height="148" version="1.1" viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg"><path d="M1,1H2V2H1zM2,1H3V2H2zM3,1H4V2H3zM4,1H5V2H4zM5,1H6V2H5zM6,1H7V2H6zM7,1H8V2H7zM9,1H10V2H9zM10,1H11V2H10zM15,1H16V2H15zM19,1H20V2H19zM20,1H21V2H20zM21,1H22V2H21zM22,1H23V2H22zM23,1H24V2H23zM24,1H25V2H24zM25,1H26V2H25zM1,2H2V3H1zM7,2H8V3H7zM9,2H10V3H9zM10,2H11V3H10zM14,2H15V3H14zM17,2H18V3H17zM19,2H20V3H19zM25,2H26V3H25zM1,3H2V4H1zM3,3H4V4H3zM4,3H5V4H4zM5,3H6V4H5zM7,3H8V4H7zM9,3H10V4H9zM11,3H12V4H11zM14,3H15V4H14zM15,3H16V4H15zM19,3H20V4H19zM21,3H22V4H21zM22,3H23V4H22zM23,3H24V4H23zM25,3H26V4H25zM1,4H2V5H1zM3,4H4V5H3zM4,4H5V5H4zM5,4H6V5H5zM7,4H8V5H7zM10,4H11V5H10zM12,4H13V5H12zM14,4H15V5H14zM15,4H16V5H15zM16,4H17V5H16zM17,4H18V5H17zM19,4H20V5H19zM21,4H22V5H21zM22,4H23V5H22zM23,4H24V5H23zM25,4H26V5H25zM1,5H2V6H1zM3,5H4V6H3zM4,5H5V6H4zM5,5H6V6H5zM7,5H8V6H7zM9,5H10V6H9zM10,5H11V6H10zM12,5H13V6H12zM13,5H14V6H13zM14,5H15V6H14zM15,5H16V6H15zM17,5H18V6H17zM19,5H20V6H19zM21,5H22V6H21zM22,5H23V6H22zM23,5H24V6H23zM25,5H26V6H25zM1,6H2V7H1zM7,6H8V7H7zM11,6H12V7H11zM12,6H13V7H12zM14,6H15V7H14zM15,6H16V7H15zM19,6H20V7H19zM25,6H26V7H25zM1,7H2V8H1zM2,7H3V8H2zM3,7H4V8H3zM4,7H5V8H4zM5,7H6V8H5zM6,7H7V8H6zM7,7H8V8H7zM9,7H10V8H9zM11,7H12V8H11zM13,7H14V8H13zM15,7H16V8H15zM17,7H18V8H17zM19,7H20V8H19zM20,7H21V8H20zM21,7H22V8H21zM22,7H23V8H22zM23,7H24V8H23zM24,7H25V8H24zM25,7H26V8H25zM10,8H11V9H10zM11,8H12V9H11zM14,8H15V9H14zM16,8H17V9H16zM1,9H2V10H1zM4,9H5V10H4zM5,9H6V10H5zM6,9H7V10H6zM7,9H8V10H7zM8,9H9V10H8zM9,9H10V10H9zM11,9H12V10H11zM12,9H13V10H12zM13,9H14V10H13zM14,9H15V10H14zM16,9H17V10H16zM17,9H18V10H17zM18,9H19V10H18zM21,9H22V10H21zM23,9H24V10H23zM24,9H25V10H24zM25,9H26V10H25zM1,10H2V11H1zM2,10H3V11H2zM3,10H4V11H3zM5,10H6V11H5zM6,10H7V11H6zM8,10H9V11H8zM9,10H10V11H9zM13,10H14V11H13zM14,10H15V11H14zM15,10H16V11H15zM16,10H17V11H16zM18,10H19V11H18zM20,10H21V11H20zM21,10H22V11H21zM22,10H23V11H22zM23,10H24V11H23zM24,10H25V11H24zM1,11H2V12H1zM2,11H3V12H2zM3,11H4V12H3zM6,11H7V12H6zM7,11H8V12H7zM8,11H9V12H8zM9,11H10V12H9zM10,11H11V12H10zM11,11H12V12H11zM14,11H15V12H14zM16,11H17V12H16zM18,11H19V12H18zM21,11H22V12H21zM22,11H23V12H22zM25,11H26V12H25zM1,12H2V13H1zM2,12H3V13H2zM5,12H6V13H5zM8,12H9V13H8zM10,12H11V13H10zM14,12H15V13H14zM16,12H17V13H16zM18,12H19V13H18zM19,12H20V13H19zM22,12H23V13H22zM23,12H24V13H23zM24,12H25V13H24zM25,12H26V13H25zM1,13H2V14H1zM5,13H6V14H5zM7,13H8V14H7zM8,13H9V14H8zM10,13H11V14H10zM11,13H12V14H11zM12,13H13V14H12zM13,13H14V14H13zM14,13H15V14H14zM17,13H18V14H17zM19,13H20V14H19zM25,13H26V14H25zM1,14H2V15H1zM4,14H5V15H4zM6,14H7V15H6zM10,14H11V15H10zM14,14H15V15H14zM15,14H16V15H15zM16,14H17V15H16zM18,14H19V15H18zM21,14H22V15H21zM24,14H25V15H24zM1,15H2V16H1zM2,15H3V16H2zM3,15H4V16H3zM5,15H6V16H5zM7,15H8V16H7zM8,15H9V16H8zM9,15H10V16H9zM10,15H11V16H10zM12,15H13V16H12zM13,15H14V16H13zM14,15H15V16H14zM16,15H17V16H16zM19,15H20V16H19zM21,15H22V16H21zM22,15H23V16H22zM23,15H24V16H23zM24,15H25V16H24zM25,15H26V16H25zM1,16H2V17H1zM4,16H5V17H4zM5,16H6V17H5zM6,16H7V17H6zM9,16H10V17H9zM10,16H11V17H10zM11,16H12V17H11zM12,16H13V17H12zM16,16H17V17H16zM17,16H18V17H17zM19,16H20V17H19zM20,16H21V17H20zM22,16H23V17H22zM23,16H24V17H23zM25,16H26V17H25zM1,17H2V18H1zM3,17H4V18H3zM4,17H5V18H4zM6,17H7V18H6zM7,17H8V18H7zM8,17H9V18H8zM9,17H10V18H9zM10,17H11V18H10zM11,17H12V18H11zM15,17H16V18H15zM17,17H18V18H17zM18,17H19V18H18zM19,17H20V18H19zM20,17H21V18H20zM21,17H22V18H21zM23,17H24V18H23zM24,17H25V18H24zM9,18H10V19H9zM10,18H11V19H10zM11,18H12V19H11zM12,18H13V19H12zM13,18H14V19H13zM14,18H15V19H14zM15,18H16V19H15zM17,18H18V19H17zM21,18H22V19H21zM23,18H24V19H23zM24,18H25V19H24zM1,19H2V20H1zM2,19H3V20H2zM3,19H4V20H3zM4,19H5V20H4zM5,19H6V20H5zM6,19H7V20H6zM7,19H8V20H7zM9,19H10V20H9zM10,19H11V20H10zM12,19H13V20H12zM17,19H18V20H17zM19,19H20V20H19zM21,19H22V20H21zM25,19H26V20H25zM1,20H2V21H1zM7,20H8V21H7zM9,20H10V21H9zM11,20H12V21H11zM13,20H14V21H13zM15,20H16V21H15zM16,20H17V21H16zM17,20H18V21H17zM21,20H22V21H21zM24,20H25V21H24zM1,21H2V22H1zM3,21H4V22H3zM4,21H5V22H4zM5,21H6V22H5zM7,21H8V22H7zM9,21H10V22H9zM11,21H12V22H11zM13,21H14V22H13zM14,21H15V22H14zM15,21H16V22H15zM16,21H17V22H16zM17,21H18V22H17zM18,21H19V22H18zM19,21H20V22H19zM20,21H21V22H20zM21,21H22V22H21zM25,21H26V22H25zM1,22H2V23H1zM3,22H4V23H3zM4,22H5V23H4zM5,22H6V23H5zM7,22H8V23H7zM9,22H10V23H9zM10,22H11V23H10zM15,22H16V23H15zM16,22H17V23H16zM18,22H19V23H18zM19,22H20V23H19zM24,22H25V23H24zM25,22H26V23H25zM1,23H2V24H1zM3,23H4V24H3zM4,23H5V24H4zM5,23H6V24H5zM7,23H8V24H7zM11,23H12V24H11zM13,23H14V24H13zM15,23H16V24H15zM16,23H17V24H16zM18,23H19V24H18zM21,23H22V24H21zM22,23H23V24H22zM23,23H24V24H23zM24,23H25V24H24zM25,23H26V24H25zM1,24H2V25H1zM7,24H8V25H7zM10,24H11V25H10zM11,24H12V25H11zM15,24H16V25H15zM18,24H19V25H18zM20,24H21V25H20zM21,24H22V25H21zM23,24H24V25H23zM24,24H25V25H24zM25,24H26V25H25zM1,25H2V26H1zM2,25H3V26H2zM3,25H4V26H3zM4,25H5V26H4zM5,25H6V26H5zM6,25H7V26H6zM7,25H8V26H7zM9,25H10V26H9zM10,25H11V26H10zM14,25H15V26H14zM15,25H16V26H15zM17,25H18V26H17zM19,25H20V26H19zM22,25H23V26H22zM25,25H26V26H25z" id="qr-path" fill="#000000" fill-opacity="1" fill-rule="nonzero" stroke="none"/></svg></div><small>휴대폰 카메라로 스캔해 보세요</small><p class="b">군인·군가족·국가유공자를 위한<br><b>PX 장보기 앱 <span class="pk">PX<em>PICK</em></span></b></p></aside><script>
+const $=s=>document.querySelector(s);
+const mb=$('#mbtn'),dr=$('#drop');if(mb)mb.addEventListener('click',()=>{dr.hidden=!dr.hidden;});
+const sb=$('#sbtn');if(sb)sb.addEventListener('click',()=>{const q=$('#q');if(q){q.focus();q.scrollIntoView({block:'center'});}else location.href='guide.html#s';});
+// 가이드 첫 화면 — 글 찾기 (제목·내용에서)
+(function(){const q=$('#q');if(!q)return;const A=JSON.parse($('#arts').textContent),res=$('#res'),main=$('#main');
+ const hi=(t,w)=>t.replace(new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
+ const run=()=>{const w=q.value.trim();if(!w){res.hidden=true;main.hidden=false;return;}
+  const L=A.filter(a=>(a.t+' '+a.x).toLowerCase().includes(w.toLowerCase()));
+  res.innerHTML=L.length?L.map(a=>{const i=a.x.toLowerCase().indexOf(w.toLowerCase());const s=(i>20?'… ':'')+a.x.slice(Math.max(0,i-20),i+60).replace(/^[\s.·—]+/,'');
+    return '<a href="'+a.u+'"><h3>'+hi(a.t,w)+'</h3><p class="ex">'+hi(s,w)+'</p></a>';}).join(''):'<p class="no">찾는 글이 없어요</p>';
+  res.hidden=false;main.hidden=true;};
+ q.addEventListener('input',run);if(location.hash==='#s')q.focus();})();
+// TOP5 화살표
+document.querySelectorAll('.ttl .nav button').forEach(b=>b.addEventListener('click',()=>{const t=$('.tp');t.scrollBy({left:(b.dataset.d==='1'?1:-1)*t.clientWidth*.8,behavior:'smooth'});}));
+</script></body></html>
