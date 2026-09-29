@@ -8,6 +8,11 @@
 /big/*
   Cache-Control: public, max-age=31536000, immutable
 
+# 시안 미리보기 (2026-09-30) — 사장님이 폰으로 보시는 용. 검색에 안 나가게.
+/sian-dd4f3c/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache
+
 # >>> 미리 부르기 (굽는 스크립트가 씀)
 /
   Link: </data.json?v=f52f69d242>; rel=preload; as=fetch; crossorigin=anonymous; nopush
