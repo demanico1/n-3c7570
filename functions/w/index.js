@@ -39,8 +39,18 @@ export async function onRequest(context) {
       if (codes.length >= 300) break;
     }
     if (!codes.length) return Response.redirect(home, 302);
+    // ★ 보낸 사람·목록 이름·목록 열쇠 (2026-10-01). 미리보기에 "지은님이 보낸 '주말 장보기'" 가 뜨고,
+    //   앱은 `k` 로 같은 사람의 같은 목록을 알아본다. 사람이 적은 글이라 꺾쇠·따옴표·& 는 뺀다.
+    const clean = (v, n) => String(v || "").replace(/[<>"'&#\\]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
+    const from = clean(url.searchParams.get("f"), 10);
+    const name = clean(url.searchParams.get("n"), 16);
+    const key = /^[0-9a-z]{3,12}\.[0-9]{1,4}$/.test(url.searchParams.get("k") || "") ? url.searchParams.get("k") : "";
+    let tail = "";
+    if (from) tail += "&f=" + encodeURIComponent(from);
+    if (name) tail += "&n=" + encodeURIComponent(name);
+    if (key) tail += "&k=" + key;
     const list = toks.join("-");
-    const app = "/app/#w=" + list;   // 앱은 /app/ (2026-09-30)
+    const app = "/app/#w=" + list + tail;   // 앱은 /app/ (2026-09-30)
 
     // 미리보기 사진 — 앞에서부터 사진이 있는 첫 상품 (사진이 없는 상품이 4건 있다)
     let img = "";
@@ -57,10 +67,11 @@ export async function onRequest(context) {
     }
 
     const n = codes.length;
-    const title = "PX 찜 목록 " + n + "개";
+    const title = from ? "💌 " + from + "님이 보낸 " + (name || "장보기 목록") + " · " + n + "개"
+                : name ? "💌 " + name + " · " + n + "개" : "PX 찜 목록 " + n + "개";
     const desc = "군마트(PX) 상품 " + n + "개" + (pcs > n ? "(모두 " + pcs + "개)" : "")
       + "를 모아서 보냈어요. 눌러서 온라인 가격과 비교해 보세요.";
-    const me = url.origin + "/w/?c=" + list;
+    const me = url.origin + "/w/?c=" + list + tail;
     const html =
       '<!doctype html><html lang="ko"><head><meta charset="utf-8">' +
       '<meta name="viewport" content="width=device-width,initial-scale=1">' +

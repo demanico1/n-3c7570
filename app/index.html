@@ -438,6 +438,31 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 @keyframes gdn{50%{transform:translateY(8px)}}
 @media (prefers-reduced-motion:reduce){#guide .garrow{animation:none}}
 #sheet button.go .ico svg path{stroke:#fff}
+#listtabs{display:none;gap:6px;padding:8px 12px 0;overflow-x:auto;scrollbar-width:none}
+#listtabs::-webkit-scrollbar{display:none}
+#listtabs.on{display:flex}
+#listtabs .lt{flex:none;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);
+     font-size:13px;white-space:nowrap;cursor:pointer;color:var(--fg)}
+#listtabs .lt i{font-style:normal;margin-left:5px;font-weight:700;opacity:.75}
+#listtabs .lt.on{background:#0b7a4b;border-color:#0b7a4b;color:#fff}
+#listtabs .lta{color:var(--dim)}
+#listhead{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 0}
+#listhead.on{display:flex}
+#listhead b{display:block;font-size:15px}
+#listhead small{color:var(--dim);font-size:12px}
+#listhead .lmore{flex:none;width:36px;height:32px;border:1px solid var(--line);border-radius:9px;
+     background:var(--card);font-size:17px;line-height:1;cursor:pointer;color:var(--fg)}
+#onlybar #onlysave{background:#fff;color:#0b7a4b;border-color:#fff;font-weight:700}
+.shf label{display:block;font-size:12.5px;color:var(--dim);margin:12px 0 5px}
+.shf input{width:100%;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+     background:var(--card);color:var(--fg)}
+.shf .shchips{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.shf .shchips span{font-size:12px;padding:4px 9px;border-radius:999px;background:var(--bg);
+     border:1px solid var(--line);cursor:pointer}
+#sheet button.kakao{background:#FEE500;border-color:#FEE500;color:#191919;font-weight:700}
+.ldiff{list-style:none;margin:10px 0;padding:0;font-size:13.5px;line-height:1.9}
+.ldiff .a{color:var(--good)} .ldiff .d{color:var(--bad)} .ldiff .c{color:var(--dim)}
+#cpman{width:100%;font-size:14px;padding:10px;border:1px solid var(--line);border-radius:10px}
 #cartbar{display:none;gap:6px;padding:8px 12px 0}
 #cartbar button{flex:1;min-width:0;padding:8px 4px;border:1px solid var(--line);border-radius:9px;
      background:var(--card);font-size:13px;letter-spacing:-.3px;white-space:nowrap;cursor:pointer}
@@ -578,6 +603,8 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
   <div id="hdsp"></div>
 
 
+  <div class="rows" id="listtabs"></div>
+  <div id="listhead"></div>
   <div class="rows" id="cartbar">
     <button data-act="sharecart">찜 공유하기</button>
     <button data-act="importcart">찜 가져오기</button>
@@ -606,7 +633,7 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
         <select id="view" hidden></select>
   </div>
 
-  <div id="onlybar"><span id="onlytext"></span><span class="ob"><button id="onlytake" hidden>내 찜에 담기</button><button id="onlyall">전체 보기</button></span></div>
+  <div id="onlybar"><span id="onlytext"></span><span class="ob"><button id="onlysave" hidden>이 목록 따로 저장</button><button id="onlytake" hidden>내 찜에 담기</button><button id="onlyall">전체 보기</button></span></div>
 
   <main id="list"></main>
 
@@ -873,10 +900,19 @@ function start(d){
   const wantBig = raw.indexOf("c=") === 0
                 ? decodeURIComponent(raw.slice(2)) : "";
   const sIt = shared ? DATA.find(x => x.p === shared) : null;
-  if (/^w=[0-9x-]+$/.test(raw)) {
+  if (/^w=[0-9x-]+(&|$)/.test(raw)) {
     const have = new Set(DATA.map(x => x.p));
-    WQ = {};
-    const got = [...new Set(raw.slice(2).split("-").map(t => {
+    WQ = {}; WMETA = {};
+    const parts = raw.split("&");
+    for (const kv of parts.slice(1)){
+      const i = kv.indexOf("="); if (i < 1) continue;
+      let v = ""; try { v = decodeURIComponent(kv.slice(i + 1)); } catch(e){}
+      const k = kv.slice(0, i);
+      if (k === "f") WMETA.f = cleanName(v, 10);
+      if (k === "n") WMETA.n = cleanName(v, 16);
+      if (k === "k" && /^[0-9a-z]{3,12}\.[0-9]{1,4}$/.test(v)) WMETA.k = v;
+    }
+    const got = [...new Set(parts[0].slice(2).split("-").map(t => {
       const m = t.match(/^([0-9]+)(?:x([0-9]{1,2}))?$/);
       if (!m) return "";
       if (m[2] && Number(m[2]) > 1) WQ[m[1]] = Number(m[2]);
@@ -885,12 +921,15 @@ function start(d){
     if (got.length) {
       WLIST = new Set(got);
       $("#onlybar").style.display = "flex";
-      $("#onlytext").textContent = "공유받은 찜 목록 " + got.length + "개예요";
+      $("#onlytext").textContent = WMETA.f
+        ? "💌 " + WMETA.f + "님이 보낸 '" + (WMETA.n || "장보기 목록") + "' · " + got.length + "개"
+        : (WMETA.n ? "💌 '" + WMETA.n + "' · " : "공유받은 찜 목록 ") + got.length + "개예요";
+      $("#onlysave").hidden = false;
       const tk = $("#onlytake");
       tk.hidden = false;
       tk.disabled = got.every(inCart);
-      tk.textContent = tk.disabled ? "이미 다 찜했어요" : "내 찜에 담기";
-      document.title = "PX 찜 목록 " + got.length + "개";
+      tk.textContent = tk.disabled ? "이미 다 찜했어요" : "내 찜에 섞어 담기";
+      document.title = WMETA.f ? WMETA.f + "님이 보낸 장보기 목록" : "PX 찜 목록 " + got.length + "개";
     }
   }
   if (sIt){
@@ -958,7 +997,7 @@ function start(d){
 
 function goHome(){
   ONLY = "";
-  WLIST = null; $("#onlytake").hidden = true;
+  WLIST = null; $("#onlytake").hidden = true; $("#onlysave").hidden = true;
   document.title = TITLE0;
   const bar = $("#onlybar");
   if (bar) bar.style.display = "none";
@@ -1109,7 +1148,7 @@ function run(){
       if (vw === "wait" && (it.rate != null || it.nm)) return false;
       if (vw === "mine" && !it.mine) return false;
     }
-    if (vw === "cart" && !inCart(it.p)) return false;
+    if (vw === "cart" && !inCur(it.p)) return false;
     let score = 0;
     for (const t of toks){
       const inBody = t.cho ? it._cb.includes(t.c) : it._b.includes(t.j);
@@ -1147,8 +1186,10 @@ function run(){
     }
   });
 
+  if (CUR && !curList()) CUR = "";
+  listTabs(view);
   const bar = $("#cartbar");
-  bar.style.display = (view === "cart" || view === "mine") ? "flex" : "none";
+  bar.style.display = (view === "mine" || (view === "cart" && !listOn())) ? "flex" : "none";
   $("#cartbtn").classList.toggle("on", view === "cart");
   bar.dataset.mode = view;
   bar.children[0].style.display = view === "mine" ? "none" : "";   // 공유하기
@@ -1296,10 +1337,11 @@ function card(it, raw){
   if (it.sub) tags.push('<span class="tag">' + esc(it.sub) + "</span>");
   if (WLIST && qtyOf(it.p) > 1) tags.unshift('<span class="tag tag-qty">' + qtyOf(it.p) + "개</span>");
   const mine = !WLIST && $("#view").value === "cart";
+  const inL = mine && listOn();
   const cq = mine ? '<div class="cq"><button class="qb" data-q="-1" aria-label="하나 빼기">&minus;</button>' +
       '<span class="qn">' + qtyOf(it.p) + '</span>' +
       '<button class="qb" data-q="1" aria-label="하나 더">&#43;</button>' +
-      '<button class="got">' + (isGot(it.p) ? "샀어요 ✓" : "샀어요") + "</button></div>" : "";
+      (inL ? "" : '<button class="got">' + (isGot(it.p) ? "샀어요 ✓" : "샀어요") + "</button>") + "</div>" : "";
   const b = PICS[it.p];
   const img = '<img class="thumb" loading="lazy" alt="" data-p="' + it.p +
       '" data-nm="' + esc(it.name) + '"' +
@@ -1308,7 +1350,7 @@ function card(it, raw){
   const left = '<div class="left">' + img + "</div>";
   return '<article class="item' + (mine && isGot(it.p) ? " bought" : "") + '" data-p="' + it.p + '">' +
     '<i class="cpg" title="메뉴 보기">' + INFO + "</i>" +
-    '<i class="cart' + (inCart(it.p) ? " on" : "") + '" title="찜하기">' +
+    '<i class="cart' + ((inL ? inCur(it.p) : inCart(it.p)) ? " on" : "") + '" title="' + (inL ? "이 목록에서 빼기" : "찜하기") + '">' +
       HEART + "</i>" + left +
     '<div class="body"><div class="nm">' + hi(it.name, raw) + "</div>" +
     '<div class="sub">' + esc(it.spec || "") + (it.spec && it.maker ? " · " : "") +
@@ -1539,8 +1581,27 @@ let CQ = {}, GOT = [];
 try { CQ = JSON.parse(localStorage.getItem(CQ_KEY) || "{}") || {}; } catch(e){ CQ = {}; }
 try { GOT = JSON.parse(localStorage.getItem(GOT_KEY) || "[]") || []; } catch(e){ GOT = []; }
 let WQ = {};
-function qtyOf(p){ return (WLIST ? WQ[p] : CQ[p]) || 1; }
-function isGot(p){ return GOT.indexOf(p) >= 0; }
+const LISTS_KEY = "gmpx-lists", ME_KEY = "gmpx-me";
+let LISTS = [], ME = {};
+try { LISTS = JSON.parse(localStorage.getItem(LISTS_KEY) || "[]") || []; } catch(e){ LISTS = []; }
+try { ME = JSON.parse(localStorage.getItem(ME_KEY) || "{}") || {}; } catch(e){ ME = {}; }
+if (!ME.id){ ME.id = Math.random().toString(36).slice(2, 8); try { localStorage.setItem(ME_KEY, JSON.stringify(ME)); } catch(e){} }
+let CUR = "";          // 찜 화면에서 보는 칸 — "" 는 내 찜, 아니면 받은 목록의 id
+let WMETA = {};        // 공유받은 주소에 실려 온 {f 보낸 사람, n 목록 이름, k 목록 열쇠}
+let PEND = null;       // 따로 저장하려다 '바뀐 것' 을 묻는 중인 받은 목록
+function saveLists(){ try { localStorage.setItem(LISTS_KEY, JSON.stringify(LISTS)); } catch(e){} }
+function saveMe(){ try { localStorage.setItem(ME_KEY, JSON.stringify(ME)); } catch(e){} }
+function curList(){ return CUR ? LISTS.find(l => l.id === CUR) || null : null; }
+function listOn(){ const v = $("#view"); return v && v.value === "cart" ? curList() : null; }
+function inCur(p){ const L = curList(); return L ? L.items.indexOf(p) >= 0 : inCart(p); }
+function qtyOf(p){
+  if (WLIST) return WQ[p] || 1;
+  const L = listOn();
+  return (L ? L.q[p] : CQ[p]) || 1;
+}
+function isGot(p){ return !listOn() && GOT.indexOf(p) >= 0; }
+const mdate = iso => { const d = new Date(iso || Date.now()); return (d.getMonth() + 1) + "월 " + d.getDate() + "일"; };
+function lname(l){ return (l.from ? l.from + " · " : "") + (l.name || (l.from ? "장보기 목록" : "받은 목록 · " + mdate(l.at))); }
 function saveCQ(){
   for (const p of Object.keys(CQ)) if (!inCart(p) || !(CQ[p] > 1)) delete CQ[p];
   GOT = GOT.filter(inCart);
@@ -1549,7 +1610,7 @@ function saveCQ(){
     localStorage.setItem(GOT_KEY, JSON.stringify(GOT));
   } catch(e){}
 }
-function shopText(){
+function shopText(title){
   const c = CARTSUM || {};
   const lines = VIEW.map(i => {
     const q = qtyOf(i.p);
@@ -1559,7 +1620,7 @@ function shopText(){
   let tail = "총 " + won(c.px);
   if (c.cp) tail += " · " + ONL + "보다 " + c.about + won(Math.abs(c.gap))
                   + (c.gap >= 0 ? " 아껴요" : " 더 비싸요");
-  return "PX 장보기 목록 (" + c.kinds + "가지 · " + c.n + "개)\n" + lines.join("\n")
+  return (title || "PX 장보기 목록") + " (" + c.kinds + "가지 · " + c.n + "개)\n" + lines.join("\n")
        + "\n" + tail;
 }
 const TIP_KEY = "gmpx-tips";
@@ -1615,7 +1676,7 @@ function scheduleTips(){
     if (WLIST){
       const b = $("#onlytake");
       if (b && !b.hidden && !b.disabled)
-        showTip("wtake", b, "내 찜에 담기를 누르면 이 목록이 내 찜으로 옮겨져요");
+        showTip("wtake", $("#onlysave") || b, "이 목록 따로 저장을 누르면 찜 화면에 칸으로 따로 모아 둬요");
       return;
     }
     if ($("#view").value === "cart"){
@@ -1666,7 +1727,7 @@ function curTag(){
 
 function sameSub(it){
   if ($("#view").value === "cart" || $("#view").value === "mine") $("#view").value = "all";
-  ONLY = ""; WLIST = null; $("#onlytake").hidden = true;
+  ONLY = ""; WLIST = null; $("#onlytake").hidden = true; $("#onlysave").hidden = true;
   const bar = $("#onlybar"); if (bar) bar.style.display = "none";
   $("#q").value = "";
   BIG = it.big; SUB = it.sub;
@@ -1907,7 +1968,8 @@ function openHelp(sec){
       '<div class="hbtns"><span>찜 공유하기</span><span>찜 가져오기</span><span>찜 비우기</span></div>' +
       n(3, "<b>공유하기</b> 장보기 목록을 카톡으로") +
       n(4, "<b>가져오기</b> 받은 목록을 내 찜에") +
-      '<div class="hnote">공유받은 찜은 <b>내 찜에 담기</b>를 누르면 옮겨져요. 찜은 이 폰, 이 브라우저에 저장돼요.</div>') +
+      '<div class="hnote">공유받은 목록은 <b>이 목록 따로 저장</b>을 누르면 찜 화면에 <b>칸으로 따로</b> 모여요. ' +
+      '섞고 싶으면 <b>내 찜에 섞어 담기</b>. 찜은 이 폰, 이 브라우저에 저장돼요.</div>') +
 
     card("h-menu", I.menu, "상품 메뉴",
       '<div class="hmini hmenu" style="padding-top:4px">' +
@@ -1957,6 +2019,7 @@ $("#sheet").addEventListener("click", e => {
     closeSheet();
     return setTimeout(() => sameSub(it), 0);
   }
+  if (act && (act.indexOf("l-") === 0 || act.indexOf("sh-") === 0)) return listAct(act, b);
   if (act === "import") return openImport();
   if (act === "imppaste"){
     navigator.clipboard.readText().then(t => { $("#impbox").value = t; })
@@ -2015,14 +2078,11 @@ $("#sheet").addEventListener("click", e => {
       navigator.share({title: it.name, text: line, url: url}).catch(() => {});
       return;
     }
-    try { navigator.clipboard.writeText(it.name + "\n" + line + "\n" + url); }
-    catch(e){}
-    b.textContent = "주소를 복사했습니다";
+    copyOr(it.name + "\n" + line + "\n" + url, b, "주소를 복사했습니다");
     return;
   }
   if (act === "copyout"){
-    try { navigator.clipboard.writeText(OUT_URL || location.href); } catch(err){}
-    b.textContent = "주소를 복사했어요";
+    copyOr(OUT_URL || location.href, b, "주소를 복사했어요");
     return;
   }
   if (act === "install"){ closeSheet(); return setTimeout(openInstall, 260); }
@@ -2037,8 +2097,7 @@ $("#sheet").addEventListener("click", e => {
   }
   if (act === "movelink"){
     const url = location.origin + location.pathname + "#import=" + packed();
-    try { navigator.clipboard.writeText(url); } catch(e){}
-    b.textContent = "복사했습니다 — 새 주소에서 여세요";
+    copyOr(url, b, "복사했습니다 — 새 주소에서 여세요");
     return;
   }
   if (act === "movein"){
@@ -2134,7 +2193,9 @@ function importText(t){
 
 function openCart(){
   if ($("#view").value === "cart") return backFromCart();   // 한 번 더 누르면 되돌아간다
-  if (!CART.length){
+  const act = LISTS.filter(l => !l.arch);
+  if (!CART.length && !CUR && act.length) CUR = act[0].id;
+  if (!CART.length && !curList()){
     return openSheet('<h3>찜한 것이 없습니다</h3>' +
       '<p class="note">하트를 누르면 여기 모입니다.<br>' +
       "다른 곳에서 찜한 목록이 있으면 찜 가져오기로 옮겨 올 수 있어요.</p>" +
@@ -2303,31 +2364,223 @@ function toast(msg){
   toast._t = setTimeout(() => t.classList.remove("on"), 3500);
 }
 
-function cartUrl(){
+function cartUrl(meta){
   const have = new Set(DATA.map(x => x.p));
-  const codes = CART.filter(p => have.has(p));
+  const L = listOn();
+  const src = L ? L.items : CART, qq = L ? L.q : CQ;
+  const codes = src.filter(p => have.has(p));
   if (!codes.length) return null;
-  const toks = codes.map(p => CQ[p] > 1 ? p + "x" + CQ[p] : p);
+  const toks = codes.map(p => qq[p] > 1 ? p + "x" + qq[p] : p);
+  let tail = "";
+  if (meta){
+    if (meta.f) tail += "&f=" + encodeURIComponent(meta.f);
+    if (meta.n) tail += "&n=" + encodeURIComponent(meta.n);
+    tail += "&k=" + ME.id + "." + (L ? L.no : 0);
+  }
   let path = location.pathname;
   if (!path.endsWith("/")){
     const cut = path.lastIndexOf("/");
     path = path.slice(cut + 1).includes(".") ? path.slice(0, cut + 1) : path + "/";
   }
   path = path.replace(/app\/$/, "");   // 앱은 /app/, 찜 공유 /w/ 는 루트 (2026-09-30)
-  return {url: location.origin + path + "w/?c=" + toks.join("-"), n: codes.length};
+  return {url: location.origin + path + "w/?c=" + toks.join("-") + tail, n: codes.length};
 }
-function shareCart(b){
-  const u = cartUrl(); if (!u) return;
-  const title = "PX 찜 목록 " + u.n + "개";
-  const body = shopText();
-  if (navigator.share){
-    navigator.share({title: title, text: body + "\n\n찜 목록 보기 ↓", url: u.url}).catch(() => {});
-    return;
+function shareCart(){
+  if (!cartUrl()) return;
+  const L = listOn();
+  const nm = (L && L.name) || ME.last || "장보기 목록";
+  const chip = w => "<span data-v=\"" + esc(w) + "\">" + esc(w) + "</span>";
+  openSheet("<h3>" + (L ? "이 목록 공유하기" : "찜 공유하기") + "</h3>" +
+    '<p class="note">받는 분께 <b>누가 보낸 무슨 목록</b>인지 보여요. 이름은 처음 한 번만 적으면 다음부터 알아서 들어가요.</p>' +
+    '<div class="shf"><label for="shfrom">보내는 사람</label>' +
+      '<input id="shfrom" maxlength="10" autocomplete="off" placeholder="예: 지은" value="' + esc(ME.name || "") + '">' +
+      '<label for="shname">목록 이름</label>' +
+      '<input id="shname" maxlength="16" autocomplete="off" value="' + esc(nm) + '">' +
+      '<div class="shchips">' + ["장보기 목록", "주말 장보기", "사 올 것", "부대 동기 부탁"].map(chip).join("") + "</div></div>" +
+    '<button class="go kakao" data-act="sh-send">' + (navigator.share ? "카톡·문자로 보내기" : "목록과 링크 복사") + "</button>" +
+    (navigator.share ? '<button data-act="sh-copy">목록과 링크 복사</button>' : ""));
+}
+function shareOut(){
+  const f = cleanName(($("#shfrom") || {}).value || "", 10);
+  const n = cleanName(($("#shname") || {}).value || "", 16) || "장보기 목록";
+  ME.name = f; ME.last = n; saveMe();
+  const u = cartUrl({f: f, n: n}); if (!u) return null;
+  const title = f ? f + "님이 보낸 " + n : n;
+  return {title: title, body: shopText(title), url: u.url};
+}
+function cleanName(v, max){ return String(v || "").replace(/[<>"'&#\\]/g, "").replace(/\s+/g, " ").trim().slice(0, max); }
+
+function copyText(text){
+  let ok = false;
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", "");
+    ta.style.cssText = "position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px";
+    document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, text.length);
+    ok = document.execCommand("copy");
+    ta.remove();
+  } catch(e){ ok = false; }
+  if (ok) return Promise.resolve(true);
+  if (navigator.clipboard && navigator.clipboard.writeText)
+    return navigator.clipboard.writeText(text).then(() => true, () => false);
+  return Promise.resolve(false);
+}
+function copyOr(text, b, done){
+  copyText(text).then(ok => {
+    if (ok){
+      if (b){ const was = b.textContent; b.textContent = done || "복사했어요"; setTimeout(() => { b.textContent = was; }, 1500); }
+      else toast(done || "복사했어요");
+      return;
+    }
+    openSheet("<h3>길게 눌러 복사하세요</h3>" +
+      '<p class="note">이 화면에서는 바로 복사가 막혀 있어요. 아래 글을 길게 눌러 <b>전체 선택 → 복사</b>해 주세요.</p>' +
+      '<textarea id="cpman" rows="7" readonly>' + esc(text) + "</textarea>");
+    setTimeout(() => { const t = $("#cpman"); if (t){ t.focus(); t.select(); } }, 80);
+  });
+}
+
+function listTabs(view){
+  const box = $("#listtabs"), head = $("#listhead");
+  if (!box || !head) return;
+  const off = () => { box.classList.remove("on"); box.innerHTML = ""; head.classList.remove("on"); head.innerHTML = ""; };
+  if (view !== "cart" || WLIST || !LISTS.length) return off();
+  const L = curList();
+  const shown = LISTS.filter(l => !l.arch || l.id === CUR), arch = LISTS.filter(l => l.arch).length;
+  const t = (id, label, n, on) => '<button class="lt' + (on ? " on" : "") + '" data-l="' + id + '">' + label +
+      "<i>" + n + "</i></button>";
+  box.innerHTML = t("", "내 찜", CART.length, !L) +
+    shown.map(l => t(l.id, (l.arch ? "📦 " : "💌 ") + esc(lname(l)), l.items.length, l.id === CUR)).join("") +
+    (arch ? '<button class="lt lta" data-l="@arch">보관함 ' + arch + "</button>" : "");
+  box.classList.add("on");
+  if (L){
+    head.innerHTML = "<div><b>" + esc(lname(L)) + "</b><small>" + mdate(L.at) + " 받음 · " + L.items.length + "가지" +
+      (L.arch ? " · 보관함" : "") + "</small></div>" +
+      '<button class="lmore" aria-label="목록 메뉴">⋯</button>';
+    head.classList.add("on");
+  } else { head.classList.remove("on"); head.innerHTML = ""; }
+  const on = box.querySelector(".lt.on"); if (on) on.scrollIntoView({block: "nearest", inline: "nearest"});
+}
+function openListMenu(){
+  const L = curList(); if (!L) return;
+  openSheet("<h3>" + esc(lname(L)) + "</h3>" +
+    '<button data-act="l-rename">이름 바꾸기</button>' +
+    '<button data-act="l-share">이 목록 공유하기</button>' +
+    '<button data-act="l-move">내 찜으로 옮겨 담기</button>' +
+    (L.arch ? '<button data-act="l-unarch">보관함에서 꺼내기</button>'
+            : '<button data-act="l-arch">다 샀어요 — 보관하기</button>') +
+    '<button data-act="l-del" style="color:var(--bad)">이 목록 지우기</button>');
+}
+function openArch(){
+  const arch = LISTS.filter(l => l.arch);
+  openSheet("<h3>보관함</h3>" +
+    '<p class="note">다 산 목록이에요. 누르면 다시 볼 수 있어요.</p>' +
+    arch.map(l => '<button data-act="l-open" data-l="' + l.id + '">📦 ' + esc(lname(l)) +
+      " · " + l.items.length + "가지 · " + mdate(l.at) + "</button>").join(""));
+}
+function openList(id){
+  ONLY = ""; WLIST = null; WMETA = {};
+  $("#onlytake").hidden = true; $("#onlysave").hidden = true;
+  $("#onlybar").style.display = "none";
+  document.title = TITLE0;
+  try { history.replaceState(null, "", location.pathname); } catch(e){}
+  CUR = id;
+  if ($("#view").value !== "cart"){
+    PREV = null;
+    $("#view").value = "cart"; $("#q").value = ""; BIG = "전체"; SUB = "";
+    $("#chips").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c.dataset.b === "전체"));
   }
-  try { navigator.clipboard.writeText(body + "\n\n찜 목록 보기 " + u.url); } catch(e){}
-  const was = b.textContent;
-  b.textContent = "복사했어요";
-  setTimeout(() => { b.textContent = was; }, 1500);
+  run();
+  scrollTo(0, 0);
+}
+function nextCur(){ const a = LISTS.filter(l => !l.arch); return CART.length || !a.length ? "" : a[0].id; }
+function newList(codes, q){
+  const no = LISTS.reduce((m, l) => Math.max(m, l.no || 0), 0) + 1;
+  const L = {id: "L" + Date.now().toString(36), no: no, key: WMETA.k || "", from: WMETA.f || "",
+             name: WMETA.n || "", items: codes.slice(), q: Object.assign({}, q),
+             at: new Date().toISOString(), arch: 0};
+  LISTS.unshift(L); saveLists();
+  return L;
+}
+function listDiff(L, codes, q){
+  const nm = p => { const it = DATA.find(x => x.p === p); return it ? it.name : p; };
+  const out = [], old = new Set(L.items), now = new Set(codes);
+  for (const p of codes) if (!old.has(p)) out.push(["a", "+ " + nm(p) + " · " + (q[p] || 1) + "개"]);
+  for (const p of L.items) if (!now.has(p)) out.push(["d", "− " + nm(p)]);
+  for (const p of codes) if (old.has(p) && (L.q[p] || 1) !== (q[p] || 1))
+    out.push(["c", "↻ " + nm(p) + " " + (L.q[p] || 1) + "개 → " + (q[p] || 1) + "개"]);
+  return out;
+}
+function saveReceived(){
+  if (!WLIST) return;
+  tipUsed("wtake");
+  const codes = [...WLIST], q = {};
+  for (const p of codes) if (WQ[p] > 1) q[p] = WQ[p];
+  const L = WMETA.k ? LISTS.find(l => l.key === WMETA.k) : null;
+  if (L){
+    const d = listDiff(L, codes, q);
+    if (!d.length){ toast("이미 저장한 목록이에요"); return openList(L.id); }
+    PEND = {id: L.id, codes: codes, q: q};
+    return openSheet("<h3>" + esc(WMETA.f ? WMETA.f + "님이 '" + (WMETA.n || L.name || "장보기 목록") + "'를"
+                                           : "'" + lname(L) + "'를") + "<br>고쳐서 다시 보냈어요</h3>" +
+      '<ul class="ldiff">' + d.map(x => '<li class="' + x[0] + '">' + esc(x[1]) + "</li>").join("") + "</ul>" +
+      '<button class="go" data-act="l-replace">새 내용으로 바꾸기</button>' +
+      '<button data-act="l-savenew">따로 하나 더 저장</button>');
+  }
+  const N = newList(codes, q);
+  toast("찜 화면에 '" + lname(N) + "' 칸으로 저장했어요");
+  openList(N.id);
+}
+function listAct(act, b){
+  if (act === "sh-send" || act === "sh-copy"){
+    const o = shareOut(); if (!o) return;
+    if (act === "sh-send" && navigator.share){
+      closeSheet();
+      navigator.share({title: o.title, text: o.body + "\n\n목록 보기 ↓", url: o.url}).catch(() => {});
+      return;
+    }
+    return copyOr(o.body + "\n\n목록 보기 " + o.url, b, "복사했어요 — 카톡에 붙여 넣으세요");
+  }
+  if (act === "l-open"){ closeSheet(); return setTimeout(() => openList(b.dataset.l), 260); }
+  if (act === "l-replace" || act === "l-savenew"){
+    const P = PEND; PEND = null; if (!P) return closeSheet();
+    closeSheet();
+    if (act === "l-replace"){
+      const L = LISTS.find(l => l.id === P.id);
+      if (L){ L.items = P.codes; L.q = P.q; L.at = new Date().toISOString(); L.arch = 0;
+              if (WMETA.n) L.name = WMETA.n; if (WMETA.f) L.from = WMETA.f; saveLists();
+              toast("새 내용으로 바꿨어요"); return setTimeout(() => openList(L.id), 260); }
+    }
+    const N = newList(P.codes, P.q); N.key = "";   // 따로 저장한 것은 다음 번 비교 대상에서 뺀다
+    saveLists(); toast("따로 하나 더 저장했어요");
+    return setTimeout(() => openList(N.id), 260);
+  }
+  const L = curList(); if (!L) return closeSheet();
+  if (act === "l-rename"){
+    closeSheet();
+    const v = prompt("목록 이름", L.name || "");
+    if (v == null) return;
+    L.name = cleanName(v, 16); saveLists(); return run();
+  }
+  if (act === "l-share"){ closeSheet(); return setTimeout(shareCart, 260); }
+  if (act === "l-move"){
+    let n = 0;
+    for (const p of L.items) if (!inCart(p)){ CART.push(p); n++; if (L.q[p] > 1) CQ[p] = L.q[p]; }
+    saveCart(); saveCQ(); closeSheet();
+    toast(n ? n + "개를 내 찜에 담았어요" : "이미 다 내 찜에 있어요");
+    return run();
+  }
+  if (act === "l-arch" || act === "l-unarch"){
+    L.arch = act === "l-arch" ? 1 : 0; saveLists(); closeSheet();
+    if (L.arch){ CUR = nextCur(); toast("보관함에 넣었어요 — 찜 화면 '보관함'에서 다시 볼 수 있어요"); }
+    return run();
+  }
+  if (act === "l-del"){
+    if (!confirm("'" + lname(L) + "' 목록을 지울까요?")) return;
+    LISTS = LISTS.filter(l => l.id !== L.id); CUR = nextCur(); saveLists(); closeSheet();
+    toast("목록을 지웠어요");
+    return run();
+  }
 }
 
 $("#cartbtn").insertAdjacentHTML("afterbegin", HEART);
@@ -2336,7 +2589,7 @@ $("#cartsum").addEventListener("click", () => { tipUsed("cartsum"); openCartSum(
 $("#cartbar").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const mine = $("#cartbar").dataset.mode === "mine";
-  if (b.dataset.act === "sharecart") return shareCart(b);
+  if (b.dataset.act === "sharecart") return shareCart();
   if (b.dataset.act === "clear"){
     if (mine){ MINE = {}; saveMine(); }
     else {
@@ -2347,14 +2600,21 @@ $("#cartbar").addEventListener("click", e => {
   }
   if (b.dataset.act === "importcart") return openImport();
   if (b.dataset.act === "carthelp") return openHelp("h-cart");
-  const text = mineText();
-  try { navigator.clipboard.writeText(text); } catch(e){}
-  const was = b.textContent;
-  b.textContent = "복사했습니다";
-  setTimeout(() => { b.textContent = was; }, 1500);
+  copyOr(mineText(), b, "복사했습니다");
 });
 saveCart();
 
+$("#listtabs").addEventListener("click", e => {
+  const b = e.target.closest(".lt"); if (!b) return;
+  if (b.dataset.l === "@arch") return openArch();
+  CUR = b.dataset.l; run(); toTop();
+});
+$("#listhead").addEventListener("click", e => { if (e.target.closest(".lmore")) openListMenu(); });
+$("#onlysave").addEventListener("click", saveReceived);
+$("#sheet").addEventListener("click", e => {
+  const c = e.target.closest(".shchips span"); if (!c) return;
+  const i = $("#shname"); if (i){ i.value = c.dataset.v; }
+});
 $("#onlytake").addEventListener("click", e => {
   if (!WLIST) return;
   tipUsed("wtake");
@@ -2370,7 +2630,7 @@ $("#onlytake").addEventListener("click", e => {
 });
 $("#onlyall").addEventListener("click", () => {
   ONLY = "";
-  WLIST = null; $("#onlytake").hidden = true;
+  WLIST = null; $("#onlytake").hidden = true; $("#onlysave").hidden = true;
   document.title = TITLE0;
   $("#onlybar").style.display = "none";
   try { history.replaceState(history.state, "", location.pathname); } catch(e){}
@@ -2399,8 +2659,10 @@ $("#list").addEventListener("click", e => {
   const qb = e.target.closest(".qb");
   if (qb || e.target.closest(".got")) tipUsed("cartq");
   if (qb){
-    CQ[p] = Math.min(99, Math.max(1, qtyOf(p) + Number(qb.dataset.q)));
-    saveCQ();
+    const n = Math.min(99, Math.max(1, qtyOf(p) + Number(qb.dataset.q)));
+    const L = listOn();
+    if (L){ if (n > 1) L.q[p] = n; else delete L.q[p]; saveLists(); }
+    else { CQ[p] = n; saveCQ(); }
     card.querySelector(".qn").textContent = qtyOf(p);
     return cartSum();
   }
@@ -2413,6 +2675,13 @@ $("#list").addEventListener("click", e => {
   }
   if (e.target.closest(".cq")) return;
   const cartIcon = e.target.closest(".cart");
+  if (cartIcon && listOn()){          // 받은 목록 칸에서는 그 목록에서 뺀다 (내 찜은 안 건드린다)
+    const L = listOn();
+    L.items = L.items.filter(x => x !== p); delete L.q[p];
+    saveLists();
+    toast("이 목록에서 뺐어요");
+    return run();
+  }
   if (cartIcon){
     if (inCart(p)) CART = CART.filter(x => x !== p);
     else { CART.push(p); inappJit(); homeHint(); tipUsed("heart"); }
