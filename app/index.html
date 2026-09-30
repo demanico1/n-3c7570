@@ -30,19 +30,19 @@
 :root{
   --bg:#f6f7f9; --card:#fff; --line:#e3e6ea; --ink:#16181d; --dim:#6b7280;
   --good:#0f7b3f; --good-bg:#e7f6ec; --bad:#b3261e; --bad-bg:#fdeceb;
-  --mid:#8a6d00; --mid-bg:#fdf6e0; --accent:#1c6fd0; --shadow:0 1px 2px rgba(0,0,0,.06);
+  --mid:#8a6d00; --mid-bg:#fdf6e0; --accent:#11974B; --shadow:0 1px 2px rgba(0,0,0,.06);
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --bg:#101215; --card:#191c21; --line:#2a2f37; --ink:#e8eaed; --dim:#9aa2ad;
     --good:#5ddb97; --good-bg:#122a1c; --bad:#ff8b80; --bad-bg:#2c1614;
-    --mid:#e6c455; --mid-bg:#2a2412; --accent:#6fb0ff; --shadow:none;
+    --mid:#e6c455; --mid-bg:#2a2412; --accent:#1fae5f; --shadow:none;
   }
 }
 :root[data-theme="dark"]{
   --bg:#101215; --card:#191c21; --line:#2a2f37; --ink:#e8eaed; --dim:#9aa2ad;
   --good:#5ddb97; --good-bg:#122a1c; --bad:#ff8b80; --bad-bg:#2c1614;
-  --mid:#e6c455; --mid-bg:#2a2412; --accent:#6fb0ff; --shadow:none;
+  --mid:#e6c455; --mid-bg:#2a2412; --accent:#1fae5f; --shadow:none;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 i{font-style:normal}
@@ -98,6 +98,7 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 .brand{display:flex;align-items:center;gap:8px;flex:1;min-width:0;
  text-decoration:none;color:var(--ink);-webkit-tap-highlight-color:transparent}
 .brand img{width:30px;height:24px;display:block;flex:0 0 30px}
+.brand b .wmsvg{display:block;height:.707em;width:auto}
 .brand span{min-width:0;display:block;line-height:1.15}
 .brand b{display:block;font-size:16px;font-weight:800;letter-spacing:-.4px;
  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -141,7 +142,7 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
 .rows::-webkit-scrollbar{display:none}
 .chip{flex:0 0 auto;padding:6px 11px;border:1px solid var(--line);border-radius:999px;
       background:var(--card);color:var(--dim);font-size:13px;cursor:pointer;white-space:nowrap}
-.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.chip.on{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
 #subchips{display:none;margin-top:7px}
 #subchips.on{display:flex}
 #subchips .sl{flex:none;align-self:center;font-size:12px;color:var(--dim);margin-right:1px}
@@ -157,9 +158,9 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);
  color:var(--dim);font-size:12.5px;font-weight:600;letter-spacing:-.4px;
  cursor:pointer;white-space:nowrap;overflow:hidden;font-family:inherit;
  -webkit-tap-highlight-color:transparent}
-.sortbar .sb.on{background:var(--accent);border-color:var(--accent);
- color:#fff;font-weight:700}
-.sortbar .sb.on select{color:#fff}
+.sortbar .sb.on{background:var(--good-bg);border-color:var(--good);
+ color:var(--good);font-weight:700}
+.sortbar .sb.on select{color:var(--good)}
 .sortbar .sb.on::after{color:#fff;opacity:.85}
 .sortbar select{border:0;background:transparent;color:inherit;font:inherit;
  font-size:12.5px;letter-spacing:-.4px;padding:0;cursor:pointer;min-width:0;
@@ -314,7 +315,7 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 .hsearch svg{width:16px;height:16px;fill:none;stroke:var(--dim);stroke-width:2.2;stroke-linecap:round}
 .hpill{display:inline-block;padding:4px 10px;margin:6px 4px 0 0;border-radius:999px;border:1px solid var(--line);
      background:var(--card);font-size:12.5px}
-.hpill.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.hpill.on{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
 .hmenu span{display:block;padding:9px 12px;margin-top:6px;border:1px solid var(--line);border-radius:10px;
      background:var(--card);font-size:13.5px}
 .hmenu span.go{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -546,7 +547,7 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
 <div id="app" hidden>
   <header>
     <div class="top">
-      <a class="brand" id="home" href="./" title="처음 화면으로"><svg class="lg" viewBox="0 0 40 40" width="28" height="28" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#11974B"/><path d="M11.5 20.5l6 6 11-13" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>PX<em>PICK</em></b></span></a>
+      <a class="brand" id="home" href="./" title="처음 화면으로"><svg class="lg" viewBox="0 0 40 40" width="28" height="28" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#11974B"/><path d="M11.5 20.5l6 6 11-13" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b><svg class="wmsvg" viewBox="0 0 7520 1448" role="img" aria-label="PXPICK" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M98 1448H478V1012H702C1032 1012 1250 818 1250 508C1250 204 1038 0 714 0H98ZM478 716V304H626C770 304 852 382 852 508C852 636 770 716 626 716Z M1781.5 0H1353.5L1785.5 724L1339.5 1448H1773.5L2025.5 1010H2037.5L2291.5 1448H2727.5L2277.5 724L2711.5 0H2285.5L2037.5 432H2025.5Z"/><path fill="#11974B" d="M2863.0 1448H3243.0V1012H3467.0C3797.0 1012 4015.0 818 4015.0 508C4015.0 204 3803.0 0 3479.0 0H2863.0ZM3243.0 716V304H3391.0C3535.0 304 3617.0 382 3617.0 508C3617.0 636 3535.0 716 3391.0 716Z M4524.5 0H4144.5V1448H4524.5Z M5654.0 538H6040.0C6008.0 182 5746.0 -20 5386.0 -20C4996.0 -20 4690.0 242 4690.0 724C4690.0 1204 4988.0 1468 5386.0 1468C5802.0 1468 6020.0 1180 6040.0 932L5654.0 928C5634.0 1056 5540.0 1136 5394.0 1136C5198.0 1136 5082.0 996 5082.0 724C5082.0 466 5196.0 312 5396.0 312C5550.0 312 5642.0 402 5654.0 538Z M6203.6 1448H6583.6V1070L6717.6 898L7051.6 1448H7507.6L7001.6 646L7497.6 0H7051.6L6603.6 592H6583.6V0H6203.6Z"/></svg></b></span></a>
       <button class="iconbtn" id="mode" title="보기 바꾸기"><em id="modelb"></em></button>
       <button class="iconbtn" id="cartbtn" title="찜한 것"><span id="cartn"></span><em>찜</em></button>
       <button class="iconbtn" id="theme" title="밝게/어둡게">◐<em id="themelb"></em></button>
