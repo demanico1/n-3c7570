@@ -319,6 +319,7 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 .hmenu span{display:block;padding:9px 12px;margin-top:6px;border:1px solid var(--line);border-radius:10px;
      background:var(--card);font-size:13.5px}
 .hmenu span.go{background:var(--accent);border-color:var(--accent);color:#fff}
+.hmenu span.hi{background:var(--good-bg);border-color:transparent;color:var(--good);font-weight:700}
 .hnote{font-size:13px;color:var(--dim);margin-top:6px}
 #sheet .hsec button.go{margin-top:10px}
 #impbox{display:block;width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);
@@ -337,15 +338,24 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 #sheet button{display:flex;align-items:center;gap:10px;width:100%;margin-top:8px;
        padding:13px 16px;border-radius:11px;border:1px solid var(--line);
        background:var(--bg);font-size:14.5px;cursor:pointer;text-align:left}
-#sheet .ico{flex:0 0 20px;width:20px;height:20px;line-height:0}
-#sheet .ico svg{width:20px;height:20px;display:block}
+#sheet .ico{flex:0 0 26px;width:26px;height:26px;border-radius:13px;background:var(--card);border:1px solid var(--line);
+       box-sizing:border-box;display:flex;align-items:center;justify-content:center;line-height:0}
+#sheet .ico svg{width:16px;height:16px;display:block}
 #sheet .ico svg path{fill:none;stroke:var(--dim);stroke-width:1.7}
 #sheet .ico.on svg path{fill:#ca210c;stroke:#ca210c}
-#sheet .ico.won{font-size:15.5px;font-weight:800;color:var(--dim);
-       line-height:20px;text-align:center}
-#sheet .ico.share{font-size:16px;font-weight:700;color:var(--dim);
-       line-height:20px;text-align:center}
+#sheet .ico.won{font-size:13.5px;font-weight:800;color:var(--dim);
+       line-height:24px;text-align:center}
+#sheet .ico.share{font-size:14px;font-weight:700;color:var(--dim);
+       line-height:24px;text-align:center}
 #sheet button.same{background:var(--good-bg);border-color:transparent;color:var(--good);font-weight:700}
+#sheet button.hi{background:var(--good-bg);border-color:transparent;color:var(--good);padding:10px 14px;min-height:56px}
+#sheet .mc{flex:0 0 26px;width:26px;height:26px;border-radius:13px;background:var(--card);color:var(--good);
+       display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:800;font-size:14px;line-height:0}
+#sheet .mc svg{width:15px;height:15px;display:block}
+#sheet .mc svg path{fill:none;stroke:var(--good);stroke-width:2;stroke-linejoin:round}
+#sheet .mt{display:flex;flex-direction:column;gap:2px;line-height:1.25;min-width:0}
+#sheet .mt b{font-weight:700}
+#sheet .mt s{text-decoration:none;font-size:12px;font-weight:500;opacity:.8}
 #sheet button.go{background:var(--accent);border-color:var(--accent);color:#fff;
        font-weight:600}
 #sheet button.off{color:var(--dim)}
@@ -1296,7 +1306,7 @@ function card(it, raw){
          : (PICSDONE ? ' src="' + BLANK + '" data-nopic="1"' : "")) + ">";
   const left = '<div class="left">' + img + "</div>";
   return '<article class="item' + (mine && isGot(it.p) ? " bought" : "") + '" data-p="' + it.p + '">' +
-    '<i class="cpg" title="쿠팡에서 보기">' + OUT + "</i>" +
+    '<i class="cpg" title="메뉴 보기">' + INFO + "</i>" +
     '<i class="cart' + (inCart(it.p) ? " on" : "") + '" title="찜하기">' +
       HEART + "</i>" + left +
     '<div class="body"><div class="nm">' + hi(it.name, raw) + "</div>" +
@@ -1396,6 +1406,11 @@ addEventListener("hashchange", () => {
 const OUT = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
   '<path d="M14 5h5v5M19 5l-8 8M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8' +
   'a2 2 0 0 1 2-2h4"/></svg>';
+
+const INFO = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+  '<path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0"/><path d="M12 11v6M12 7.5v.01"/></svg>';
+const GRID = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+  '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>';
 
 const XMARK = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
   '<path d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"/></svg>';
@@ -1895,12 +1910,12 @@ function openHelp(sec){
 
     card("h-menu", I.menu, "상품 메뉴",
       '<div class="hmini hmenu" style="padding-top:4px">' +
-        '<span class="go">' + CP + " 가격 확인하기</span><span>찜하기</span><span>공유하기</span>" +
+        '<span class="hi">같은 종류 더 보기</span><span class="hi">' + CP + " 가격 확인하기</span><span>찜하기</span>" +
       "</div>" +
-      n(1, "상품 <b>이름</b>을 누르면 이 메뉴가 떠요") +
-      n(2, "<b>" + CP + " 가격 확인하기</b> — 쿠팡 화면으로 바로 가요") +
-      n(3, "<b>공유하기</b> — 그 상품을 카톡으로 보내요") +
-      n(4, "<b>같은 종류 더 보기</b> — 비슷한 상품들과 값을 비교해 봐요") +
+      n(1, "상품 <b>이름</b>이나 오른쪽 위 <b>ⓘ</b>를 누르면 이 메뉴가 떠요") +
+      n(2, "<b>같은 종류 더 보기</b> — 비슷한 상품들과 값을 비교해 봐요") +
+      n(3, "<b>" + CP + " 가격 확인하기</b> — 지금 얼마인지 쿠팡에서 봐요") +
+      n(4, "<b>공유하기</b> — 그 상품을 카톡으로 보내요") +
       '<div class="hnote">맨 아래 <b>직접 가격 비교 입력하기</b>로 내가 본 온라인 가격을 적어 두면, 내 폰에서는 그 값으로 비교해요.</div>') +
 
     card("h-home", I.home, "홈 화면 · 밝게",
@@ -2380,7 +2395,6 @@ $("#list").addEventListener("click", e => {
   const p = card.dataset.p;
   const it = DATA.find(x => x.p === p); if (!it) return;
 
-  if (e.target.closest(".cpg")) return coupang(it.name, it.a);
   const qb = e.target.closest(".qb");
   if (qb || e.target.closest(".got")) tipUsed("cartq");
   if (qb){
@@ -2406,7 +2420,7 @@ $("#list").addEventListener("click", e => {
     cartIcon.classList.toggle("on", inCart(p));
     return;
   }
-  let img = GAL ? null : e.target.closest(".thumb");
+  let img = (GAL || e.target.closest(".cpg")) ? null : e.target.closest(".thumb");   // ⓘ 는 메뉴로
   if (img && (img.dataset.nopic || !img.getAttribute("src"))) img = null;
   if (img){
     $("#zoom img").src = img.src || "";
@@ -2421,11 +2435,11 @@ $("#list").addEventListener("click", e => {
     '<p class="note">군마트 ' + won(it.g) +
       (it.c != null ? " · " + srcOf(it) + " " + won(it.c) : "") + "</p>" +
     (it.b && it.c != null ? '<p class="note basis">' + esc(it.b) + "</p>" : "") +
-    '<button class="go" data-act="coupang" data-p="' + p + '" data-q="' +
-      esc(it.name) + '"><i class="ico cpg-img"></i>' + CP + " 가격 확인하기</button>" +
     (it.sub && subN(it.sub) > 1
-      ? '<button class="same" data-act="samesub" data-p="' + p + '">같은 종류 더 보기 · ' +
-        esc(it.sub) + " " + subN(it.sub) + "개 ›</button>" : "") +
+      ? '<button class="hi" data-act="samesub" data-p="' + p + '"><i class="mc">' + GRID + '</i>' +
+        '<span class="mt"><b>같은 종류 더 보기</b><s>' + esc(it.sub) + " " + subN(it.sub) + "개 한눈에 비교</s></span></button>" : "") +
+    '<button class="hi" data-act="coupang" data-p="' + p + '" data-q="' + esc(it.name) + '">' +
+      '<i class="mc">C</i><span class="mt"><b>' + CP + ' 가격 확인하기</b><s>지금 얼마인지 보기</s></span></button>' +
     '<button data-act="' + (on ? "del" : "add") + '" data-p="' + p + '">' +
       '<i class="ico' + (on ? " on" : "") + '">' + HEART + "</i>" +
       (on ? "찜하기 취소" : "찜하기") + "</button>" +
