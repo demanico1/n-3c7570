@@ -1611,7 +1611,7 @@ function scheduleTips(){
     if (sc && BIG !== "전체" && showTip("subs", sc, "더 자세한 종류로 골라 볼 수 있어요")) return;
     if (ONLY || CART.length) return;
     showTip("heart", document.querySelector("#list .item .cart"),
-            "하트를 누르면 찜에 담겨요. 찜은 장바구니처럼 쓸 수 있어요");
+            "하트를 누르면 찜에 담겨요. 찜은 장보기 목록처럼 쓸 수 있어요");
   }, 1500);
 }
 
@@ -1841,7 +1841,7 @@ function openHelp(sec){
   const card = (id, icon, title, body) =>
     '<div class="hsec" id="' + id + '"><div class="hst">' + icon + "<b>" + title + "</b></div>" + body + "</div>";
   const lens = '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>';
-  const chips = [["h-find", "찾기"], ["h-price", "가격 보기"], ["h-cart", "찜·장바구니"],
+  const chips = [["h-find", "찾기"], ["h-price", "가격 보기"], ["h-cart", "찜·장보기 목록"],
                  ["h-menu", "상품 메뉴"], ["h-home", "홈 화면"]];
   openSheet(
     '<div class="hh"><h3>사용방법</h3><div class="hchips">' +
@@ -1876,7 +1876,7 @@ function openHelp(sec){
         '<div class="hex"><span class="badge b-none">비교군 없음</span><span>같은 상품을 못 찾음</span></div>' +
       "</div>") +
 
-    card("h-cart", I.cart, "찜 · 장바구니",
+    card("h-cart", I.cart, "찜 · 장보기 목록",
       '<div class="hflow">' +
         '<div class="hstep"><div class="v"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z" fill="#d93025"/></svg></div>하트로 담기</div>' +
         '<span class="harr">›</span>' +
