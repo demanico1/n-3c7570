@@ -459,7 +459,7 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 .shf .shchips{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
 .shf .shchips span{font-size:12px;padding:4px 9px;border-radius:999px;background:var(--bg);
      border:1px solid var(--line);cursor:pointer}
-#sheet button.kakao{background:#FEE500;border-color:#FEE500;color:#191919;font-weight:700}
+#sheet button.soft{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
 .ldiff{list-style:none;margin:10px 0;padding:0;font-size:13.5px;line-height:1.9}
 .ldiff .a{color:var(--good)} .ldiff .d{color:var(--bad)} .ldiff .c{color:var(--dim)}
 #cpman{width:100%;font-size:14px;padding:10px;border:1px solid var(--line);border-radius:10px}
@@ -481,6 +481,66 @@ html.cart-on #cartsum{display:flex}
 #cartsum .tot small{font-size:12px;font-weight:500;opacity:.85;margin-right:4px}
 #cartsum .tot i{font-style:normal;font-size:15px;font-weight:400;opacity:.8;margin-left:3px}
 html.cart-on body{padding-bottom:calc(66px + env(safe-area-inset-bottom))}
+#cartsum .pxgo{flex:none;margin-left:2px;padding:8px 11px;border:0;border-radius:11px;background:#fff;color:#0b7a4b;
+     font-size:13.5px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+#shopstrip{display:none;align-items:center;justify-content:space-between;gap:10px;margin:0 12px 8px;padding:8px 12px;
+     border-radius:10px;background:#0b7a4b;color:#fff;font-size:13px}
+#shopstrip b{font-weight:800;white-space:nowrap}
+#shopstrip span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.95}
+html.shop #shopstrip{display:flex}
+html.shop #chips, html.shop #subchips, html.shop .sum, html.shop .sortbar, html.shop #listtabs,
+html.shop #listhead, html.shop #cartbar, html.shop #addbar, html.shop #onlybar{display:none!important}
+html.shop .searchwrap input{border-color:#0b7a4b}
+html.shop #cartsum{display:block;height:calc(148px + env(safe-area-inset-bottom));padding:12px 14px env(safe-area-inset-bottom);cursor:default;
+     white-space:normal}
+html.shop body{padding-bottom:calc(158px + env(safe-area-inset-bottom))}
+html.shop #toast, html.shop #stoast{bottom:calc(160px + env(safe-area-inset-bottom))}
+html.shop #inbar{display:none}
+.gz .row{display:flex;gap:10px;align-items:center;height:92px}
+.gz .art{flex:none;width:96px;height:84px;position:relative}
+.gz .art svg{position:absolute;left:0;top:0;overflow:visible}
+.gz .col{flex:1;min-width:0}
+.gz .lb{font-size:12px;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gz .amt{white-space:nowrap;font-size:24px;font-weight:800;letter-spacing:-.4px;line-height:1.2}
+.gz .amt.sm{font-size:20px}
+.gz .pct{font-size:12px;font-weight:800;background:rgba(255,255,255,.2);border-radius:8px;padding:2px 6px;margin-left:5px;vertical-align:4px}
+.gz .sv{white-space:nowrap;display:inline-block;font-size:11px;font-weight:800;color:#0b7a4b;background:#BDEFCF;border-radius:6px;padding:1px 6px;margin-top:2px}
+.gz .fin{flex:none;background:#fff;color:#0b7a4b;font-weight:800;border:0;border-radius:12px;padding:10px 11px;font-size:13px;
+     white-space:nowrap;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.gz .bt{display:flex;justify-content:space-between;align-items:center;height:40px;border-top:1px solid rgba(255,255,255,.18);
+     font-size:13px;white-space:nowrap}
+.gz .bt b{font-weight:800}.gz .bt .all b{font-size:16px;margin-left:3px}
+.gz .chipy{position:absolute;right:-6px;top:-8px;background:#FFE14D;color:#1a1a1a;border-radius:9px;padding:1px 6px;font-size:11px;
+     font-weight:900;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.item .cart.bk svg path{fill:none;stroke:var(--good);stroke-width:1.8;opacity:1}
+.item .cart.bk{border:1.5px solid var(--good);border-radius:50%;padding:4px}
+.item .cart.bk.on{background:#0b7a4b;border-color:#0b7a4b;border-radius:999px;padding:4px 8px;display:flex;align-items:center;gap:3px}
+.item .cart.bk.on svg path{stroke:#fff}
+.item .cart.bk.on b{color:#fff;font-size:13px;font-weight:800;line-height:1}
+.item .cart.bk svg{width:20px;height:20px}
+.item.inb{background:var(--good-bg);border-color:var(--good)}
+.tag.tag-here{background:#fff3e0;border-color:#f0b35a;color:#b35c00;font-weight:700}
+html.dark .tag.tag-here{background:#2a2412;color:#e6c455}
+#shoppop{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35)}
+#shoppop div{background:var(--card);color:var(--fg);border-radius:18px;padding:22px 26px;text-align:center;max-width:300px;
+     box-shadow:0 10px 30px rgba(0,0,0,.25)}
+#shoppop .i{font-size:44px;line-height:1}
+#shoppop b{display:block;font-size:20px;margin:10px 0 8px}
+#shoppop p{margin:0;font-size:13.5px;line-height:1.7;color:var(--dim)}
+#stoast{position:fixed;left:12px;right:12px;z-index:61;display:none;align-items:center;gap:10px;padding:10px 12px;
+     border-radius:12px;background:#1f2328;color:#fff;font-size:13px;line-height:1.45;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+#stoast.on{display:flex}
+#stoast .t{flex:1;min-width:0}
+#stoast button{flex:none;border:0;border-radius:9px;background:#fff;color:#1f2328;font-weight:700;font-size:12.5px;padding:7px 10px;cursor:pointer}
+@media (min-width:720px){#stoast{left:50%;right:auto;width:480px;transform:translateX(-50%)}}
+.rcpt{text-align:center}
+.rcpt .ic{font-size:40px}
+.rcpt h3{margin:6px 0 4px}
+.rcpt .big{font-size:34px;font-weight:900;letter-spacing:-.5px}
+.rcpt .pill{display:inline-block;margin:8px 0 12px;padding:6px 14px;border-radius:999px;background:var(--good-bg);color:var(--good);font-weight:800}
+.rcpt table{width:100%;border-top:1px dashed var(--line);margin:4px 0 12px;font-size:14px;text-align:left}
+.rcpt td{padding:7px 2px;white-space:nowrap}.rcpt td+td{text-align:right;font-weight:700;white-space:normal;padding-left:10px}
+.rcpt .foot{font-size:12.5px;color:var(--dim);margin-top:8px}
 html.cart-on #inbar{bottom:calc(66px + env(safe-area-inset-bottom))}
 html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
 .sumtbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
@@ -589,6 +649,7 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
       <button class="iconbtn" id="theme" title="밝게/어둡게">◐<em id="themelb"></em></button>
             <button class="iconbtn" id="more" title="메뉴">⋯<em>메뉴</em></button>
     </div>
+    <div id="shopstrip"><b>🛒 장보는 중</b><span id="shopname"></span></div>
     <div class="searchwrap">
       <span class="mag">🔍</span>
       <input id="q" type="search" placeholder="검색" autocomplete="off"
@@ -609,7 +670,6 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
     <button data-act="sharecart">찜 공유하기</button>
     <button data-act="importcart">찜 가져오기</button>
     <button data-act="clear">찜 비우기</button>
-    <button data-act="carthelp" class="qh" aria-label="찜 사용법">?</button>
   </div>
   <div id="cartsum" role="button" aria-live="polite"></div>
 
@@ -858,11 +918,12 @@ function prepItems(items){
   }
 }
 
+var PH0 = "";
 function start(d){
   DATA = d.items.filter(i => !HIDE_SUB.includes(i.sub));
   document.title = TITLE0 = d.title;
   $("#foot").innerHTML = d.foot;
-  $("#q").placeholder = d.hint;
+  $("#q").placeholder = PH0 = d.hint;
   CP = d.cp;
   $("#sort").innerHTML = d.sorts.map(o =>
       '<option value="' + o[0] + '">' + o[1] + "</option>").join("");
@@ -983,6 +1044,10 @@ function start(d){
     useSort(back.sort);
   }
   setMode(GAL);
+  if (SHOP && !WLIST && !ONLY && !raw){        // 장보다 닫았으면 카트 화면으로 돌아온다
+    CUR = SHOP.cur || ""; $("#view").value = "cart"; $("#q").value = "";
+    if (Date.now() - (SHOP.t || 0) > 6 * 3600e3) setTimeout(askShopDone, 900);
+  }
   run();
   if (back && back.y){
     let guard = 0;
@@ -1024,7 +1089,7 @@ function leaveCart(){
   try { if (history.state && history.state.cart) history.replaceState(null, ""); } catch(e){}
   return true;
 }
-$("#q").addEventListener("input", () => { SUB = ""; leaveCart(); runFresh(); toTop(); });
+$("#q").addEventListener("input", () => { SUB = ""; runFresh(); toTop(); });
 (function(){
   const hd = $("header"), sp = $("#hdsp");
   if (!hd || !sp) return;
@@ -1148,7 +1213,7 @@ function run(){
       if (vw === "wait" && (it.rate != null || it.nm)) return false;
       if (vw === "mine" && !it.mine) return false;
     }
-    if (vw === "cart" && !inCur(it.p)) return false;
+    if (vw === "cart" && !inCur(it.p) && !(SHOP && !WLIST && toks.length)) return false;
     let score = 0;
     for (const t of toks){
       const inBody = t.cho ? it._cb.includes(t.c) : it._b.includes(t.j);
@@ -1186,7 +1251,12 @@ function run(){
     }
   });
 
+  if (SHOP && view === "cart" && !WLIST) CUR = SHOP.cur || "";
   if (CUR && !curList()) CUR = "";
+  document.documentElement.classList.toggle("shop", shopOn());
+  if (PH0) $("#q").placeholder = shopOn() ? "전체에서 찾아 바로 담기 — ㅅㄹㅁ, 닥터지…"
+                               : view === "cart" && !WLIST ? "찜 안에서 찾기 — ㅅㄹㅁ, 닥터지…" : PH0;
+  if (shopOn()){ const L = curList(); $("#shopname").textContent = L ? "💌 " + lname(L) : "내 찜"; }
   listTabs(view);
   const bar = $("#cartbar");
   bar.style.display = (view === "mine" || (view === "cart" && !listOn())) ? "flex" : "none";
@@ -1195,7 +1265,6 @@ function run(){
   bar.children[0].style.display = view === "mine" ? "none" : "";   // 공유하기
   bar.children[1].textContent = view === "mine" ? "직접 입력한 값 복사" : "찜 가져오기";
   bar.children[1].dataset.act = view === "mine" ? "copyall" : "importcart";
-  bar.children[3].style.display = view === "mine" ? "none" : "";
   bar.children[2].textContent = view === "mine" ? "직접 입력한 값 모두 지우기"
                                                 : "찜 비우기";
   stats();
@@ -1338,20 +1407,25 @@ function card(it, raw){
   if (WLIST && qtyOf(it.p) > 1) tags.unshift('<span class="tag tag-qty">' + qtyOf(it.p) + "개</span>");
   const mine = !WLIST && $("#view").value === "cart";
   const inL = mine && listOn();
-  const cq = mine ? '<div class="cq"><button class="qb" data-q="-1" aria-label="하나 빼기">&minus;</button>' +
+  const sh = mine && shopOn(), inb = sh && inBasket(it.p), member = mine && inCur(it.p);
+  if (sh && SHOP.x.indexOf(it.p) >= 0) tags.unshift('<span class="tag tag-here">현장</span>');
+  const cq = member ? '<div class="cq"><button class="qb" data-q="-1" aria-label="하나 빼기">&minus;</button>' +
       '<span class="qn">' + qtyOf(it.p) + '</span>' +
       '<button class="qb" data-q="1" aria-label="하나 더">&#43;</button>' +
-      (inL ? "" : '<button class="got">' + (isGot(it.p) ? "샀어요 ✓" : "샀어요") + "</button>") + "</div>" : "";
+      "</div>" : "";
   const b = PICS[it.p];
   const img = '<img class="thumb" loading="lazy" alt="" data-p="' + it.p +
       '" data-nm="' + esc(it.name) + '"' +
       (b ? ' src="data:image/webp;base64,' + b + '"'
          : (PICSDONE ? ' src="' + BLANK + '" data-nopic="1"' : "")) + ">";
   const left = '<div class="left">' + img + "</div>";
-  return '<article class="item' + (mine && isGot(it.p) ? " bought" : "") + '" data-p="' + it.p + '">' +
-    '<i class="cpg" title="메뉴 보기">' + INFO + "</i>" +
-    '<i class="cart' + ((inL ? inCur(it.p) : inCart(it.p)) ? " on" : "") + '" title="' + (inL ? "이 목록에서 빼기" : "찜하기") + '">' +
-      HEART + "</i>" + left +
+  const icon = sh
+    ? '<i class="cart bk' + (inb ? " on" : "") + '" title="' + (inb ? "카트에서 빼기" : "카트에 넣기") + '">' + CARTI +
+        (inb ? "<b>" + qtyOf(it.p) + "</b>" : "") + "</i>"
+    : '<i class="cart' + ((inL ? inCur(it.p) : inCart(it.p)) ? " on" : "") + '" title="' + (inL ? "이 목록에서 빼기" : "찜하기") + '">' +
+      HEART + "</i>";
+  return '<article class="item' + (inb ? " inb" : "") + '" data-p="' + it.p + '">' +
+    '<i class="cpg" title="메뉴 보기">' + INFO + "</i>" + icon + left +
     '<div class="body"><div class="nm">' + hi(it.name, raw) + "</div>" +
     '<div class="sub">' + esc(it.spec || "") + (it.spec && it.maker ? " · " : "") +
       esc(it.maker || "") + "</div>" +
@@ -1590,6 +1664,13 @@ let CUR = "";          // 찜 화면에서 보는 칸 — "" 는 내 찜, 아니
 let WMETA = {};        // 공유받은 주소에 실려 온 {f 보낸 사람, n 목록 이름, k 목록 열쇠}
 let PEND = null;       // 따로 저장하려다 '바뀐 것' 을 묻는 중인 받은 목록
 function saveLists(){ try { localStorage.setItem(LISTS_KEY, JSON.stringify(LISTS)); } catch(e){} }
+const SHOP_KEY = "gmpx-shop", TRIPS_KEY = "gmpx-trips";
+let SHOP = null, RCPT = null;
+try { SHOP = JSON.parse(localStorage.getItem(SHOP_KEY) || "null"); } catch(e){ SHOP = null; }
+if (SHOP && (typeof SHOP !== "object" || !SHOP.b)) SHOP = null;
+function saveShop(){ try { SHOP ? localStorage.setItem(SHOP_KEY, JSON.stringify(SHOP)) : localStorage.removeItem(SHOP_KEY); } catch(e){} }
+function shopOn(){ const v = $("#view"); return !!SHOP && !!v && v.value === "cart" && !WLIST; }
+function inBasket(p){ return !!(SHOP && SHOP.b[p]); }
 function saveMe(){ try { localStorage.setItem(ME_KEY, JSON.stringify(ME)); } catch(e){} }
 function curList(){ return CUR ? LISTS.find(l => l.id === CUR) || null : null; }
 function listOn(){ const v = $("#view"); return v && v.value === "cart" ? curList() : null; }
@@ -1599,7 +1680,7 @@ function qtyOf(p){
   const L = listOn();
   return (L ? L.q[p] : CQ[p]) || 1;
 }
-function isGot(p){ return !listOn() && GOT.indexOf(p) >= 0; }
+function isGot(p){ return false; }
 const mdate = iso => { const d = new Date(iso || Date.now()); return (d.getMonth() + 1) + "월 " + d.getDate() + "일"; };
 function lname(l){ return (l.from ? l.from + " · " : "") + (l.name || (l.from ? "장보기 목록" : "받은 목록 · " + mdate(l.at))); }
 function saveCQ(){
@@ -1682,7 +1763,7 @@ function scheduleTips(){
     if ($("#view").value === "cart"){
       const next = () => showTip("cartsum", $("#cartsum"), "초록 띠를 누르면 합계를 자세히 볼 수 있어요");
       if (!showTip("cartq", document.querySelector("#list .cq"),
-                   "수량을 바꾸고, 산 것은 샀어요를 눌러 지워 가세요", next)) next();
+                   "수량을 정해 두고, PX에 가면 초록 띠의 🛒 PX 도착을 누르세요", next)) next();
       return;
     }
     const sc = document.querySelector("#subchips.on .sc:not(.on)");
@@ -1743,7 +1824,7 @@ function cartMode(){ return !!WLIST || $("#view").value === "cart"; }
 function cartSum(){
   const box = $("#cartsum");
   if (!box) return;
-  const on = cartMode() && VIEW.length > 0;
+  const on = cartMode() && (VIEW.length > 0 || shopOn());
   document.documentElement.classList.toggle("cart-on", on);
   if (!on) return;
   let px = 0, cp = 0, pxC = 0, n = 0, kinds = 0, noC = 0, conv = 0, left = 0, leftN = 0, gotN = 0;
@@ -1764,7 +1845,9 @@ function cartSum(){
       ? "<b>" + about + won(gap) + " 아껴요</b>"
       : '<b class="ov">' + about + won(-gap) + " 더 비싸요</b>");
   const tot = (gotN ? "<small>남은</small>" + won(left) : won(px)) + "<i>›</i>";
-  box.innerHTML = '<span class="l">' + l + "</span>" + '<span class="tot">' + tot + "</span>";
+  if (shopOn()) return gauge(box);
+  box.innerHTML = '<span class="l">' + l + "</span>" + '<span class="tot">' + tot + "</span>" +
+    (!WLIST && $("#view").value === "cart" ? '<button class="pxgo">🛒 PX 도착</button>' : "");
 }
 var CARTSUM = null;   // var — 첫 화면이 이 줄보다 먼저 cartSum 을 부를 수 있다
 function openCartSum(){
@@ -1960,13 +2043,14 @@ function openHelp(sec){
         '<span class="harr">›</span>' +
         '<div class="hstep"><div class="v cq" style="margin:0"><span class="qb" style="width:24px;height:24px;font-size:14px;display:inline-flex;align-items:center;justify-content:center">&minus;</span><b>3</b><span class="qb" style="width:24px;height:24px;font-size:14px;display:inline-flex;align-items:center;justify-content:center">+</span></div>수량 정하기</div>' +
         '<span class="harr">›</span>' +
-        '<div class="hstep"><div class="v"><span style="padding:3px 8px;border-radius:7px;background:var(--good);color:#fff;font-size:11.5px">샀어요 ✓</span></div>산 건 지우기</div>' +
+        '<div class="hstep"><div class="v"><span style="padding:3px 8px;border-radius:7px;background:#0b7a4b;color:#fff;font-size:11.5px">🛒 PX 도착</span></div>카트 끌기</div>' +
       "</div>" +
       '<div class="hbar"><div><small>5개 · ' + ONL + '보다</small><b>15,150원 아껴요</b></div><span class="t">34,790원 ›</span></div>' +
       n(1, "아래 <b>초록 띠</b>에 총금액이 바로 나와요") +
       n(2, "띠를 누르면 자세히 봐요") +
       '<div class="hbtns"><span>찜 공유하기</span><span>찜 가져오기</span><span>찜 비우기</span></div>' +
       n(3, "<b>공유하기</b> 장보기 목록을 카톡으로") +
+      n(5, "PX에 가면 띠의 <b>🛒 PX 도착</b> — 하트가 🛒로 바뀌고, 담을 때마다 카트가 차요. 다 사면 <b>🧾 계산 끝</b>") +
       n(4, "<b>가져오기</b> 받은 목록을 내 찜에") +
       '<div class="hnote">공유받은 목록은 <b>이 목록 따로 저장</b>을 누르면 찜 화면에 <b>칸으로 따로</b> 모여요. ' +
       '섞고 싶으면 <b>내 찜에 섞어 담기</b>. 찜은 이 폰, 이 브라우저에 저장돼요.</div>') +
@@ -2020,6 +2104,15 @@ $("#sheet").addEventListener("click", e => {
     return setTimeout(() => sameSub(it), 0);
   }
   if (act && (act.indexOf("l-") === 0 || act.indexOf("sh-") === 0)) return listAct(act, b);
+  if (act === "rc-done"){
+    const t = doneText(); if (!t) return;
+    if (navigator.share){ navigator.share({text: t}).catch(() => {}); return; }
+    return copyOr(t, b, "복사했어요 — 카톡에 붙여 넣으세요");
+  }
+  if (act === "rc-brag"){ b.textContent = "만드는 중…"; bragCard(b).then(() => { if (b.textContent === "만드는 중…") b.textContent = "🔥 자랑 카드 만들기"; }); return; }
+  if (act === "rc-finish"){ closeSheet(); return setTimeout(finishShop, 260); }
+  if (act === "rc-keep"){ if (SHOP){ SHOP.t = Date.now(); saveShop(); } return closeSheet(); }
+  if (act === "rc-drop"){ SHOP = null; saveShop(); closeSheet(); return run(); }
   if (act === "import") return openImport();
   if (act === "imppaste"){
     navigator.clipboard.readText().then(t => { $("#impbox").value = t; })
@@ -2194,6 +2287,7 @@ function importText(t){
 function openCart(){
   if ($("#view").value === "cart") return backFromCart();   // 한 번 더 누르면 되돌아간다
   const act = LISTS.filter(l => !l.arch);
+  if (SHOP) CUR = SHOP.cur || "";
   if (!CART.length && !CUR && act.length) CUR = act[0].id;
   if (!CART.length && !curList()){
     return openSheet('<h3>찜한 것이 없습니다</h3>' +
@@ -2397,7 +2491,7 @@ function shareCart(){
       '<label for="shname">목록 이름</label>' +
       '<input id="shname" maxlength="16" autocomplete="off" value="' + esc(nm) + '">' +
       '<div class="shchips">' + ["장보기 목록", "주말 장보기", "사 올 것", "부대 동기 부탁"].map(chip).join("") + "</div></div>" +
-    '<button class="go kakao" data-act="sh-send">' + (navigator.share ? "카톡·문자로 보내기" : "목록과 링크 복사") + "</button>" +
+    '<button class="soft" data-act="sh-send">' + (navigator.share ? "카톡·문자로 보내기" : "목록과 링크 복사") + "</button>" +
     (navigator.share ? '<button data-act="sh-copy">목록과 링크 복사</button>' : ""));
 }
 function shareOut(){
@@ -2438,6 +2532,209 @@ function copyOr(text, b, done){
       '<textarea id="cpman" rows="7" readonly>' + esc(text) + "</textarea>");
     setTimeout(() => { const t = $("#cpman"); if (t){ t.focus(); t.select(); } }, 80);
   });
+}
+
+const CARTI = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 4h2.2l2.1 10.2a1.6 1.6 0 0 0 1.6 1.3h8.3a1.6 1.6 0 0 0 1.6-1.2L20.6 8H6.1M9.5 20.2a.9.9 0 1 0 0-.1M17 20.2a.9.9 0 1 0 0-.1"/></svg>';
+function shopItems(){
+  const L = curList(), have = new Map(DATA.map(x => [x.p, x]));
+  return (L ? L.items : CART).map(p => have.get(p)).filter(Boolean);
+}
+function startShop(){
+  if (WLIST) return;
+  SHOP = {cur: CUR || "", b: {}, x: [], t: Date.now()};
+  saveShop();
+  $("#q").value = ""; run(); toTop();
+  const d = document.createElement("div");
+  d.id = "shoppop";
+  d.innerHTML = '<div><span class="i">🛒</span><b>카트를 끌었어요!</b><p>하트가 🛒로 바뀌었어요.<br>바구니에 넣을 때 🛒를 톡 누르세요.<br>검색하면 PX 전체에서 찾아요.</p></div>';
+  document.body.appendChild(d);
+  const bye = () => { if (d.parentNode) d.remove(); };
+  d.addEventListener("click", bye);
+  setTimeout(bye, 2600);
+}
+function basketTap(it){
+  const p = it.p, L = curList();
+  if (inBasket(p)){
+    delete SHOP.b[p]; saveShop();
+    toast("카트에서 뺐어요");
+    return run();
+  }
+  if (!inCur(p)){
+    if (L){ L.items.push(p); saveLists(); } else { CART.push(p); saveCart(); }
+    if (SHOP.x.indexOf(p) < 0) SHOP.x.push(p);
+  }
+  SHOP.b[p] = 1; saveShop();
+  const q = qtyOf(p), raw = $("#q").value.trim();
+  const gap = it.c != null ? (it.c - it.g) * q : null;
+  const msg = "<b>" + esc(short(it.name)) + "</b> 담았어요<br>계산할 돈 +" + won(it.g * q) +
+    (gap != null ? " · " + ONL + "보다 " + won(Math.abs(gap)) + (gap >= 0 ? " 싸요" : " 비싸요") : "");
+  if (raw){ SHOP.last = raw; saveShop(); $("#q").value = ""; run(); toTop(); stoast(msg, "방금 검색 다시"); }
+  else { run(); stoast(msg); }
+}
+const short = (n, k) => { k = k || 18; return n.length > k ? n.slice(0, k - 1) + "…" : n; };
+function stoast(html, btn){
+  let t = $("#stoast");
+  if (!t){
+    t = document.createElement("div"); t.id = "stoast"; document.body.appendChild(t);
+    t.addEventListener("click", e => {
+      if (!e.target.closest("button")) return;
+      t.classList.remove("on");
+      if (SHOP && SHOP.last){ $("#q").value = SHOP.last; run(); toTop(); $("#q").focus({preventScroll: true}); }
+    });
+  }
+  t.innerHTML = '<span class="t">' + html + "</span>" + (btn ? "<button>" + btn + "</button>" : "");
+  t.classList.add("on");
+  clearTimeout(stoast._t);
+  stoast._t = setTimeout(() => t.classList.remove("on"), btn ? 5000 : 2600);
+}
+function shopStat(){
+  let tot = 0, amt = 0, save = 0, kin = 0, left = 0, lamt = 0;
+  const th = [];
+  for (const it of shopItems()){
+    const q = qtyOf(it.p), g = it.g * q;
+    tot += g;
+    if (inBasket(it.p)){ amt += g; kin++; th.push(it.p); if (it.c != null) save += (it.c - it.g) * q; }
+    else { left++; lamt += g; }
+  }
+  return {tot, amt, save, kin, left, lamt, th, pct: tot ? Math.round(100 * amt / tot) : 0};
+}
+function cartArt(th){
+  const src = p => PICS[p] ? "data:image/webp;base64," + PICS[p] : "/big/" + p + ".jpg";
+  const HEAP = [[30, -2, -8], [50, -6, 6], [68, -1, -5], [40, -16, 10], [60, -18, -8], [50, -28, 4]];
+  const one = (t, uid, heap) => {
+    let s = '<path d="M20 14 L86 14 L78 52 L28 52 Z" fill="rgba(255,255,255,.16)"/>';
+    t.slice(0, 9).forEach((p, i) => {
+      const c = i % 3, r = Math.floor(i / 3);
+      s += '<image href="' + src(p) + '" x="' + (24 + c * 19 + (r % 2) * 5) + '" y="' + (38 - r * 12) +
+           '" width="20" height="20"/>';
+    });
+    t.slice(9, 9 + heap).forEach((p, i) => {
+      const [x, y, rot] = HEAP[i];
+      s += '<g transform="rotate(' + rot + " " + (x + 11) + " " + (y + 11) + ')"><rect x="' + x + '" y="' + y +
+           '" width="22" height="22" rx="4" fill="#fff"/><image href="' + src(p) + '" x="' + x + '" y="' + y + '" width="22" height="22"/></g>';
+    });
+    return s + '<path d="M20 14 L86 14 L78 52 L28 52 Z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>' +
+      '<path d="M36 14 L39 52 M52 14 L53 52 M68 14 L66 52 M24 27 L83 27 M26 40 L80 40" stroke="rgba(255,255,255,.35)" stroke-width="1.2"/>' +
+      '<path d="M4 4 H14 L20 14" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path d="M28 52 L26 60 H80" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<circle cx="34" cy="68" r="6" fill="#fff"/><circle cx="34" cy="68" r="2.4" fill="#0b7a4b"/>' +
+      '<circle cx="74" cy="68" r="6" fill="#fff"/><circle cx="74" cy="68" r="2.4" fill="#0b7a4b"/>';
+  };
+  const n = th.length;
+  const box = (vb, inner) => '<svg width="96" height="84" viewBox="' + vb + '">' + inner + "</svg>";
+  if (n <= 9) return box("0 -30 96 106", one(th, "a", 0));
+  if (n <= 20) return box("0 -30 96 106", one(th, "a", Math.min(6, n - 9))) + (n > 15 ? '<span class="chipy">+' + (n - 15) + "</span>" : "");
+  const carts = Math.ceil(n / 20);
+  let g = "";
+  for (let k = Math.min(carts, 4) - 1; k > 0; k--)
+    g += '<g transform="translate(' + (16 * k + 34) + " " + (22 - 2 * k) + ") scale(" + (0.72 - 0.08 * k).toFixed(2) + ')" opacity="' +
+         (1 - 0.2 * k).toFixed(2) + '">' + one(th.slice(20 * k), "k" + k, 6) + "</g>";
+  return box("0 -30 150 106", g + "<g>" + one(th, "a", 6) + "</g>") + '<span class="chipy">🛒 ' + carts + "대" + (carts > 2 ? "!" : "") + "</span>";
+}
+function gauge(box){
+  const s = shopStat();
+  box.innerHTML = '<div class="gz"><div class="row"><div class="art">' + cartArt(s.th) + "</div>" +
+    '<div class="col"><div class="lb">넣은 ' + s.kin + "가지 · 계산할 돈</div>" +
+    '<div class="amt' + (s.amt >= 100000 ? " sm" : "") + '">' + won(s.amt) + '<span class="pct">' + s.pct + "%</span></div>" +
+    (s.save > 0 ? '<span class="sv">' + ONL + "보다 " + won(s.save) + " 아낌</span>" : "") + "</div>" +
+    '<button class="fin">🧾 계산 끝</button></div>' +
+    '<div class="bt"><span>남은 <b>' + s.left + "가지</b> · " + won(s.lamt) + '</span><span class="all">다 사면<b>' + won(s.tot) + "</b></span></div></div>";
+}
+function tripsLoad(){ try { return JSON.parse(localStorage.getItem(TRIPS_KEY) || "[]") || []; } catch(e){ return []; } }
+function finishShop(){
+  if (!SHOP) return;
+  const s = shopStat(), L = curList(), items = shopItems();
+  if (!s.kin && !confirm("카트가 비어 있어요. 장보기를 끝낼까요?")) return;
+  const ask = items.filter(i => SHOP.x.indexOf(i.p) < 0);
+  const here = items.filter(i => SHOP.x.indexOf(i.p) >= 0 && inBasket(i.p));
+  const miss = ask.filter(i => !inBasket(i.p));
+  const got = ask.filter(i => inBasket(i.p));
+  const now = new Date(), ym = now.getFullYear() + "-" + (now.getMonth() + 1);
+  const trips = tripsLoad().filter(t => t.m === ym);
+  if (s.kin){ trips.push({m: ym, d: now.toISOString(), amt: s.amt, save: s.save}); }
+  try { const all = tripsLoad().filter(t => t.m !== ym).concat(trips).slice(-200); localStorage.setItem(TRIPS_KEY, JSON.stringify(all)); } catch(e){}
+  RCPT = {L: L ? {from: L.from, name: lname(L)} : null, amt: s.amt, save: s.save, kin: s.kin,
+          got: got.map(i => [i.name, qtyOf(i.p)]), miss: miss.map(i => i.name), here: here.map(i => [i.name, qtyOf(i.p)]),
+          th: s.th.slice(0, 6), ask: ask.length, mN: trips.length, mSave: trips.reduce((a, t) => a + (t.save || 0), 0)};
+  SHOP = null; saveShop(); $("#q").value = ""; run();
+  const who = RCPT.L && RCPT.L.from ? RCPT.L.from : "";
+  const row = (k, v) => "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
+  const missTxt = RCPT.miss.length ? esc(short(RCPT.miss[0], 14)) + (RCPT.miss.length > 1 ? " 외 " + (RCPT.miss.length - 1) + "개" : "") : "없음";
+  openSheet('<div class="rcpt"><div class="ic">🧾</div><h3>오늘 PX 장보기 끝!</h3>' +
+    '<div class="big">' + won(RCPT.amt) + "</div>" +
+    (RCPT.save > 0 ? '<div class="pill">' + ONL + "보다 " + won(RCPT.save) + " 아꼈어요</div>" : "<div style=\"height:12px\"></div>") +
+    "<table>" +
+      row(RCPT.L ? "💌 " + esc(who ? who + " 부탁" : RCPT.L.name) : "♥ 찜 목록", RCPT.ask + "개 중 " + RCPT.got.length + "개") +
+      (RCPT.here.length ? row("🛒 현장에서 담은 것", RCPT.here.length + "개") : "") +
+      row("못 찾은 것", missTxt) +
+      row("이번 달 PX", RCPT.mN + "번 · " + won(RCPT.mSave) + " 아낌") +
+    "</table>" +
+    '<button class="go" data-act="rc-done">💌 ' + (who ? esc(who) + "님께 " : "") + '"다 샀어" 보내기</button>' +
+    '<button data-act="rc-brag">🔥 자랑 카드 만들기</button>' +
+    '<p class="foot">🛒가 다시 ♥로 — 찜 목록은 지우기 전까지 그대로예요</p></div>');
+}
+function askShopDone(){
+  if (!SHOP) return;
+  openSheet("<h3>장보기 끝났나요?</h3>" +
+    '<p class="note">카트를 끈 지 6시간이 넘었어요.</p>' +
+    '<button class="go" data-act="rc-finish">🧾 계산 끝</button>' +
+    '<button data-act="rc-keep">아직 장보는 중이에요</button>' +
+    '<button data-act="rc-drop">카트 그냥 비우기</button>');
+}
+function doneText(){
+  const R = RCPT; if (!R) return "";
+  const who = R.L && R.L.from ? R.L.from + "님, " : "";
+  const ln = [who + "PX 장보기 다 했어요! 🛒"];
+  for (const [n, q] of R.got) ln.push("✓ " + n + (q > 1 ? " × " + q : ""));
+  for (const n of R.miss) ln.push("✗ " + n + " (못 찾음)");
+  for (const [n, q] of R.here) ln.push("+ " + n + (q > 1 ? " × " + q : "") + " (현장에서)");
+  ln.push("총 " + won(R.amt) + (R.save > 0 ? " · " + ONL + "보다 " + won(R.save) + " 아꼈어요" : ""));
+  return ln.join("\n");
+}
+async function bragCard(b){
+  const R = RCPT; if (!R) return;
+  const W = 1080, H = 1350, cv = document.createElement("canvas");
+  cv.width = W; cv.height = H;
+  const x = cv.getContext("2d");
+  if (!x.roundRect) x.roundRect = function(a, b, w, h){ this.rect(a, b, w, h); };   // 옛 브라우저는 네모로
+  const gr = x.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, "#11974B"); gr.addColorStop(1, "#0b6b41");
+  x.fillStyle = gr; x.fillRect(0, 0, W, H);
+  const F = w => w + ' "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+  x.fillStyle = "#fff"; x.textAlign = "center";
+  x.font = F("bold 54px"); x.fillText("🛒 오늘 PX 장보기 끝!", W / 2, 150);
+  x.font = F("900 130px"); x.fillText(won(R.amt), W / 2, 330);
+  if (R.save > 0){
+    const t = ONL + "보다 " + won(R.save) + " 아꼈어요";
+    x.font = F("800 58px"); const tw = x.measureText(t).width + 80;
+    x.fillStyle = "#BDEFCF"; x.beginPath(); x.roundRect((W - tw) / 2, 390, tw, 100, 50); x.fill();
+    x.fillStyle = "#0b7a4b"; x.fillText(t, W / 2, 460);
+  }
+  const imgs = await Promise.all(R.th.map(p => new Promise(ok => {
+    const im = new Image(); im.onload = () => ok(im); im.onerror = () => ok(null); im.src = "/big/" + p + ".jpg";
+  })));
+  const n = imgs.length, sz = 250, gap = 30, cols = Math.min(3, n), rows = Math.ceil(n / 3);
+  imgs.forEach((im, i) => {
+    const c = i % 3, r = Math.floor(i / 3), inRow = r === rows - 1 ? n - 3 * r : cols;
+    const x0 = (W - (inRow * sz + (inRow - 1) * gap)) / 2 + c * (sz + gap), y0 = 560 + r * (sz + gap);
+    x.fillStyle = "#fff"; x.beginPath(); x.roundRect(x0, y0, sz, sz, 28); x.fill();
+    if (im){ const k = Math.min((sz - 30) / im.width, (sz - 30) / im.height);
+             x.drawImage(im, x0 + (sz - im.width * k) / 2, y0 + (sz - im.height * k) / 2, im.width * k, im.height * k); }
+  });
+  x.fillStyle = "#fff"; x.font = F("600 44px");
+  x.fillText(R.kin + "가지 담음 · 이번 달 PX " + R.mN + "번", W / 2, H - 170);
+  x.font = F("900 60px"); x.fillText("PXPICK", W / 2, H - 80);
+  x.font = F("500 34px"); x.globalAlpha = .85; x.fillText("군마트 vs 온라인 · pxpick.com", W / 2, H - 36); x.globalAlpha = 1;
+  cv.toBlob(async blob => {
+    if (!blob) return;
+    const file = new File([blob], "PX장보기.png", {type: "image/png"});
+    if (navigator.canShare && navigator.canShare({files: [file]})){
+      try { await navigator.share({files: [file], text: "PX 장보기 끝! " + (R.save > 0 ? ONL + "보다 " + won(R.save) + " 아꼈어요" : "")}); return; } catch(e){ return; }
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "PX장보기.png";
+    document.body.appendChild(a); a.click(); a.remove();
+    if (b){ b.textContent = "그림을 저장했어요"; }
+  }, "image/png");
 }
 
 function listTabs(view){
@@ -2585,7 +2882,12 @@ function listAct(act, b){
 
 $("#cartbtn").insertAdjacentHTML("afterbegin", HEART);
 $("#cartbtn").addEventListener("click", openCart);
-$("#cartsum").addEventListener("click", () => { tipUsed("cartsum"); openCartSum(); });
+$("#cartsum").addEventListener("click", e => {
+  if (e.target.closest(".pxgo")) return startShop();
+  if (e.target.closest(".fin")) return finishShop();
+  if (shopOn()) return;
+  tipUsed("cartsum"); openCartSum();
+});
 $("#cartbar").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const mine = $("#cartbar").dataset.mode === "mine";
@@ -2664,6 +2966,7 @@ $("#list").addEventListener("click", e => {
     if (L){ if (n > 1) L.q[p] = n; else delete L.q[p]; saveLists(); }
     else { CQ[p] = n; saveCQ(); }
     card.querySelector(".qn").textContent = qtyOf(p);
+    const pill = card.querySelector(".cart.bk b"); if (pill) pill.textContent = qtyOf(p);
     return cartSum();
   }
   if (e.target.closest(".got")){
@@ -2675,6 +2978,7 @@ $("#list").addEventListener("click", e => {
   }
   if (e.target.closest(".cq")) return;
   const cartIcon = e.target.closest(".cart");
+  if (cartIcon && shopOn()) return basketTap(it);
   if (cartIcon && listOn()){          // 받은 목록 칸에서는 그 목록에서 뺀다 (내 찜은 안 건드린다)
     const L = listOn();
     L.items = L.items.filter(x => x !== p); delete L.q[p];
