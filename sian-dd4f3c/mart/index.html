@@ -358,6 +358,11 @@ br.mb{display:inline}
 .allm{display:block;margin:16px 16px 0;text-align:center;border-radius:12px;background:#F2F4F7;padding:14px;font-size:14px;font-weight:700;color:#374151}
 .toastc{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#111;color:#fff;font-size:14px;border-radius:999px;padding:10px 16px;opacity:0;transition:opacity .25s;z-index:90;pointer-events:none}
 .toastc.on{opacity:1}
+#cpman{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center}#cpman[hidden]{display:none}
+#cpman .bx{width:100%;max-width:520px;background:#fff;border-radius:20px 20px 0 0;padding:22px 20px 28px}
+#cpman b{font-size:16px}#cpman small{display:block;font-size:13px;color:#6B7280;margin-top:4px}
+#cpman p{margin-top:14px;background:#F2F4F7;border-radius:12px;padding:14px;font-size:16px;line-height:1.5;-webkit-user-select:all;user-select:all}
+#cpman button{margin-top:14px;width:100%;height:48px;border:0;border-radius:12px;background:var(--p);color:#fff;font:inherit;font-size:15px;font-weight:700}
 /* 목록 */
 .mi-top{padding:22px 16px 0}.mi-top h1{font-size:26px;font-weight:800;letter-spacing:-.5px}.mi-top p{font-size:14px;color:#6B7280;margin-top:6px}
 .mi-srch{display:flex;align-items:center;gap:8px;margin:14px 16px 0;padding:10px 14px;background:#F3F4F6;border-radius:12px}
@@ -439,10 +444,18 @@ document.querySelectorAll('.catchips button').forEach(b=>b.addEventListener('cli
  if(t<o)set(o-t<=60?'soon':'shut','영업 전',m[1]+':'+m[2]+'에 열어요');
  else if(t<c)set(c-t<=60?'soon':'open','지금 영업 중',m[3]+':'+m[4]+'에 닫아요');
  else set('shut','오늘 영업 끝',m[3]+':'+m[4]+'에 닫았어요');})();
-// 주소 복사
+// 주소 복사 — ★ 카톡 같은 앱 안 브라우저는 클립보드 기능을 막는다. 실패해도 '복사했어요' 를 띄우면
+//   옛 클립보드(페이지 주소 등)가 붙어 나간다 (2026-09-30 사장님 폰). 된 것을 확인했을 때만 알린다.
+//   ① 글상자 선택 복사(손가락으로 누른 그 순간에 해야 된다) → ② 클립보드 기능 → ③ 둘 다 안 되면 창에 띄워 길게 눌러 복사
 document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{const s=b.dataset.copy;const t=document.getElementById('toastc');
- const done=()=>{t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1600);};
- if(navigator.clipboard)navigator.clipboard.writeText(s).then(done,done);else{const a=document.createElement('textarea');a.value=s;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove();done();}}));
+ const done=()=>{t.textContent='주소를 복사했어요';t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1600);};
+ const byBox=()=>{const a=document.createElement('textarea');a.value=s;a.setAttribute('readonly','');
+   a.style.cssText='position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px';document.body.appendChild(a);
+   a.focus();a.select();try{a.setSelectionRange(0,s.length)}catch(e){}let ok=false;try{ok=document.execCommand('copy')}catch(e){}a.remove();return ok;};
+ const manual=()=>{const w=document.getElementById('cpman');w.querySelector('p').textContent=s;w.hidden=false;};
+ if(byBox())return done();
+ if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(s).then(done,manual);else manual();}));
+document.addEventListener('click',e=>{if(e.target.id==='cpman'||e.target.closest('#cpman button'))document.getElementById('cpman').hidden=true;});
 // 목록 찾기
 (function(){const q=document.getElementById('mq');if(!q)return;q.addEventListener('input',()=>{const w=q.value.trim();
  document.querySelectorAll('.mi-g').forEach(g=>{let n=0;g.querySelectorAll('a').forEach(a=>{const ok=!w||a.dataset.s.includes(w);a.hidden=!ok;if(ok)n++;});g.hidden=!n;});});})();
