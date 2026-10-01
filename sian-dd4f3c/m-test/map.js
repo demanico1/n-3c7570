@@ -27,10 +27,10 @@ function openPop(m,d){box.querySelectorAll('.pxm-pin.sel').forEach(x=>{x.classLi
  pop.innerHTML='<button class="x" aria-label="닫기">×</button><b>'+m.n+'</b> '+pill(m)+'<div class="s">'+m.a+'<br>'+(dayHours(m)||'오늘 영업시간 정보 없음')+(m.tel?' · '+m.tel:'')+'</div>'+
   '<div class="bt"><a href="'+m.u+'">마트 정보 보기</a>'+(m.pu?'<a class="go" href="'+m.pu+'" target="_blank" rel="noopener">실시간 영업시간 보기 ›</a>':'')+'</div>';
  pop.classList.add('on');pop.querySelector('.x').onclick=()=>{pop.classList.remove('on');box.querySelectorAll('.pxm-pin.sel').forEach(x=>x.classList.remove('sel'))}}
-function zoomTo(r){if(!map)return;cur=r;el.classList.remove('nat');box.classList.add('zoom');pop.classList.remove('on');
+function zoomTo(r){if(window.pxmOpen)pxmOpen(r);if(!map)return;cur=r;el.classList.remove('nat');box.classList.add('zoom');pop.classList.remove('on');
  const L=M.filter(m=>m.r==r),bd=new kakao.maps.LatLngBounds();L.forEach(m=>bd.extend(new kakao.maps.LatLng(m.lat,m.lng)));
  if(L.length==1){map.setCenter(bd.getSouthWest());map.setLevel(6)}else map.setBounds(bd,50,30,70,30)}
-function home(){if(!map)return;cur='';pop.classList.remove('on');box.classList.remove('zoom');el.classList.add('nat');map.setBounds(all,30,20,30,20)}
+function home(){if(window.pxmOpen)pxmOpen('');if(!map)return;cur='';pop.classList.remove('on');box.classList.remove('zoom');el.classList.add('nat');map.setBounds(all,30,20,30,20)}
 box.querySelector('.pxm-back').onclick=home;
 // ── 내 근처 마트 — 직선거리 · 차로 대략 몇 분 · 길찾기(카카오맵 경로). 위치는 이 화면에서만 쓰고 어디로도 안 보낸다
 const km=(a,b,c,d)=>{const R=6371,t=x=>x*Math.PI/180,dl=t(c-a),dn=t(d-b);const h=Math.sin(dl/2)**2+Math.cos(t(a))*Math.cos(t(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
@@ -53,9 +53,21 @@ box.querySelector('.pxm-me').onclick=()=>{const b=box.querySelector('.pxm-me');
   pop.querySelectorAll('.pxm-near b').forEach(e=>e.onclick=()=>{const m=M[+e.dataset.i];map.setCenter(new kakao.maps.LatLng(m.lat,m.lng));map.setLevel(5);openPop(m,null)})},
  e=>{b.textContent='📍 내 근처 마트';pop.innerHTML='<button class="x" aria-label="닫기">×</button><b>위치를 가져오지 못했어요</b><div class="s">위치 허용을 눌러 주시거나, 지도의 지역 숫자를 눌러 찾아보세요.</div>';
   pop.classList.add('on');pop.querySelector('.x').onclick=()=>pop.classList.remove('on')},{enableHighAccuracy:false,timeout:10000,maximumAge:300000})};
+// ★ 한 손가락은 페이지 스크롤, 지도는 두 손가락 · PC 휠은 페이지 스크롤, Ctrl+휠이 확대 (2026-10-02 사장님 — 내리려는데 지도만 움직였다)
+//   한 손가락 신호를 지도보다 먼저(capture) 받아 지도에 안 넘긴다 → 브라우저가 그대로 스크롤한다. 톡 누르기(딱지·점)는 click 이라 그대로 된다
+function guard(el,map){const tip=document.createElement('div');tip.className='pxm-tip';el.appendChild(tip);let t=0,two=false;const P=new Set();
+ const say=s=>{tip.textContent=s;tip.classList.add('on');clearTimeout(t);t=setTimeout(()=>tip.classList.remove('on'),1300)};
+ const mac=/Mac|iPhone|iPad/.test(navigator.platform||'');const o={capture:true,passive:true};
+ const T=e=>{if(e.touches.length>=2)two=true;if(!two)e.stopPropagation();if(!e.touches.length)two=false};
+ el.addEventListener('touchstart',T,o);el.addEventListener('touchend',T,o);el.addEventListener('touchcancel',T,o);
+ el.addEventListener('touchmove',e=>{T(e);if(!two)say('두 손가락으로 지도를 움직여요')},o);
+ const Q=e=>{if(e.pointerType!=='touch')return;if(e.type==='pointerdown')P.add(e.pointerId);if(P.size>=2)two=true;if(!two)e.stopPropagation();
+  if(e.type==='pointerup'||e.type==='pointercancel'){P.delete(e.pointerId);if(!P.size)two=false}};
+ ['pointerdown','pointermove','pointerup','pointercancel'].forEach(k=>el.addEventListener(k,Q,o));
+ el.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey)return;e.stopPropagation();say((mac?'⌘':'Ctrl')+' + 휠로 지도를 키워요')},o)}
 let started=null;function init(){return started||(started=init0())}
 async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').textContent='지도를 불러오지 못했어요';return}
- el.innerHTML='';map=new kakao.maps.Map(el,{center:new kakao.maps.LatLng(36.3,127.8),level:13});all=new kakao.maps.LatLngBounds();
+ el.innerHTML='';map=new kakao.maps.Map(el,{center:new kakao.maps.LatLng(36.3,127.8),level:13});guard(el,map);all=new kakao.maps.LatLngBounds();
  M.forEach(m=>{const s=st(m),pos=new kakao.maps.LatLng(m.lat,m.lng);all.extend(pos);
   const d=document.createElement('div');d.className='pxm-pin '+s[0];d.innerHTML='<u></u><b><s></s>'+m.n+'</b>';d.onclick=()=>openPop(m,d);
   new kakao.maps.CustomOverlay({position:pos,content:d,yAnchor:.5,zIndex:2}).setMap(map)});
@@ -77,7 +89,7 @@ async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').
  kakao.maps.event.addListener(map,'zoom_changed',()=>{const v=map.getLevel();el.classList.toggle('nat',!cur&&v>=11);el.classList.toggle('big',v<=8);box.classList.toggle('zoom',!!cur||v<11)});
  el.classList.add('nat');map.setBounds(all,30,20,30,20);
  // 위 시도 바로가기(.jump)를 누르면 목록으로 내려가기 전에 지도도 그 지역으로
- document.querySelectorAll('.jump a').forEach(a=>a.addEventListener('click',()=>{const r=decodeURIComponent(a.getAttribute('href').slice(1));if(C[r])zoomTo(r)}))}
+ document.querySelectorAll('.jump a').forEach(a=>a.addEventListener('click',()=>{const r=decodeURIComponent(a.getAttribute('href').slice(1));if(C[r])zoomTo(r);else if(!r)home()}))}
 addEventListener('resize',()=>{if(map)map.relayout()});   // 창 크기가 바뀌면 지도도 다시 맞춘다
 const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){io.disconnect();init()}},{rootMargin:'200px'});io.observe(box);
 })();
