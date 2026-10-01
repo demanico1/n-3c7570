@@ -55,7 +55,9 @@ box.querySelector('.pxm-me').onclick=()=>{const b=box.querySelector('.pxm-me');
   pop.classList.add('on');pop.querySelector('.x').onclick=()=>pop.classList.remove('on')},{enableHighAccuracy:false,timeout:10000,maximumAge:300000})};
 // ★ 한 손가락은 페이지 스크롤, 지도는 두 손가락 · PC 휠은 페이지 스크롤, Ctrl+휠이 확대 (2026-10-02 사장님 — 내리려는데 지도만 움직였다)
 //   한 손가락 신호를 지도보다 먼저(capture) 받아 지도에 안 넘긴다 → 브라우저가 그대로 스크롤한다. 톡 누르기(딱지·점)는 click 이라 그대로 된다
-function guard(el,map){const tip=document.createElement('div');tip.className='pxm-tip';el.appendChild(tip);let t=0,two=false;const P=new Set();
+// ★ 2026-10-02 사장님 — 지도를 머리 바로 아래 붙인 뒤로는 스크롤이 막힐 일이 없어 꺼 뒀다. 다시 켜려면 GUARD_ON 을 true 로
+const GUARD_ON=false;
+function guard(el,map){el.classList.add('guard');const tip=document.createElement('div');tip.className='pxm-tip';el.appendChild(tip);let t=0,two=false;const P=new Set();
  const say=s=>{tip.innerHTML='<span>'+s+'</span>';tip.classList.add('on');clearTimeout(t);t=setTimeout(()=>tip.classList.remove('on'),1300)};
  const mac=/Mac|iPhone|iPad/.test(navigator.platform||'');const o={capture:true,passive:true};
  const T=e=>{if(e.touches.length>=2)two=true;if(!two)e.stopPropagation();if(!e.touches.length)two=false};
@@ -67,7 +69,7 @@ function guard(el,map){const tip=document.createElement('div');tip.className='px
  el.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey)return;e.stopPropagation();say((mac?'⌘':'Ctrl')+' + 휠로 지도를 키워요')},o)}
 let started=null;function init(){return started||(started=init0())}
 async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').textContent='지도를 불러오지 못했어요';return}
- el.innerHTML='';map=new kakao.maps.Map(el,{center:new kakao.maps.LatLng(36.3,127.8),level:13});guard(el,map);all=new kakao.maps.LatLngBounds();
+ el.innerHTML='';map=new kakao.maps.Map(el,{center:new kakao.maps.LatLng(36.3,127.8),level:13});if(GUARD_ON)guard(el,map);all=new kakao.maps.LatLngBounds();
  M.forEach(m=>{const s=st(m),pos=new kakao.maps.LatLng(m.lat,m.lng);all.extend(pos);
   const d=document.createElement('div');d.className='pxm-pin '+s[0];d.innerHTML='<u></u><b><s></s>'+m.n+'</b>';d.onclick=()=>openPop(m,d);
   new kakao.maps.CustomOverlay({position:pos,content:d,yAnchor:.5,zIndex:2}).setMap(map)});

@@ -1,6 +1,6 @@
 
 .pxm-tip{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(17,24,39,.35);color:#fff;font-size:16px;font-weight:700;opacity:0;transition:opacity .25s;pointer-events:none;text-align:center;padding:0 20px}.pxm-tip.on{opacity:1}.pxm-tip span{background:rgba(17,24,39,.88);border-radius:999px;padding:11px 18px;box-shadow:0 4px 16px rgba(0,0,0,.25)}
-.pxm-km,.pxm-km *,.mmap,.mmap *{touch-action:pan-y!important}   /* 한 손가락 세로 밀기는 브라우저 몫 */
+.pxm-km.guard,.pxm-km.guard *,.mmap,.mmap *{touch-action:pan-y!important}   /* 한 손가락 세로 밀기는 브라우저 몫 (문지기를 켤 때만) */
 /* 영외마트 목록 지도 — 영외마트지도_만들기.py 가 굽는다. 이름은 전부 pxm- 으로 시작(s.css 와 안 겹치게) */
 .pxm{position:relative;margin:14px -16px 6px;background:#EEF1F4}
 .pxm-km{height:62vh;min-height:380px;max-height:560px;position:relative}.pxm-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-size:14px}
