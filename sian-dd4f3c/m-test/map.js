@@ -60,8 +60,8 @@ async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').
   const d=document.createElement('div');d.className='pxm-pin '+s[0];d.innerHTML='<u></u><b>'+m.n+'</b>';d.onclick=()=>openPop(m,d);
   new kakao.maps.CustomOverlay({position:pos,content:d,yAnchor:.5,zIndex:2}).setMap(map)});
  // 시도 딱지 — 전국 크기에서 붙어 있는 곳은 조금씩 비켜 놓는다
- const OFF={'서울':[-.02,.42],'인천':[-.3,-.1],'경기':[.22,-.05],'대전':[-.22,.3],'세종':[.12,-.42],'충남':[.05,-.35],'충북':[.1,.15],
-            '대구':[-.12,-.42],'경북':[.35,.15],'부산':[-.05,.3],'경남':[.05,-.45]};
+ const OFF={'서울':[-.3,.62],'인천':[-.08,-.75],'경기':[.42,.05],'강원':[.05,.25],'대전':[-.38,.42],'세종':[.32,-.55],'충남':[-.1,-.7],'충북':[.25,.25],
+            '대구':[-.15,.3],'경북':[.45,.25],'부산':[-.08,.32],'경남':[.05,-.5],'전북':[0,-.55],'전남·광주':[-.1,-.2]};
  Object.keys(C).forEach(r=>{const L=M.filter(m=>m.r==r);const o=OFF[r]||[0,0];
   const la=L.reduce((s,m)=>s+m.lat,0)/L.length+o[0],lo=L.reduce((s,m)=>s+m.lng,0)/L.length+o[1];
   const d=document.createElement('div');d.className='pxm-rb'+(C[r]<=3?' sm':'');d.innerHTML='<em>'+C[r]+'</em>'+r.replace('전남·광주','전남');d.onclick=()=>zoomTo(r);
@@ -71,5 +71,6 @@ async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').
  el.classList.add('nat');map.setBounds(all,30,20,30,20);
  // 위 시도 바로가기(.jump)를 누르면 목록으로 내려가기 전에 지도도 그 지역으로
  document.querySelectorAll('.jump a').forEach(a=>a.addEventListener('click',()=>{const r=decodeURIComponent(a.getAttribute('href').slice(1));if(C[r])zoomTo(r)}))}
+addEventListener('resize',()=>{if(map)map.relayout()});   // 창 크기가 바뀌면 지도도 다시 맞춘다
 const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){io.disconnect();init()}},{rootMargin:'200px'});io.observe(box);
 })();
