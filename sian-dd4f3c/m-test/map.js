@@ -56,7 +56,7 @@ box.querySelector('.pxm-me').onclick=()=>{const b=box.querySelector('.pxm-me');
 // ★ 한 손가락은 페이지 스크롤, 지도는 두 손가락 · PC 휠은 페이지 스크롤, Ctrl+휠이 확대 (2026-10-02 사장님 — 내리려는데 지도만 움직였다)
 //   한 손가락 신호를 지도보다 먼저(capture) 받아 지도에 안 넘긴다 → 브라우저가 그대로 스크롤한다. 톡 누르기(딱지·점)는 click 이라 그대로 된다
 function guard(el,map){const tip=document.createElement('div');tip.className='pxm-tip';el.appendChild(tip);let t=0,two=false;const P=new Set();
- const say=s=>{tip.textContent=s;tip.classList.add('on');clearTimeout(t);t=setTimeout(()=>tip.classList.remove('on'),1300)};
+ const say=s=>{tip.innerHTML='<span>'+s+'</span>';tip.classList.add('on');clearTimeout(t);t=setTimeout(()=>tip.classList.remove('on'),1300)};
  const mac=/Mac|iPhone|iPad/.test(navigator.platform||'');const o={capture:true,passive:true};
  const T=e=>{if(e.touches.length>=2)two=true;if(!two)e.stopPropagation();if(!e.touches.length)two=false};
  el.addEventListener('touchstart',T,o);el.addEventListener('touchend',T,o);el.addEventListener('touchcancel',T,o);
