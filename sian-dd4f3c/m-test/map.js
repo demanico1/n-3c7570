@@ -7,7 +7,7 @@ const C={};M.forEach(m=>C[m.r]=(C[m.r]||0)+1);
 function kst(){const d=new Date(Date.now()+9*36e5);return{day:d.getUTCDay(),min:d.getUTCHours()*60+d.getUTCMinutes(),txt:(d.getUTCMonth()+1)+'/'+d.getUTCDate()+'('+'일월화수목금토'[d.getUTCDay()]+') '+d.getUTCHours()+':'+String(d.getUTCMinutes()).padStart(2,'0')}}
 const rng=s=>{const m=(s||'').match(/(\d{1,2}):?(\d{2})\s*~\s*(\d{1,2}):?(\d{2})/);return m?[+m[1]*60+ +m[2],+m[3]*60+ +m[4]]:null};
 const hm=v=>Math.floor(v/60)+':'+String(v%60).padStart(2,'0');
-function st(m){const N=kst();if(/휴점|휴업|폐점|공사/.test(m.x))return['off','임시 휴점',''];
+function st(m){const N=kst();const dn=(m.x.match(/([일월화수목금토])요일\s*휴점/)||[])[1];if(dn&&'일월화수목금토'.indexOf(dn)==N.day)return['cl','오늘 쉬어요','정기 휴무'];
  const s=N.day==0?m.su:N.day==6?m.sa:m.wk,r=rng(s);
  if(!r)return s?['na','시간 확인','']:(m.wk?['cl','오늘 쉬어요','']:['na','시간 정보 없음','']);
  if(N.min<r[0])return['cl','영업 전',hm(r[0])+' 열어요'];if(N.min>=r[1])return['cl','영업 끝',''];
@@ -57,7 +57,7 @@ let started=null;function init(){return started||(started=init0())}
 async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').textContent='지도를 불러오지 못했어요';return}
  el.innerHTML='';map=new kakao.maps.Map(el,{center:new kakao.maps.LatLng(36.3,127.8),level:13});all=new kakao.maps.LatLngBounds();
  M.forEach(m=>{const s=st(m),pos=new kakao.maps.LatLng(m.lat,m.lng);all.extend(pos);
-  const d=document.createElement('div');d.className='pxm-pin '+s[0];d.innerHTML='<u></u><b>'+m.n+'</b>';d.onclick=()=>openPop(m,d);
+  const d=document.createElement('div');d.className='pxm-pin '+s[0];d.innerHTML='<u></u><b><s></s>'+m.n+'</b>';d.onclick=()=>openPop(m,d);
   new kakao.maps.CustomOverlay({position:pos,content:d,yAnchor:.5,zIndex:2}).setMap(map)});
  // 시도 딱지 — 마트들의 가운데에 두고, 화면에서 겹치는 딱지끼리는 저절로 비켜 가게 한다(폰 크기마다 달라서 손으로는 못 맞춘다)
  const RB=[];Object.keys(C).forEach(r=>{const L=M.filter(m=>m.r==r);
