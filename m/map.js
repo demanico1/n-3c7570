@@ -16,7 +16,7 @@ function st(m){const N=kst();const dn=(m.x.match(/([일월화수목금토])요�
 const dayHours=m=>{const N=kst();return N.day==0?(m.su?'일요일 '+m.su:''):N.day==6?(m.sa?'토요일 '+m.sa:''):(m.wk?'평일 '+m.wk:'')};
 const pill=m=>{const s=st(m);return'<em class="pxst '+s[0]+'">'+s[1]+(s[2]?' · '+s[2]:'')+'</em>'};
 // ── 목록 줄마다 실시간 영업 표시
-document.querySelectorAll('ul.mk li[data-n]').forEach(li=>{const m=BY[li.dataset.n];if(m)li.insertAdjacentHTML('beforeend',pill(m))});
+document.querySelectorAll('ul.mk li[data-n]').forEach(li=>{const m=BY[li.dataset.n];if(m)li.insertAdjacentHTML('beforeend','<span class="pxw">'+pill(m)+'</span>')});
 const now=document.getElementById('pxm-now');if(now)now.textContent=kst().txt+' 기준 영업 표시예요 · 표시한 시간은 자료 기준이라 가시기 전에 전화로 확인해 보세요';
 // ── 지도 (지도 칸이 화면에 보일 때만 불러온다)
 const box=document.getElementById('pxmap');if(!box)return;

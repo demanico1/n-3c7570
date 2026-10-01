@@ -33,7 +33,7 @@
 .pxst{display:inline-block;font-style:normal;font-size:12px;font-weight:800;border-radius:7px;padding:3px 8px;white-space:nowrap;margin-left:6px}
 .pxst.op{color:#0B7A4B;background:#E8F5EE}.pxst.soon,.pxst.lu{color:#B45309;background:#FEF3C7}.pxst.cl{color:#6B7280;background:#F3F4F6}
 .pxst.off{color:#B91C1C;background:#FEE2E2}.pxst.na{color:#9CA3AF;background:#F9FAFB}
-ul.mk li .pxst{margin:4px 0 0 0}
+ul.mk li{flex-wrap:wrap}ul.mk li .pxw{flex-basis:100%;margin-top:6px}ul.mk li .pxst{margin:0}   /* 영업 표시는 줄 아래로 — 옆에 두면 시군 이름이 꺾였다 */
 .pxm-now{font-size:12px;color:#9CA3AF;margin:-4px 0 10px}
 /* 내 근처 마트 (2026-10-02 사장님) — 단추를 눌러야 위치를 묻는다. 위치는 폰 안에서만 쓴다 */
 .pxm-me{position:absolute;right:12px;top:12px;z-index:30;background:#fff;color:#111827;font-size:14px;font-weight:800;border:0;border-radius:99px;padding:9px 14px;box-shadow:0 2px 10px rgba(0,0,0,.25);cursor:pointer}
