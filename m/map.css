@@ -69,3 +69,5 @@ ul.mk li{flex-wrap:wrap;border:0;border-bottom:1px solid #E9ECEF;border-radius:0
 .rgs ul.mk[hidden]{display:none}
 .jump.sj{margin:4px 0 6px}.jump.sj a{background:#F2F4F7;border-color:#F2F4F7}
 .jump.sj a.on{background:#0B5E3A;border-color:#0B5E3A;color:#fff}
+/* 낱말 중간에서 꺾이지 않게 (2026-10-02 사장님 — `전/화로` `있/어요`) */
+.pxm-leg,.pxm-now,.mh1+.sub,.mall .note,.pxm-near{word-break:keep-all}
