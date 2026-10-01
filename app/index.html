@@ -527,6 +527,8 @@ html.dark .tag.tag-here{background:#2a2412;color:#e6c455}
 #shoppop .i{font-size:44px;line-height:1}
 #shoppop b{display:block;font-size:20px;margin:10px 0 8px}
 #shoppop p{margin:0;font-size:13.5px;line-height:1.7;color:var(--dim)}
+#shoppop button{margin-top:16px;width:100%;padding:11px 0;border:0;border-radius:12px;background:#0b7a4b;color:#fff;
+     font-size:15px;font-weight:800;cursor:pointer}
 #stoast{position:fixed;left:12px;right:12px;z-index:61;display:none;align-items:center;gap:10px;padding:10px 12px;
      border-radius:12px;background:#1f2328;color:#fff;font-size:13px;line-height:1.45;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 #stoast.on{display:flex}
@@ -560,12 +562,12 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
 .gal .cq{gap:4px}
 .gal .cq .qb{width:28px;height:28px}
 .gal .cq .got{padding:0 7px}
-.cq .bkb{margin-left:auto;height:32px;padding:0 12px;border:1.5px solid var(--good);border-radius:10px;background:var(--card);
+.cq .bkb{margin-left:6px;height:32px;padding:0 12px;border:1.5px solid var(--good);border-radius:10px;background:var(--card);
      color:var(--good);font-size:13.5px;font-weight:800;white-space:nowrap;cursor:pointer;display:flex;align-items:center;gap:4px}
 .cq .bkb svg{width:17px;height:17px}
 .cq .bkb svg path{fill:none;stroke:currentColor;stroke-width:1.9}
 .cq .bkb.on{background:#0b7a4b;border-color:#0b7a4b;color:#fff}
-.gal .cq .bkb{padding:0 8px;font-size:12.5px;height:30px}
+.gal .cq .bkb{margin-left:4px;padding:0 8px;font-size:12.5px;height:30px}
 .tag-qty{background:var(--accent);color:#fff}
 .item{position:relative;-webkit-touch-callout:none;user-select:none}
 .item .cart{position:absolute;top:5px;right:7px;padding:3px;cursor:pointer;
@@ -1417,7 +1419,7 @@ function card(it, raw){
   if (sh && SHOP.x.indexOf(it.p) >= 0) tags.unshift('<span class="tag tag-here">현장</span>');
   const bkb = sh ? '<button class="bkb' + (inb ? " on" : "") + '" aria-label="' + (inb ? "카트에서 빼기" : "카트에 담기") + '">' +
       (inb ? "✓ 담음" : CARTI + "담기") + "</button>" : "";
-  const cq = member || sh ? '<div class="cq">' + (member ? '<button class="qb" data-q="-1" aria-label="하나 빼기">&minus;</button>' +
+  const cq = member || sh ? '<div class="cq">' + (member || sh ? '<button class="qb" data-q="-1" aria-label="하나 빼기">&minus;</button>' +
       '<span class="qn">' + qtyOf(it.p) + '</span>' +
       '<button class="qb" data-q="1" aria-label="하나 더">&#43;</button>' : "") + bkb +
       "</div>" : "";
@@ -1431,7 +1433,7 @@ function card(it, raw){
     : '<i class="cart' + ((inL ? inCur(it.p) : inCart(it.p)) ? " on" : "") + '" title="' + (inL ? "이 목록에서 빼기" : "찜하기") + '">' +
       HEART + "</i>";
   return '<article class="item' + (inb ? " inb" : "") + '" data-p="' + it.p + '">' +
-    '<i class="cpg" title="메뉴 보기">' + INFO + "</i>" + icon + left +
+    (sh ? "" : '<i class="cpg" title="메뉴 보기">' + INFO + "</i>") + icon + left +
     '<div class="body"><div class="nm">' + hi(it.name, raw) + "</div>" +
     '<div class="sub">' + esc(it.spec || "") + (it.spec && it.maker ? " · " : "") +
       esc(it.maker || "") + "</div>" +
@@ -1683,9 +1685,11 @@ function listOn(){ const v = $("#view"); return v && v.value === "cart" ? curLis
 function inCur(p){ const L = curList(); return L ? L.items.indexOf(p) >= 0 : inCart(p); }
 function qtyOf(p){
   if (WLIST) return WQ[p] || 1;
+  if (SHOP && !WLIST && listOnOrMine() && !inCur(p)) return (SHOP.pq || {})[p] || 1;   // 카트에서 검색해 나온 것 — 담기 전 수량
   const L = listOn();
   return (L ? L.q[p] : CQ[p]) || 1;
 }
+function listOnOrMine(){ const v = $("#view"); return !!v && v.value === "cart"; }
 function isGot(p){ return false; }
 const mdate = iso => { const d = new Date(iso || Date.now()); return (d.getMonth() + 1) + "월 " + d.getDate() + "일"; };
 function lname(l){ return (l.from ? l.from + " · " : "") + (l.name || (l.from ? "장보기 목록" : "받은 목록 · " + mdate(l.at))); }
@@ -2552,23 +2556,26 @@ function startShop(){
   $("#q").value = ""; run(); toTop();
   const d = document.createElement("div");
   d.id = "shoppop";
-  d.innerHTML = '<div><span class="i">🛒</span><b>카트를 끌었어요!</b><p>하트가 🛒로 바뀌었어요.<br>바구니에 넣을 때 🛒를 톡 누르세요.<br>검색하면 PX 전체에서 찾아요.</p></div>';
+  d.innerHTML = '<div><span class="i">🛒</span><b>카트를 끌었어요!</b><p>바구니에 넣을 때 수량 옆<br><b style="display:inline;font-size:inherit;margin:0;color:var(--good)">[🛒 담기]</b>를 누르세요.<br>검색하면 PX 전체에서 찾아요.</p>' +
+    '<button type="button">확인</button></div>';
   document.body.appendChild(d);
-  const bye = () => { if (d.parentNode) d.remove(); };
-  d.addEventListener("click", bye);
-  setTimeout(bye, 2600);
+  d.querySelector("button").addEventListener("click", () => d.remove());
 }
 function basketTap(it){
   const p = it.p, L = curList();
-  if (inBasket(p)){ delete SHOP.b[p]; saveShop(); return run(); }
-  if (!inCur(p)){
-    if (L){ L.items.push(p); saveLists(); } else { CART.push(p); saveCart(); }
-    if (SHOP.x.indexOf(p) < 0) SHOP.x.push(p);
+  if (inBasket(p)){ delete SHOP.b[p]; saveShop(); }
+  else {
+    if (!inCur(p)){
+      const q = (SHOP.pq && SHOP.pq[p]) || 1;
+      if (L){ L.items.push(p); if (q > 1) L.q[p] = q; saveLists(); }
+      else { CART.push(p); if (q > 1) CQ[p] = q; saveCart(); saveCQ(); }
+      if (SHOP.pq) delete SHOP.pq[p];
+      if (SHOP.x.indexOf(p) < 0) SHOP.x.push(p);
+    }
+    SHOP.b[p] = 1; saveShop();
   }
-  SHOP.b[p] = 1; saveShop();
-  const raw = $("#q").value.trim();
-  if (raw){ SHOP.last = raw; saveShop(); $("#q").value = ""; run(); toTop(); }   // 검색해서 담으면 카트로 돌아온다
-  else run();
+  const el = document.querySelector('.item[data-p="' + p + '"]');
+  if (el){ el.outerHTML = card(it, $("#q").value.trim()); sharpen_all(); cartSum(); } else run();
 }
 const short = (n, k) => { k = k || 18; return n.length > k ? n.slice(0, k - 1) + "…" : n; };
 function stoast(html, btn){
@@ -2962,7 +2969,8 @@ $("#list").addEventListener("click", e => {
   if (qb){
     const n = Math.min(99, Math.max(1, qtyOf(p) + Number(qb.dataset.q)));
     const L = listOn();
-    if (L){ if (n > 1) L.q[p] = n; else delete L.q[p]; saveLists(); }
+    if (shopOn() && !inCur(p)){ SHOP.pq = SHOP.pq || {}; if (n > 1) SHOP.pq[p] = n; else delete SHOP.pq[p]; saveShop(); }
+    else if (L){ if (n > 1) L.q[p] = n; else delete L.q[p]; saveLists(); }
     else { CQ[p] = n; saveCQ(); }
     card.querySelector(".qn").textContent = qtyOf(p);
     if (shopOn()) cartSum();
