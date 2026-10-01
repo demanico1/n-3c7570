@@ -463,6 +463,46 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 .ldiff{list-style:none;margin:10px 0;padding:0;font-size:13.5px;line-height:1.9}
 .ldiff .a{color:var(--good)} .ldiff .d{color:var(--bad)} .ldiff .c{color:var(--dim)}
 #cpman{width:100%;font-size:14px;padding:10px;border:1px solid var(--line);border-radius:10px}
+.tipc{grid-column:1/-1;position:relative;margin:2px 0;padding:13px 14px 12px;border:1.5px dashed var(--good);border-radius:14px;
+     background:linear-gradient(135deg,var(--good-bg),var(--card))}
+#list:not(.gal) .tipc{margin:6px 12px}
+.tipc .tx{position:absolute;right:8px;top:6px;border:0;background:none;color:var(--dim);font-size:16px;padding:4px 6px;cursor:pointer}
+.tipc .k{font-size:12px;font-weight:800;color:var(--good)}
+.tipc b{display:block;font-size:15px;margin:4px 0 6px;line-height:1.4;color:var(--fg)}
+.tipc p{margin:0 0 9px;font-size:13px;color:var(--dim);line-height:1.5}
+.tipc .tgo{border:0;border-radius:9px;background:#0b7a4b;color:#fff;font-weight:800;font-size:13px;padding:7px 13px;cursor:pointer}
+.tipc .tn{float:right;margin-top:9px;font-size:11.5px;color:var(--dim)}
+#startcard{margin:0 12px 10px;padding:13px 14px;border-radius:14px;background:#0b7a4b;color:#fff;position:relative}
+#startcard b{display:block;font-size:16px}#startcard small{display:block;font-size:12.5px;opacity:.92;margin:3px 0 10px}
+#startcard .sgo{border:0;border-radius:9px;background:#fff;color:#0b7a4b;font-weight:800;font-size:13px;padding:7px 13px;cursor:pointer}
+#startcard .sno{border:0;background:none;color:#fff;opacity:.85;font-size:12.5px;margin-left:6px;cursor:pointer}
+#startcard .sx{position:absolute;right:8px;top:6px;border:0;background:none;color:#fff;opacity:.7;font-size:16px;padding:4px 6px;cursor:pointer}
+#tour{position:fixed;inset:0;z-index:80}
+#tour .hole{position:fixed;border-radius:12px;box-shadow:0 0 0 3px #FFE14D,0 0 0 9999px rgba(0,0,0,.55);pointer-events:none;transition:all .2s}
+#tour .bub{position:fixed;left:14px;right:14px;max-width:420px;margin:0 auto;background:var(--card);color:var(--fg);border-radius:14px;
+     padding:13px 14px;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+#tour .st{font-size:12px;font-weight:800;color:var(--good)}#tour .bub b{display:block;font-size:15.5px;margin:3px 0 4px}
+#tour .bub p{margin:0;font-size:13px;color:var(--dim);line-height:1.55}
+#tour .rw{display:flex;justify-content:space-between;align-items:center;margin-top:11px}
+#tour .skip{border:0;background:none;color:var(--dim);font-size:13px;cursor:pointer}
+#tour .nx{border:0;border-radius:9px;background:#0b7a4b;color:#fff;font-weight:800;font-size:13.5px;padding:7px 16px;cursor:pointer}
+#tour .dt{display:flex;gap:4px}#tour .dt i{width:6px;height:6px;border-radius:50%;background:var(--line)}#tour .dt i.on{background:var(--good);width:16px;border-radius:3px}
+#helpline{text-align:center;font-size:13px;color:var(--dim);padding:6px 12px 2px}
+#helpline button{border:0;background:none;color:var(--good);font-weight:700;text-decoration:underline;font-size:13px;cursor:pointer;padding:2px}
+html.shop #helpline, html.shop #startcard, html.shop .tipc{display:none!important}
+#sheet button.helpb{display:flex;align-items:center;gap:10px;background:var(--good-bg);border:1.5px solid var(--good);color:var(--fg)}
+#sheet button.helpb .ht{flex:1;text-align:left}#sheet button.helpb .ht b{display:block;color:var(--good)}
+#sheet button.helpb .ht small{font-size:12px;color:var(--dim);font-weight:500}
+#sheet button.stampb{font-size:13px}
+#sheet button.stampb u{text-decoration:none;font-weight:800;color:var(--good)}
+.stamps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0 12px}
+.stamps button{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:0;margin:0!important;min-height:74px;word-break:keep-all;border:1.5px solid var(--line);border-radius:12px;padding:10px 4px;background:var(--card);font-size:12px;font-weight:700;color:var(--dim);cursor:pointer}
+.stamps button i{display:block;font-style:normal;font-size:22px;margin-bottom:3px;filter:grayscale(1);opacity:.45}
+.stamps button.ok{border-color:var(--good);background:var(--good-bg);color:var(--good)}.stamps button.ok i{filter:none;opacity:1}
+.sbar{height:9px;border-radius:9px;background:var(--line);overflow:hidden;margin:4px 0 4px}.sbar u{display:block;height:100%;background:var(--good)}
+.snext{background:#0b7a4b;color:#fff;border-radius:12px;padding:11px 13px;font-size:13px}
+.snext b{display:block;font-size:14.5px;margin:2px 0 8px}
+.snext button{border:0;border-radius:9px;background:#fff;color:#0b7a4b;font-weight:800;font-size:12.5px;padding:6px 12px;cursor:pointer}
 #cartbar{display:none;gap:6px;padding:8px 12px 0}
 #cartbar button{flex:1;min-width:0;padding:8px 4px;border:1px solid var(--line);border-radius:9px;
      background:var(--card);font-size:13px;letter-spacing:-.3px;white-space:nowrap;cursor:pointer}
@@ -568,6 +608,7 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
 .cq .bkb svg path{fill:none;stroke:currentColor;stroke-width:1.9}
 .cq .bkb.on{background:#0b7a4b;border-color:#0b7a4b;color:#fff}
 .gal .cq .bkb{margin-left:4px;padding:0 8px;font-size:12.5px;height:30px}
+html.shop .cq{justify-content:flex-end}
 .tag-qty{background:var(--accent);color:#fff}
 .item{position:relative;-webkit-touch-callout:none;user-select:none}
 .item .cart{position:absolute;top:5px;right:7px;padding:3px;cursor:pointer;
@@ -703,7 +744,9 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
 
   <div id="onlybar"><span id="onlytext"></span><span class="ob"><button id="onlysave" hidden>이 목록 따로 저장</button><button id="onlytake" hidden>내 찜에 담기</button><button id="onlyall">전체 보기</button></span></div>
 
+  <div id="startcard" hidden></div>
   <main id="list"></main>
+  <div id="helpline">처음이라 헷갈리세요? <button type="button" id="helpgo">사용법 보기</button></div>
 
   <footer id="foot"></footer>
 </div>
@@ -1235,6 +1278,7 @@ function run(){
     return true;
   };
   const BASE = DATA.filter(it => pass(it, BIG, view, true));
+  if (toks.some(t => t.cho) && BASE.length) stamp("cho");             // 📖 도장 — 초성으로 찾아 봤다
   VIEW = SUB ? BASE.filter(it => it.sub === SUB) : BASE;
   subChips(BASE, raw, view);
   curTag();
@@ -1277,6 +1321,7 @@ function run(){
                                                 : "찜 비우기";
   stats();
   cartSum();
+  startCard();
 
   SHOWN = 0;
   $("#list").innerHTML = "";
@@ -1448,7 +1493,11 @@ function more(){
   const raw = $("#q").value.trim();
   const chunk = VIEW.slice(SHOWN, SHOWN + 60);
   if (!chunk.length) return;
-  $("#list").insertAdjacentHTML("beforeend", chunk.map(i => card(i, raw)).join(""));
+  const tips = tipsOK();
+  $("#list").insertAdjacentHTML("beforeend", chunk.map((i, n) => {
+    const at = TIP_AT.indexOf(SHOWN + n);
+    return (tips && at >= 0 ? tipCard(at) : "") + card(i, raw);
+  }).join(""));
   SHOWN += chunk.length;
   sharpen_all();
 }
@@ -1509,7 +1558,9 @@ function openMove(){
   const n1 = CART.length, n2 = Object.keys(MINE).length;
   openSheet("<h3>메뉴</h3>" +
     '<p class="note">찜한 것 ' + n1 + "건 · 넣은 값 " + n2 + "건</p>" +
-    '<button class="go" data-act="help"><i class="ico">' + ICO_BOOK + "</i>사용방법</button>" +
+    '<button class="helpb" data-act="helpctx"><i class="ico">' + ICO_BOOK + '</i><span class="ht"><b>사용법</b>' +
+      "<small>지금 화면에 맞는 것부터 보여 줘요</small></span></button>" +
+    '<button class="stampb" data-act="stamps">🏅 PXPICK 고수 <u>' + stampN() + " / " + FEAT.length + "</u> — 도장판 보기</button>" +
     (STANDALONE ? "" : '<button data-act="install"><i class="ico">' + ICO_ADDHOME +
                        "</i>홈 화면에 추가</button>"));
 }
@@ -1762,7 +1813,8 @@ addEventListener("scroll", () => {
 function scheduleTips(){
   clearTimeout(scheduleTips._t);
   scheduleTips._t = setTimeout(() => {
-    if (TIP_ON || document.documentElement.classList.contains("sheet-on")) return;
+    if (TIP_ON || document.documentElement.classList.contains("sheet-on") || SHOP) return;   // 카트 모드엔 안 띄움 (2026-10-01)
+    if (!$("#startcard").hidden || $("#tour")) return;   // 처음 오셨나요 카드·둘러보기가 떠 있으면 쉰다 — 한 화면에 하나만
     if ($("#sheet").style.display === "flex") return;
     if (WLIST){
       const b = $("#onlytake");
@@ -2107,6 +2159,9 @@ $("#sheet").addEventListener("click", e => {
   const p = b.dataset.p, act = b.dataset.act;
   if (act === "close") return closeSheet();
   if (act === "help") return openHelp();
+  if (act === "helpctx") return openHelp($("#view").value === "cart" ? "h-cart" : undefined);
+  if (act === "stamps") return openStamps();
+  if (act === "st-go") return featGo(b.dataset.k);
   if (act === "hgo") return helpGo(b.dataset.go);
   if (act === "samesub"){
     const it = DATA.find(x => x.p === p); if (!it) return;
@@ -2505,6 +2560,7 @@ function shareCart(){
     (navigator.share ? '<button data-act="sh-copy">목록과 링크 복사</button>' : ""));
 }
 function shareOut(){
+  stamp("share");
   const f = cleanName(($("#shfrom") || {}).value || "", 10);
   const n = cleanName(($("#shname") || {}).value || "", 16) || "장보기 목록";
   ME.name = f; ME.last = n; saveMe();
@@ -2543,6 +2599,90 @@ function copyOr(text, b, done){
     setTimeout(() => { const t = $("#cpman"); if (t){ t.focus(); t.select(); } }, 80);
   });
 }
+
+const FEAT = [
+  {k: "cho",   icon: "🔍", name: "초성 찾기",     tip: "초성만 쳐도 찾아져요",
+   say: "ㅅㄹㅁ 처럼 자음만 쳐도 신라면이 나와요. 이름 일부만 쳐도 돼요.", go: () => { $("#q").value = "ㅅㄹㅁ"; runFresh(); toTop(); }},
+  {k: "heart", icon: "♥", name: "찜하기",        tip: "하트로 찜해 두세요",
+   say: "살 것에 ♥를 누르면 찜에 모여요. PX 가기 전에 장보기 목록이 돼요.", go: () => startTour(1)},
+  {k: "qty",   icon: "±", name: "수량 정하기",   tip: "찜에서 수량을 정하면 합계가 보여요",
+   say: "찜 화면에서 − + 로 개수를 정하면, 다 사면 얼마인지 아래 초록 띠에 바로 나와요.", go: () => { CART.length ? openCart() : startTour(1); }},
+  {k: "share", icon: "💌", name: "찜 공유",       tip: "찜 목록을 가족에게 보낼 수 있어요",
+   say: "찜 화면의 찜 공유하기 — 받은 사람은 사진·값까지 그대로 봐요.", go: () => { if (CART.length){ openCart(); setTimeout(shareCart, 300); } else openHelp("h-cart"); }},
+  {k: "recv",  icon: "📥", name: "받은 목록 저장", tip: "받은 목록은 따로 모아 둘 수 있어요",
+   say: "가족이 보낸 찜 링크를 열고 '이 목록 따로 저장' — 찜 화면에 칸으로 따로 생겨요.", go: () => openHelp("h-cart")},
+  {k: "cart",  icon: "🛒", name: "카트 계산 끝",   tip: "PX에선 카트를 끌어 보세요",
+   say: "찜 화면 초록 띠의 🛒 PX 도착 — 담을 때마다 카트가 차고, 계산 끝에 오늘 아낀 돈이 나와요.", go: () => { CART.length || LISTS.length ? openCart() : openHelp("h-cart"); }}
+];
+const STAMP_KEY = "gmpx-stamps", TIPX_KEY = "gmpx-tipx";
+function jget(k, d){ try { return JSON.parse(localStorage.getItem(k) || "null") || d; } catch(e){ return d; } }
+function jset(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+function stamped(k){ return !!jget(STAMP_KEY, {})[k]; }
+function stamp(k){ const s = jget(STAMP_KEY, {}); if (s[k]) return; s[k] = Date.now(); jset(STAMP_KEY, s); }
+function stampN(){ return FEAT.filter(f => stamped(f.k)).length; }
+const TIP_AT = [8, 32];
+function tipFeats(){ const x = jget(TIPX_KEY, {}); return FEAT.filter(f => !stamped(f.k) && !x[f.k]); }
+function tipsOK(){
+  const v = $("#view").value;
+  return !SHOP && !WLIST && !ONLY && (v === "all" || !v) && !$("#q").value.trim();
+}
+function tipCard(n){
+  const left = tipFeats(), f = left[n]; if (!f) return "";
+  return '<div class="tipc" data-k="' + f.k + '"><button class="tx" aria-label="이 안내 닫기">✕</button>' +
+    '<span class="k">💡 알고 계셨나요?</span><b>' + f.tip + "</b><p>" + f.say + "</p>" +
+    '<button class="tgo">해 보기</button><span class="tn">아직 안 써 본 기능 ' + left.length + "개</span></div>";
+}
+function startCard(){
+  const box = $("#startcard"); if (!box) return;
+  let st = ""; try { st = localStorage.getItem("gmpx-tour") || ""; } catch(e){}
+  const on = !st && tipsOK() && visitsN() <= 1 && !stampN();
+  box.hidden = !on;
+  if (on && !box.innerHTML)
+    box.innerHTML = '<button class="sx" aria-label="닫기">✕</button><b>👋 처음 오셨나요?</b>' +
+      "<small>찾기 → 찜 → PX에서 카트까지, 30초면 다 알아요</small>" +
+      '<button class="sgo">30초 둘러보기 ▶</button><button class="sno">괜찮아요</button>';
+}
+function visitsN(){ try { return Number(localStorage.getItem("gmpx-visits") || 0); } catch(e){ return 0; } }
+function tourDone(v){ try { localStorage.setItem("gmpx-tour", v); } catch(e){} $("#startcard").hidden = true; }
+const TOUR = [
+  {el: () => $("#q"), t: "찾고 싶은 걸 쳐 보세요", p: "이름 일부나 초성(ㅅㄹㅁ)만 쳐도 바로 찾아져요."},
+  {el: () => document.querySelector("#list .item .cart"), t: "하트로 찜해 두세요", p: "살 것에 ♥를 누르면 찜에 모여요. 수량을 정하면 다 사면 얼마인지 바로 보여요."},
+  {el: () => $("#cartbtn"), t: "PX에선 카트를 끌어요", p: "찜을 열고 아래 초록 띠의 🛒 PX 도착을 누르세요. 담을 때마다 카트가 차고, 계산 끝에 오늘 아낀 돈이 나와요."}
+];
+function startTour(i){
+  i = i || 0;
+  let t = $("#tour"); if (t) t.remove();
+  const step = TOUR[i]; if (!step) return;
+  scrollTo(0, 0);
+  setTimeout(() => {
+    const el = step.el(); if (!el){ return startTour(i + 1); }
+    const r = el.getBoundingClientRect(), pad = 6;
+    t = document.createElement("div"); t.id = "tour";
+    const below = r.bottom + 190 < innerHeight;
+    t.innerHTML = '<div class="hole" style="left:' + (r.left - pad) + "px;top:" + (r.top - pad) + "px;width:" + (r.width + pad * 2) +
+      "px;height:" + (r.height + pad * 2) + 'px"></div><div class="bub" style="' + (below ? "top:" + (r.bottom + 16) : "bottom:" + (innerHeight - r.top + 16)) + 'px">' +
+      '<span class="st">둘러보기 ' + (i + 1) + " / " + TOUR.length + "</span><b>" + step.t + "</b><p>" + step.p + "</p>" +
+      '<div class="rw"><button class="skip">그만 보기</button><span class="dt">' + TOUR.map((_, j) => "<i" + (j === i ? ' class="on"' : "") + "></i>").join("") +
+      '</span><button class="nx">' + (i + 1 < TOUR.length ? "다음" : "끝") + "</button></div></div>";
+    document.body.appendChild(t);
+    t.addEventListener("click", e => {
+      if (e.target.closest(".nx")){ if (i + 1 < TOUR.length) startTour(i + 1); else { t.remove(); tourDone("done"); } }
+      else if (e.target.closest(".skip")){ t.remove(); tourDone("skip"); }
+    });
+  }, 120);
+}
+function openStamps(){
+  const n = stampN(), next = FEAT.find(f => !stamped(f.k));
+  openSheet("<h3>🏅 PXPICK 고수 되기</h3>" +
+    '<div class="sbar"><u style="width:' + Math.round(100 * n / FEAT.length) + '%"></u></div>' +
+    '<p class="note" style="margin:0">' + FEAT.length + "개 중 " + n + "개 써 봤어요</p>" +
+    '<div class="stamps">' + FEAT.map(f => '<button data-act="st-go" data-k="' + f.k + '" class="' + (stamped(f.k) ? "ok" : "") + '"><i>' +
+      f.icon + "</i>" + f.name + "</button>").join("") + "</div>" +
+    (next ? '<div class="snext">다음 도장<b>' + next.icon + " " + next.name + " — " + next.tip + '</b><button data-act="st-go" data-k="' + next.k +
+            '">어떻게 하는지 보기</button></div>' : '<div class="snext"><b>🎉 다 써 보셨어요! 이제 PXPICK 고수예요</b></div>') +
+    '<p class="note">도장은 그 기능을 <b>한 번 써 보면</b> 저절로 찍혀요. 칸을 누르면 하는 법이 나와요.</p>');
+}
+function featGo(k){ const f = FEAT.find(x => x.k === k); if (!f) return; closeSheet(); setTimeout(f.go, 260); }
 
 const CARTI = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 4h2.2l2.1 10.2a1.6 1.6 0 0 0 1.6 1.3h8.3a1.6 1.6 0 0 0 1.6-1.2L20.6 8H6.1M9.5 20.2a.9.9 0 1 0 0-.1M17 20.2a.9.9 0 1 0 0-.1"/></svg>';
 function shopItems(){
@@ -2649,6 +2789,7 @@ function gauge(box){
 function tripsLoad(){ try { return JSON.parse(localStorage.getItem(TRIPS_KEY) || "[]") || []; } catch(e){ return []; } }
 function finishShop(){
   if (!SHOP) return;
+  stamp("cart");
   const s = shopStat(), L = curList(), items = shopItems();
   if (!s.kin && !confirm("카트가 비어 있어요. 장보기를 끝낼까요?")) return;
   const ask = items.filter(i => SHOP.x.indexOf(i.p) < 0);
@@ -2816,6 +2957,7 @@ function listDiff(L, codes, q){
 }
 function saveReceived(){
   if (!WLIST) return;
+  stamp("recv");
   tipUsed("wtake");
   const codes = [...WLIST], q = {};
   for (const p of codes) if (WQ[p] > 1) q[p] = WQ[p];
@@ -2946,6 +3088,17 @@ $("#onlyall").addEventListener("click", () => {
 });
 
 $("#list").addEventListener("click", e => {
+  const c = e.target.closest(".tipc"); if (!c) return;
+  const k = c.dataset.k;
+  if (e.target.closest(".tx")){ const x = jget(TIPX_KEY, {}); x[k] = 1; jset(TIPX_KEY, x); c.remove(); return; }
+  if (e.target.closest(".tgo")){ const f = FEAT.find(z => z.k === k); if (f) f.go(); }
+});
+$("#startcard").addEventListener("click", e => {
+  if (e.target.closest(".sgo")){ tourDone("seen"); startTour(0); }
+  else if (e.target.closest(".sno, .sx")) tourDone("skip");
+});
+$("#helpgo").addEventListener("click", () => openHelp($("#view").value === "cart" ? "h-cart" : undefined));
+$("#list").addEventListener("click", e => {
   const b = e.target.closest(".e-go");
   if (!b) return;
   const act = b.dataset.act;
@@ -2969,6 +3122,7 @@ $("#list").addEventListener("click", e => {
   if (qb){
     const n = Math.min(99, Math.max(1, qtyOf(p) + Number(qb.dataset.q)));
     const L = listOn();
+    if ($("#view").value === "cart") stamp("qty");
     if (shopOn() && !inCur(p)){ SHOP.pq = SHOP.pq || {}; if (n > 1) SHOP.pq[p] = n; else delete SHOP.pq[p]; saveShop(); }
     else if (L){ if (n > 1) L.q[p] = n; else delete L.q[p]; saveLists(); }
     else { CQ[p] = n; saveCQ(); }
@@ -2996,7 +3150,7 @@ $("#list").addEventListener("click", e => {
   }
   if (cartIcon){
     if (inCart(p)) CART = CART.filter(x => x !== p);
-    else { CART.push(p); inappJit(); homeHint(); tipUsed("heart"); }
+    else { CART.push(p); inappJit(); homeHint(); tipUsed("heart"); stamp("heart"); }
     saveCart(); saveCQ();
     if ($("#view").value === "cart") return run();
     cartIcon.classList.toggle("on", inCart(p));
