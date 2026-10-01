@@ -560,6 +560,12 @@ html.cart-on #toast{bottom:calc(74px + env(safe-area-inset-bottom))}
 .gal .cq{gap:4px}
 .gal .cq .qb{width:28px;height:28px}
 .gal .cq .got{padding:0 7px}
+.cq .bkb{margin-left:auto;height:32px;padding:0 12px;border:1.5px solid var(--good);border-radius:10px;background:var(--card);
+     color:var(--good);font-size:13.5px;font-weight:800;white-space:nowrap;cursor:pointer;display:flex;align-items:center;gap:4px}
+.cq .bkb svg{width:17px;height:17px}
+.cq .bkb svg path{fill:none;stroke:currentColor;stroke-width:1.9}
+.cq .bkb.on{background:#0b7a4b;border-color:#0b7a4b;color:#fff}
+.gal .cq .bkb{padding:0 8px;font-size:12.5px;height:30px}
 .tag-qty{background:var(--accent);color:#fff}
 .item{position:relative;-webkit-touch-callout:none;user-select:none}
 .item .cart{position:absolute;top:5px;right:7px;padding:3px;cursor:pointer;
@@ -1409,9 +1415,11 @@ function card(it, raw){
   const inL = mine && listOn();
   const sh = mine && shopOn(), inb = sh && inBasket(it.p), member = mine && inCur(it.p);
   if (sh && SHOP.x.indexOf(it.p) >= 0) tags.unshift('<span class="tag tag-here">현장</span>');
-  const cq = member ? '<div class="cq"><button class="qb" data-q="-1" aria-label="하나 빼기">&minus;</button>' +
+  const bkb = sh ? '<button class="bkb' + (inb ? " on" : "") + '" aria-label="' + (inb ? "카트에서 빼기" : "카트에 담기") + '">' +
+      (inb ? "✓ 담음" : CARTI + "담기") + "</button>" : "";
+  const cq = member || sh ? '<div class="cq">' + (member ? '<button class="qb" data-q="-1" aria-label="하나 빼기">&minus;</button>' +
       '<span class="qn">' + qtyOf(it.p) + '</span>' +
-      '<button class="qb" data-q="1" aria-label="하나 더">&#43;</button>' +
+      '<button class="qb" data-q="1" aria-label="하나 더">&#43;</button>' : "") + bkb +
       "</div>" : "";
   const b = PICS[it.p];
   const img = '<img class="thumb" loading="lazy" alt="" data-p="' + it.p +
@@ -1419,9 +1427,7 @@ function card(it, raw){
       (b ? ' src="data:image/webp;base64,' + b + '"'
          : (PICSDONE ? ' src="' + BLANK + '" data-nopic="1"' : "")) + ">";
   const left = '<div class="left">' + img + "</div>";
-  const icon = sh
-    ? '<i class="cart bk' + (inb ? " on" : "") + '" title="' + (inb ? "카트에서 빼기" : "카트에 넣기") + '">' + CARTI +
-        (inb ? "<b>" + qtyOf(it.p) + "</b>" : "") + "</i>"
+  const icon = sh ? ""
     : '<i class="cart' + ((inL ? inCur(it.p) : inCart(it.p)) ? " on" : "") + '" title="' + (inL ? "이 목록에서 빼기" : "찜하기") + '">' +
       HEART + "</i>";
   return '<article class="item' + (inb ? " inb" : "") + '" data-p="' + it.p + '">' +
@@ -2554,22 +2560,15 @@ function startShop(){
 }
 function basketTap(it){
   const p = it.p, L = curList();
-  if (inBasket(p)){
-    delete SHOP.b[p]; saveShop();
-    toast("카트에서 뺐어요");
-    return run();
-  }
+  if (inBasket(p)){ delete SHOP.b[p]; saveShop(); return run(); }
   if (!inCur(p)){
     if (L){ L.items.push(p); saveLists(); } else { CART.push(p); saveCart(); }
     if (SHOP.x.indexOf(p) < 0) SHOP.x.push(p);
   }
   SHOP.b[p] = 1; saveShop();
-  const q = qtyOf(p), raw = $("#q").value.trim();
-  const gap = it.c != null ? (it.c - it.g) * q : null;
-  const msg = "<b>" + esc(short(it.name)) + "</b> 담았어요<br>계산할 돈 +" + won(it.g * q) +
-    (gap != null ? " · " + ONL + "보다 " + won(Math.abs(gap)) + (gap >= 0 ? " 싸요" : " 비싸요") : "");
-  if (raw){ SHOP.last = raw; saveShop(); $("#q").value = ""; run(); toTop(); stoast(msg, "방금 검색 다시"); }
-  else { run(); stoast(msg); }
+  const raw = $("#q").value.trim();
+  if (raw){ SHOP.last = raw; saveShop(); $("#q").value = ""; run(); toTop(); }   // 검색해서 담으면 카트로 돌아온다
+  else run();
 }
 const short = (n, k) => { k = k || 18; return n.length > k ? n.slice(0, k - 1) + "…" : n; };
 function stoast(html, btn){
@@ -2966,7 +2965,7 @@ $("#list").addEventListener("click", e => {
     if (L){ if (n > 1) L.q[p] = n; else delete L.q[p]; saveLists(); }
     else { CQ[p] = n; saveCQ(); }
     card.querySelector(".qn").textContent = qtyOf(p);
-    const pill = card.querySelector(".cart.bk b"); if (pill) pill.textContent = qtyOf(p);
+    if (shopOn()) cartSum();
     return cartSum();
   }
   if (e.target.closest(".got")){
@@ -2976,6 +2975,7 @@ $("#list").addEventListener("click", e => {
     card.querySelector(".got").textContent = isGot(p) ? "샀어요 ✓" : "샀어요";
     return cartSum();
   }
+  if (e.target.closest(".bkb")) return basketTap(it);
   if (e.target.closest(".cq")) return;
   const cartIcon = e.target.closest(".cart");
   if (cartIcon && shopOn()) return basketTap(it);
