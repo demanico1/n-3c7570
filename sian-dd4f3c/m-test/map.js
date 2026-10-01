@@ -16,7 +16,7 @@ function st(m){const N=kst();const dn=(m.x.match(/([일월화수목금토])요�
 const dayHours=m=>{const N=kst();return N.day==0?(m.su?'일요일 '+m.su:''):N.day==6?(m.sa?'토요일 '+m.sa:''):(m.wk?'평일 '+m.wk:'')};
 const pill=m=>{const s=st(m);return'<em class="pxst '+s[0]+'">'+s[1]+(s[2]?' · '+s[2]:'')+'</em>'};
 // ── 목록 줄마다 실시간 영업 표시
-document.querySelectorAll('ul.mk li[data-n]').forEach(li=>{const m=BY[li.dataset.n];if(m)li.insertAdjacentHTML('beforeend',pill(m))});
+document.querySelectorAll('ul.mk li[data-n]').forEach(li=>{const m=BY[li.dataset.n];if(m)li.insertAdjacentHTML('beforeend','<span class="pxw">'+pill(m)+'</span>')});
 const now=document.getElementById('pxm-now');if(now)now.textContent=kst().txt+' 기준 영업 표시예요 · 표시한 시간은 자료 기준이라 가시기 전에 전화로 확인해 보세요';
 // ── 지도 (지도 칸이 화면에 보일 때만 불러온다)
 const box=document.getElementById('pxmap');if(!box)return;
@@ -46,7 +46,7 @@ box.querySelector('.pxm-me').onclick=()=>{const b=box.querySelector('.pxm-me');
   you=new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(la,lo),content:yd,zIndex:50});you.setMap(map);
   cur='near';el.classList.remove('nat');box.classList.add('zoom');
   const bd=new kakao.maps.LatLngBounds();bd.extend(new kakao.maps.LatLng(la,lo));near.forEach(x=>bd.extend(new kakao.maps.LatLng(x.m.lat,x.m.lng)));map.setBounds(bd,60,40,230,40);
-  pop.innerHTML='<button class="x" aria-label="닫기">×</button><b>내 근처 영외마트</b><div class="s" style="margin-bottom:0">'+(in20?'반경 20km 안에 '+in20+'곳 · ':'')+'가까운 순 3곳 (거리는 직선, 시간은 대략)</div><ul class="pxm-near">'+
+  pop.innerHTML='<button class="x" aria-label="닫기">×</button><b>내 근처 영외마트</b><div class="s" style="margin-bottom:0">가장 가까운 3곳'+(in20?' · 20km 안에 '+in20+'곳':'')+' (거리는 직선, 시간은 대략)</div><ul class="pxm-near">'+
    near.map((x,i)=>'<li><div><b data-i="'+M.indexOf(x.m)+'">'+x.m.n+'</b> '+pill(x.m)+'<small>'+fmt(x.d)+' · 차로 약 '+drive(x.d)+'분</small></div>'+
    '<a href="https://map.kakao.com/link/to/'+encodeURIComponent(x.m.n)+','+x.m.lat+','+x.m.lng+'" target="_blank" rel="noopener">길찾기 ›</a></li>').join('')+'</ul>';
   pop.classList.add('on');pop.querySelector('.x').onclick=()=>pop.classList.remove('on');

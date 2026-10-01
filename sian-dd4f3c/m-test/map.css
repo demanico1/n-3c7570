@@ -1,7 +1,7 @@
 
 /* 영외마트 목록 지도 — 영외마트지도_만들기.py 가 굽는다. 이름은 전부 pxm- 으로 시작(s.css 와 안 겹치게) */
 .pxm{position:relative;margin:14px -16px 6px;background:#EEF1F4}
-.pxm-km{height:470px;position:relative}.pxm-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-size:14px}
+.pxm-km{height:62vh;min-height:380px;max-height:560px;position:relative}.pxm-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-size:14px}
 .pxm-back{display:none;position:absolute;left:12px;top:12px;z-index:30;background:#111827;color:#fff;font-size:14px;font-weight:700;border:0;border-radius:99px;padding:9px 14px;cursor:pointer}
 .pxm.zoom .pxm-back{display:block}
 .pxm-leg{font-size:12.5px;color:#6B7280;margin:6px 0 14px;line-height:1.6}.pxm-leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 3px 0 8px;vertical-align:-1px}
@@ -33,17 +33,17 @@
 .pxst{display:inline-block;font-style:normal;font-size:12px;font-weight:800;border-radius:7px;padding:3px 8px;white-space:nowrap;margin-left:6px}
 .pxst.op{color:#0B7A4B;background:#E8F5EE}.pxst.soon,.pxst.lu{color:#B45309;background:#FEF3C7}.pxst.cl{color:#6B7280;background:#F3F4F6}
 .pxst.off{color:#B91C1C;background:#FEE2E2}.pxst.na{color:#9CA3AF;background:#F9FAFB}
-ul.mk li .pxst{margin:4px 0 0 0}
+ul.mk li{flex-wrap:wrap;border:0;border-bottom:1px solid #E9ECEF;border-radius:0;background:none;box-shadow:none;margin:0;padding:12px 2px}   /* 상자 말고 가는 줄로 (2026-10-02 사장님) */ul.mk li .pxw{flex-basis:100%;margin-top:6px}ul.mk li .pxst{margin:0}   /* 영업 표시는 줄 아래로 — 옆에 두면 시군 이름이 꺾였다 */
 .pxm-now{font-size:12px;color:#9CA3AF;margin:-4px 0 10px}
 /* 내 근처 마트 (2026-10-02 사장님) — 단추를 눌러야 위치를 묻는다. 위치는 폰 안에서만 쓴다 */
 .pxm-me{position:absolute;right:12px;top:12px;z-index:30;background:#fff;color:#111827;font-size:14px;font-weight:800;border:0;border-radius:99px;padding:9px 14px;box-shadow:0 2px 10px rgba(0,0,0,.25);cursor:pointer}
 
-.pxm-near{list-style:none;margin:8px 0 0;padding:0}.pxm-near li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-top:1px solid #F1F3F5;font-size:14px}
+.pxm-near{list-style:none;margin:8px 0 0;padding:0}.pxm-near li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 0;margin:0;border:0;border-top:1px solid #F1F3F5;border-radius:0;background:none;box-shadow:none;font-size:14px}
 .pxm-near li:first-child{border-top:0}.pxm-near b{font-size:15.5px;cursor:pointer}.pxm-near small{display:block;color:#6B7280;font-size:12.5px;margin-top:2px}
 .pxm-near a{flex:none;font-size:13px;font-weight:700;color:#11974B;text-decoration:none;border:1.5px solid #11974B;border-radius:9px;padding:6px 10px}
 /* PC 는 훨씬 크게 (2026-10-02 사장님 "PC 에서 거의 안 보인다") */
 @media (min-width:720px){
- .pxm{margin:18px 0 8px;border-radius:16px;overflow:hidden}.pxm-km{height:640px}
+ .pxm{margin:14px 0 8px;border-radius:16px;overflow:hidden}.pxm-km{height:640px;max-height:none}
  .pxm-rb{font-size:17px;padding:6px 15px 6px 6px;gap:9px}.pxm-rb em{min-width:36px;height:36px;font-size:18px}
  .pxm-rb.sm{font-size:15px}.pxm-rb.sm em{min-width:28px;height:28px;font-size:15px}
  .pxm-pin u{width:24px;height:24px}.pxm-pin b{font-size:16.5px;padding:8px 14px 8px 11px}.pxm-pin s{width:11px;height:11px}
