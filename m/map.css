@@ -60,3 +60,12 @@ ul.mk li{flex-wrap:wrap;border:0;border-bottom:1px solid #E9ECEF;border-radius:0
 .rgs ul.mk li>i{display:block;margin-top:5px}.rgs ul.mk li:has(.pxw)>i{display:none}   /* 오늘 영업 알약이 있으면 평일 시간은 알약이 대신 말한다 */
 .rgs ul.mk li .pxw{display:block;margin-top:7px}.rgs ul.mk li .pxst{white-space:normal}
 @media (min-width:640px){.rgs ul.mk{grid-template-columns:repeat(3,minmax(0,1fr))}.rgs ul.mk li a b{font-size:17px}.rgs ul.mk li a span{font-size:14px}}
+/* ── 마트 목록 장 (2026-10-02 사장님) — 지도를 머리에 붙이고, 지역별 전체 목록은 맨 아래 */
+.pxm.top{margin-top:0!important}
+.mh1{margin:18px 0 6px}
+.mall{margin-top:36px;padding-top:22px;border-top:1px solid #E9ECEF}
+.mall h2{margin:0 0 4px}
+.mall section.rg h3{margin:18px 0 6px;font-size:16px}
+.rgs ul.mk[hidden]{display:none}
+.jump.sj{margin:4px 0 6px}.jump.sj a{background:#F2F4F7;border-color:#F2F4F7}
+.jump.sj a.on{background:#0B5E3A;border-color:#0B5E3A;color:#fff}

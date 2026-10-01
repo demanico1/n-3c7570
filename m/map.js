@@ -88,8 +88,8 @@ async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').
  // 넓게 볼 땐 점만, 확대하면 이름표 — 누른 마트는 늘 이름표
  kakao.maps.event.addListener(map,'zoom_changed',()=>{const v=map.getLevel();el.classList.toggle('nat',!cur&&v>=11);el.classList.toggle('big',v<=8);box.classList.toggle('zoom',!!cur||v<11)});
  el.classList.add('nat');map.setBounds(all,30,20,30,20);
- // 위 시도 바로가기(.jump)를 누르면 목록으로 내려가기 전에 지도도 그 지역으로
- document.querySelectorAll('.jump a').forEach(a=>a.addEventListener('click',()=>{const r=decodeURIComponent(a.getAttribute('href').slice(1));if(C[r])zoomTo(r);else if(!r)home()}))}
+ // (지역 칩은 2026-10-02 에 페이지 맨 아래로 옮겨 지도와 묶지 않는다)
+}
 addEventListener('resize',()=>{if(map)map.relayout()});   // 창 크기가 바뀌면 지도도 다시 맞춘다
 const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){io.disconnect();init()}},{rootMargin:'200px'});io.observe(box);
 })();
