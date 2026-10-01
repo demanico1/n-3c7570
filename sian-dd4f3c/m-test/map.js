@@ -59,13 +59,20 @@ async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').
  M.forEach(m=>{const s=st(m),pos=new kakao.maps.LatLng(m.lat,m.lng);all.extend(pos);
   const d=document.createElement('div');d.className='pxm-pin '+s[0];d.innerHTML='<u></u><b>'+m.n+'</b>';d.onclick=()=>openPop(m,d);
   new kakao.maps.CustomOverlay({position:pos,content:d,yAnchor:.5,zIndex:2}).setMap(map)});
- // 시도 딱지 — 전국 크기에서 붙어 있는 곳은 조금씩 비켜 놓는다
- const OFF={'서울':[-.3,.62],'인천':[-.08,-.75],'경기':[.42,.05],'강원':[.05,.25],'대전':[-.38,.42],'세종':[.32,-.55],'충남':[-.1,-.7],'충북':[.25,.25],
-            '대구':[-.15,.3],'경북':[.45,.25],'부산':[-.08,.32],'경남':[.05,-.5],'전북':[0,-.55],'전남·광주':[-.1,-.2]};
- Object.keys(C).forEach(r=>{const L=M.filter(m=>m.r==r);const o=OFF[r]||[0,0];
-  const la=L.reduce((s,m)=>s+m.lat,0)/L.length+o[0],lo=L.reduce((s,m)=>s+m.lng,0)/L.length+o[1];
+ // 시도 딱지 — 마트들의 가운데에 두고, 화면에서 겹치는 딱지끼리는 저절로 비켜 가게 한다(폰 크기마다 달라서 손으로는 못 맞춘다)
+ const RB=[];Object.keys(C).forEach(r=>{const L=M.filter(m=>m.r==r);
+  const base=new kakao.maps.LatLng(L.reduce((s,m)=>s+m.lat,0)/L.length,L.reduce((s,m)=>s+m.lng,0)/L.length);
   const d=document.createElement('div');d.className='pxm-rb'+(C[r]<=3?' sm':'');d.innerHTML='<em>'+C[r]+'</em>'+r.replace('전남·광주','전남');d.onclick=()=>zoomTo(r);
-  new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(la,lo),content:d,zIndex:3}).setMap(map)});
+  const ov=new kakao.maps.CustomOverlay({position:base,content:d,zIndex:3});ov.setMap(map);RB.push({ov,d,base})});
+ function declutter(){if(!el.classList.contains('nat'))return;const P=map.getProjection(),W=el.clientWidth,H=el.clientHeight;
+  const it=RB.map(x=>{const p=P.containerPointFromCoords(x.base);return{x,px:p.x,py:p.y,w:x.d.offsetWidth+6,h:x.d.offsetHeight+6}});
+  for(let k=0;k<80;k++){let mv=false;
+   for(let i=0;i<it.length;i++)for(let j=i+1;j<it.length;j++){const a=it[i],b=it[j],dx=b.px-a.px,dy=b.py-a.py,ox=(a.w+b.w)/2-Math.abs(dx),oy=(a.h+b.h)/2-Math.abs(dy);
+    if(ox>0&&oy>0){mv=true;if(oy<ox){const s=(dy>=0?1:-1)*oy/2;a.py-=s;b.py+=s}else{const s=(dx>=0?1:-1)*ox/2;a.px-=s;b.px+=s}}}
+   it.forEach(a=>{a.px=Math.min(Math.max(a.px,a.w/2),W-a.w/2);a.py=Math.min(Math.max(a.py,a.h/2),H-a.h/2)});   // 화면 밖으로 안 나가게
+   if(!mv)break}
+  it.forEach(a=>a.x.ov.setPosition(P.coordsFromContainerPoint(new kakao.maps.Point(a.px,a.py))))}
+ kakao.maps.event.addListener(map,'idle',declutter);
  // 넓게 볼 땐 점만, 확대하면 이름표 — 누른 마트는 늘 이름표
  kakao.maps.event.addListener(map,'zoom_changed',()=>{const v=map.getLevel();el.classList.toggle('nat',!cur&&v>=11);el.classList.toggle('big',v<=8);box.classList.toggle('zoom',!!cur||v<11)});
  el.classList.add('nat');map.setBounds(all,30,20,30,20);
