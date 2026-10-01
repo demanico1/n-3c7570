@@ -74,7 +74,9 @@ export async function onRequest(context) {
     if (name) tail += "&n=" + encodeURIComponent(name);
     if (key) tail += "&k=" + key;
     const list = toks.join("-");
-    const app = "/app/#w=" + list + tail;   // 앱은 /app/ (2026-09-30)
+    // 퍼짐 꼬리표 `r=<처음 온 곳>.<단계>` 를 앱에 넘긴다 (2026-10-02) — 앱의 VR 이 읽고 지운다
+    const rr = /^[a-z]{2,8}\.[0-9]{1,2}$/.test(url.searchParams.get("r") || "") ? url.searchParams.get("r") : "";
+    const app = "/app/" + (rr ? "?r=" + rr : "") + "#w=" + list + tail;   // 앱은 /app/ (2026-09-30)
 
     // 미리보기 사진 — 앞에서부터 사진이 있는 첫 상품 (사진이 없는 상품이 4건 있다)
     let img = "";
