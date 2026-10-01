@@ -67,8 +67,8 @@ export async function onRequest(context) {
     }
 
     const n = codes.length;
-    const title = from ? "💌 " + from + "님이 보낸 " + (name || "장보기 목록") + " · " + n + "개"
-                : name ? "💌 " + name + " · " + n + "개" : "PX 찜 목록 " + n + "개";
+    const title = from ? "📋 " + from + "님이 보낸 " + (name || "장보기 목록") + " · " + n + "개"
+                : name ? "📋 " + name + " · " + n + "개" : "PX 찜 목록 " + n + "개";
     const desc = "군마트(PX) 상품 " + n + "개" + (pcs > n ? "(모두 " + pcs + "개)" : "")
       + "를 모아서 보냈어요. 눌러서 온라인 가격과 비교해 보세요.";
     const me = url.origin + "/w/?c=" + list + tail;

@@ -130,6 +130,7 @@ footer{margin-top:32px;padding-top:17px;border-top:1px solid var(--line);
 /* 하단 안내 다섯 줄 (2026-10-01) — 꺾인 줄이 글자 시작선에 맞게 */
 footer .disc{margin:8px 0 10px}
 footer .disc p{margin:0;padding-left:.85em;text-indent:-.85em}
+footer .disc .pk{font-weight:800;white-space:nowrap;color:var(--ink)}footer .disc .pk em{font-style:normal;color:#11974B}   /* PXPICK = 로고처럼 */
 
 /* ── 소개 영역 — 2026-09-24 3차 지시.
  *
