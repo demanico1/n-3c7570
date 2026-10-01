@@ -127,6 +127,9 @@ li b.g{color:var(--px)}li b.b{color:var(--bad)}
 
 footer{margin-top:32px;padding-top:17px;border-top:1px solid var(--line);
  font-size:12px;color:var(--dim);line-height:1.8;word-break:keep-all}
+/* 하단 안내 다섯 줄 (2026-10-01) — 꺾인 줄이 글자 시작선에 맞게 */
+footer .disc{margin:8px 0 10px}
+footer .disc p{margin:0;padding-left:.85em;text-indent:-.85em}
 
 /* ── 소개 영역 — 2026-09-24 3차 지시.
  *
