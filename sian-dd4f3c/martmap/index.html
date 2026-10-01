@@ -390,9 +390,13 @@ br.mb{display:inline}
 .all summary{padding:12px 0;font-weight:700;font-size:14.5px;cursor:pointer}.all summary span{color:#9CA3AF;font-weight:600;margin-left:4px}
 .all ul{list-style:none;padding:0 0 10px;columns:2;column-gap:10px}.all li{padding:5px 0;font-size:13.5px}.all li a{color:#374151}
 .pin{transform:translate(-50%,-100%);cursor:pointer;display:flex;flex-direction:column;align-items:center}
-.pin b{background:#11974B;color:#fff;font-size:12px;font-weight:800;padding:5px 8px;border-radius:10px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.pin b{display:none;background:#11974B;color:#fff;font-size:12px;font-weight:800;padding:5px 8px;border-radius:10px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+#km.big .pin b,.pin.sel b{display:block}#km.big .pin u,.pin.sel u{display:none}
+.pin u{display:block;width:16px;height:16px;border-radius:50%;background:#11974B;border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);margin-bottom:-8px}
+.pin.cl u,.pin.na u{background:#6B7280}.pin.off u{background:#B91C1C}.pin.soon u,.pin.lu u{background:#D97706}
+.pin i{display:none}#km.big .pin i,.pin.sel i{display:block}
 .pin.cl b,.pin.na b{background:#6B7280}.pin.off b{background:#B91C1C}.pin.soon b,.pin.lu b{background:#D97706}
-.pin i{width:0;height:0;border:6px solid transparent;border-top-color:#11974B;margin-top:-1px}.pin.cl i,.pin.na i{border-top-color:#6B7280}.pin.off i{border-top-color:#B91C1C}.pin.soon i,.pin.lu i{border-top-color:#D97706}
+.pin i{display:none;width:0;height:0;border:6px solid transparent;border-top-color:#11974B;margin-top:-1px}.pin.cl i,.pin.na i{border-top-color:#6B7280}.pin.off i{border-top-color:#B91C1C}.pin.soon i,.pin.lu i{border-top-color:#D97706}
 .pin.sel b{outline:3px solid #111827}
 .pop{display:none;position:absolute;left:12px;right:12px;bottom:12px;z-index:6;background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .pop.on{display:block}.pop .cls{position:absolute;right:10px;top:8px;border:0;background:none;font-size:20px;color:#9CA3AF;cursor:pointer}
@@ -503,13 +507,15 @@ function loadSDK(){if(sdk)return sdk;sdk=new Promise((ok,no)=>{const s=document.
  s.onload=()=>kakao.maps.load(ok);s.onerror=no;document.head.appendChild(s)});return sdk}
 const box=document.getElementById('mapbox'),pop=document.getElementById('pop');
 async function showMap(r){box.classList.add('on');try{await loadSDK()}catch(e){box.classList.remove('on');return}
- const el=document.getElementById('km');if(!map){map=new kakao.maps.Map(el,{center:new kakao.maps.LatLng(36.5,127.8),level:12})}
+ const el=document.getElementById('km');if(!map){map=new kakao.maps.Map(el,{center:new kakao.maps.LatLng(36.5,127.8),level:12});
+  // 넓게 볼 땐 점만, 확대하면 이름까지 (경기 51곳이 겹쳐서 — 2026-10-02)
+  kakao.maps.event.addListener(map,'zoom_changed',()=>el.classList.toggle('big',map.getLevel()<=7))}
  map.relayout();ovs.forEach(o=>o.setMap(null));ovs=[];pop.classList.remove('on');
  const L=M.filter(m=>m.r==r&&m.lat);const bd=new kakao.maps.LatLngBounds();
  L.forEach(m=>{const s=st(m),pos=new kakao.maps.LatLng(m.lat,m.lng);bd.extend(pos);
-  const d=document.createElement('div');d.className='pin '+s[0];d.innerHTML='<b>'+m.n.replace(/마트$/,'')+'</b><i></i>';d.onclick=()=>openPop(m,d);
+  const d=document.createElement('div');d.className='pin '+s[0];d.innerHTML='<u></u><b>'+m.n.replace(/마트$/,'')+'</b><i></i>';d.onclick=()=>openPop(m,d);
   const o=new kakao.maps.CustomOverlay({position:pos,content:d,yAnchor:1,zIndex:2});o.setMap(map);ovs.push(o)});
- if(L.length==1){map.setCenter(bd.getSouthWest());map.setLevel(5)}else map.setBounds(bd,40,30,60,30)}
+ if(L.length==1){map.setCenter(bd.getSouthWest());map.setLevel(5)}else map.setBounds(bd,40,30,60,30);el.classList.toggle('big',map.getLevel()<=7)}
 function openPop(m,d){document.querySelectorAll('.pin.sel').forEach(x=>x.classList.remove('sel'));if(d)d.classList.add('sel');const s=st(m);
  pop.innerHTML='<button class="cls" aria-label="닫기">×</button><b>'+m.n+'</b> <span class="mst '+s[0]+'" style="display:inline-block;margin-left:6px">'+s[1]+(s[2]?' · '+s[2]:'')+'</span>'+
   '<div class="s">'+m.a+'<br>'+(dayHours(m)||'오늘 영업시간 정보 없음')+(m.tel?' · '+m.tel:'')+'</div><div class="bt"><a href="'+m.u+'">마트 정보 보기</a>'+(m.pu?'<a class="go" href="'+m.pu+'" target="_blank" rel="noopener">실시간 영업시간 보기 ›</a>':'')+'</div>';
