@@ -24,7 +24,20 @@ export async function onRequest(context) {
   const home = new URL("/", request.url).toString();
   try {
     const url = new URL(request.url);
-    const raw = url.searchParams.get("c") || "";
+    // ★ 짧은 주소 `?z=…&m=…` (2026-10-01) — 앱 `zPack()` 과 짝. 상품 번호 36진법 3글자 · 수량 `_`+1글자 / `~`+2글자
+    const zraw = url.searchParams.get("z") || "";
+    let raw = url.searchParams.get("c") || "";
+    if (/^[0-9a-z_~]{3,1500}$/.test(zraw)) {
+      const parts = []; let i = 0;
+      while (i + 3 <= zraw.length && parts.length < 300) {
+        const p = String(parseInt(zraw.substr(i, 3), 36)); i += 3;
+        let q = 1;
+        if (zraw[i] === "_") { q = parseInt(zraw[i + 1], 36); i += 2; }
+        else if (zraw[i] === "~") { q = parseInt(zraw.substr(i + 1, 2), 36); i += 3; }
+        if (/^[0-9]+$/.test(p)) parts.push(q > 1 && q < 100 ? p + "x" + q : p);
+      }
+      raw = parts.join("-");
+    }
     // ★ 수량이 붙어 올 수 있다 (2026-09-28): `32814x2` — 코드마다 한 번만
     const seen = new Set(), toks = [], codes = [];
     let pcs = 0;
@@ -42,9 +55,20 @@ export async function onRequest(context) {
     // ★ 보낸 사람·목록 이름·목록 열쇠 (2026-10-01). 미리보기에 "지은님이 보낸 '주말 장보기'" 가 뜨고,
     //   앱은 `k` 로 같은 사람의 같은 목록을 알아본다. 사람이 적은 글이라 꺾쇠·따옴표·& 는 뺀다.
     const clean = (v, n) => String(v || "").replace(/[<>"'&#\\]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
-    const from = clean(url.searchParams.get("f"), 10);
-    const name = clean(url.searchParams.get("n"), 16);
-    const key = /^[0-9a-z]{3,12}\.[0-9]{1,4}$/.test(url.searchParams.get("k") || "") ? url.searchParams.get("k") : "";
+    // 짧은 주소면 보낸 사람·목록 이름·열쇠가 `m` 한 덩이(UTF-8 base64url)로 온다
+    let mf = "", mn = "", mk = "";
+    const mraw = url.searchParams.get("m") || "";
+    if (/^[A-Za-z0-9_-]{1,400}$/.test(mraw)) {
+      try {
+        let b = mraw.replace(/-/g, "+").replace(/_/g, "/"); while (b.length % 4) b += "=";
+        const s = new TextDecoder().decode(Uint8Array.from(atob(b), ch => ch.charCodeAt(0)));
+        [mf, mn, mk] = s.split("\n");
+      } catch (e) { /* 이름 없이 간다 */ }
+    }
+    const from = clean(url.searchParams.get("f") || mf, 10);
+    const name = clean(url.searchParams.get("n") || mn, 16);
+    const kk = url.searchParams.get("k") || mk || "";
+    const key = /^[0-9a-z]{3,12}\.[0-9]{1,4}$/.test(kk) ? kk : "";
     let tail = "";
     if (from) tail += "&f=" + encodeURIComponent(from);
     if (name) tail += "&n=" + encodeURIComponent(name);
@@ -71,7 +95,7 @@ export async function onRequest(context) {
                 : name ? "📋 " + name + " · " + n + "개" : "PX 찜 목록 " + n + "개";
     const desc = "군마트(PX) 상품 " + n + "개" + (pcs > n ? "(모두 " + pcs + "개)" : "")
       + "를 모아서 보냈어요. 눌러서 온라인 가격과 비교해 보세요.";
-    const me = url.origin + "/w/?c=" + list + tail;
+    const me = zraw ? url.origin + "/w/?z=" + zraw + (mraw ? "&m=" + mraw : "") : url.origin + "/w/?c=" + list + tail;
     const html =
       '<!doctype html><html lang="ko"><head><meta charset="utf-8">' +
       '<meta name="viewport" content="width=device-width,initial-scale=1">' +
