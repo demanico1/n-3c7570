@@ -21,7 +21,7 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6;
  font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Malgun Gothic","Noto Sans KR",sans-serif}   /* 홈과 같은 글꼴 (2026-10-02) */
-.wrap{max-width:640px;margin:0 auto;padding:0 16px 48px}
+.wrap{max-width:768px;margin:0 auto;padding:0 16px 48px}   /* 홈·머리와 같은 폭 (2026-10-02 — 640 이라 PC 에서 머리가 튀어나와 보였다) */
 
 /* ── 머리 — 로고가 브랜드를 만든다 */
 header{background:var(--card);border-bottom:1px solid var(--line);padding:11px 0;

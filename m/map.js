@@ -37,9 +37,23 @@ const km=(a,b,c,d)=>{const R=6371,t=x=>x*Math.PI/180,dl=t(c-a),dn=t(d-b);const h
 const drive=d=>{const road=d*1.35,sp=road<10?30:road<40?45:60;return Math.max(1,Math.round(road/sp*60))};   // 길 굽은 몫 1.35배 · 가까우면 느리게
 const fmt=d=>d<1?Math.round(d*1000)+'m':(d<10?d.toFixed(1):Math.round(d))+'km';
 let you=null;
-box.querySelector('.pxm-me').onclick=()=>{const b=box.querySelector('.pxm-me');
- if(!navigator.geolocation){b.textContent='위치를 쓸 수 없어요';return}b.textContent='📍 찾는 중…';
- navigator.geolocation.getCurrentPosition(async p=>{b.textContent='📍 내 근처 마트';if(!map)await init();
+// ★ 위치 찾기 (2026-10-02 사장님 "위치 허용해 놔도 됐다 안 됐다 한다") — 한 번만 10초 묻던 것을 바꿨다.
+//   빠른 길(최근 위치·낮은 정밀도)과 정확한 길(GPS 를 지켜보기)을 **같이** 묻고 먼저 온 답을 쓴다. 최대 20초.
+//   거절(1)은 곧바로 끝내고, 위치 못 잡음(2)·시간 초과(3)는 다른 길이 아직 살아 있으면 기다린다. 찾은 위치는 이 탭에서 5분 기억
+let busy=false;
+function locate(ok,fail){
+ try{const c=JSON.parse(sessionStorage.getItem('pxp-loc')||'null');if(c&&Date.now()-c.t<300000)return ok({coords:{latitude:c.la,longitude:c.lo}})}catch(_){}
+ let done=false,wid=null,errs=0,last=2;
+ const fin=(f,a)=>{if(done)return;done=true;clearTimeout(tm);if(wid!=null)try{navigator.geolocation.clearWatch(wid)}catch(_){}
+  if(f===ok)try{sessionStorage.setItem('pxp-loc',JSON.stringify({la:a.coords.latitude,lo:a.coords.longitude,t:Date.now()}))}catch(_){}
+  f(a)};
+ const bad=e=>{if(e&&e.code===1)return fin(fail,e);last=(e&&e.code)||2;if(++errs>=2)fin(fail,{code:last})};
+ const tm=setTimeout(()=>fin(fail,{code:3}),20000);
+ try{navigator.geolocation.getCurrentPosition(p=>fin(ok,p),bad,{enableHighAccuracy:false,timeout:8000,maximumAge:600000})}catch(e){bad({code:2})}
+ try{wid=navigator.geolocation.watchPosition(p=>fin(ok,p),bad,{enableHighAccuracy:true,timeout:19000,maximumAge:0})}catch(e){bad({code:2})}}
+box.querySelector('.pxm-me').onclick=()=>{const b=box.querySelector('.pxm-me');if(busy)return;
+ if(!navigator.geolocation){b.textContent='위치를 쓸 수 없어요';return}b.textContent='📍 찾는 중…';busy=true;
+ locate(async p=>{busy=false;b.textContent='📍 내 근처 마트';if(!map)await init();
   const la=p.coords.latitude,lo=p.coords.longitude;const L=M.map(m=>({m,d:km(la,lo,m.lat,m.lng)})).sort((a,b)=>a.d-b.d);
   const near=L.slice(0,3),in20=L.filter(x=>x.d<=20).length;
   if(you)you.setMap(null);const yd=document.createElement('div');yd.className='pxm-you';
@@ -48,11 +62,16 @@ box.querySelector('.pxm-me').onclick=()=>{const b=box.querySelector('.pxm-me');
   const bd=new kakao.maps.LatLngBounds();bd.extend(new kakao.maps.LatLng(la,lo));near.forEach(x=>bd.extend(new kakao.maps.LatLng(x.m.lat,x.m.lng)));map.setBounds(bd,60,40,230,40);
   pop.innerHTML='<button class="x" aria-label="닫기">×</button><b>내 근처 영외마트</b><div class="s" style="margin-bottom:0">가장 가까운 3곳'+(in20?' · 20km 안에 '+in20+'곳':'')+' (거리는 직선, 시간은 대략)</div><ul class="pxm-near">'+
    near.map((x,i)=>'<li><div><b data-i="'+M.indexOf(x.m)+'">'+x.m.n+'</b> '+pill(x.m)+'<small>'+fmt(x.d)+' · 차로 약 '+drive(x.d)+'분</small></div>'+
-   '<a href="https://map.kakao.com/link/to/'+encodeURIComponent(x.m.n)+','+x.m.lat+','+x.m.lng+'" target="_blank" rel="noopener">길찾기 ›</a></li>').join('')+'</ul>';
+   '<span class="go2"><a href="'+x.m.u+'">마트 정보 ›</a><a href="https://map.kakao.com/link/to/'+encodeURIComponent(x.m.n)+','+x.m.lat+','+x.m.lng+'" target="_blank" rel="noopener">길찾기 ›</a></span></li>').join('')+'</ul>';
   pop.classList.add('on');pop.querySelector('.x').onclick=()=>pop.classList.remove('on');
   pop.querySelectorAll('.pxm-near b').forEach(e=>e.onclick=()=>{const m=M[+e.dataset.i];map.setCenter(new kakao.maps.LatLng(m.lat,m.lng));map.setLevel(5);openPop(m,null)})},
- e=>{b.textContent='📍 내 근처 마트';pop.innerHTML='<button class="x" aria-label="닫기">×</button><b>위치를 가져오지 못했어요</b><div class="s">위치 허용을 눌러 주시거나, 지도의 지역 숫자를 눌러 찾아보세요.</div>';
-  pop.classList.add('on');pop.querySelector('.x').onclick=()=>pop.classList.remove('on')},{enableHighAccuracy:false,timeout:10000,maximumAge:300000})};
+ e=>{busy=false;b.textContent='📍 내 근처 마트';
+  const why=e&&e.code===1?'이 사이트의 위치 사용이 꺼져 있어요. 브라우저 주소창 옆 자물쇠(또는 설정)에서 위치를 허용해 주세요.'
+   :e&&e.code===3?'위치를 잡는 데 시간이 오래 걸리고 있어요. 창가나 밖에서 다시 눌러 보세요.'
+   :'폰이 지금 위치를 잡지 못했어요. 폰 설정에서 위치(GPS)가 켜져 있는지 확인해 주세요.';
+  pop.innerHTML='<button class="x" aria-label="닫기">×</button><b>위치를 가져오지 못했어요</b><div class="s">'+why+'</div><div class="bt"><a href="#" class="go re">📍 다시 찾기</a></div>';
+  pop.classList.add('on');pop.querySelector('.x').onclick=()=>pop.classList.remove('on');
+  pop.querySelector('.re').onclick=ev=>{ev.preventDefault();pop.classList.remove('on');b.click()}})};
 // ★ 한 손가락은 페이지 스크롤, 지도는 두 손가락 · PC 휠은 페이지 스크롤, Ctrl+휠이 확대 (2026-10-02 사장님 — 내리려는데 지도만 움직였다)
 //   한 손가락 신호를 지도보다 먼저(capture) 받아 지도에 안 넘긴다 → 브라우저가 그대로 스크롤한다. 톡 누르기(딱지·점)는 click 이라 그대로 된다
 // ★ 2026-10-02 사장님 — 지도를 머리 바로 아래 붙인 뒤로는 스크롤이 막힐 일이 없어 꺼 뒀다. 다시 켜려면 GUARD_ON 을 true 로
