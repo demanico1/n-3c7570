@@ -27,6 +27,7 @@
 .mpg .hrs{width:100%;border-collapse:collapse;margin-top:10px;border:0;background:none}
 .mpg .hrs td{padding:12px 6px;font-size:15px;border:0;border-bottom:1px solid #F2F4F7;background:none}.mpg .hrs tr:last-child td{border-bottom:0}
 .mpg .hrs td:first-child{color:#4B5563;width:auto}.mpg .hrs td:last-child{text-align:right;font-weight:700;color:#111827}.mpg .hrs td.na{color:#9CA3AF;font-weight:500}
+.mpg .hrs a{color:inherit;text-decoration:none}
 .mpg .hrs tr.today td{background:#F0FAF4}.mpg .hrs tr.today td:first-child{border-radius:10px 0 0 10px}.mpg .hrs tr.today td:last-child{border-radius:0 10px 10px 0}
 .mpg .hrs tr.today td:first-child::after{content:"오늘";margin-left:6px;font-size:11px;font-weight:700;color:#fff;background:#11974B;border-radius:6px;padding:2px 6px;vertical-align:1px}
 .mpg .nb{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
