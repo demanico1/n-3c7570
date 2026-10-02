@@ -72,5 +72,5 @@ ul.mk li{flex-wrap:wrap;border:0;border-bottom:1px solid #E9ECEF;border-radius:0
 /* 낱말 중간에서 꺾이지 않게 (2026-10-02 사장님 — `전/화로` `있/어요`) */
 .pxm-leg,.pxm-now,.mh1+.sub,.mall .note,.pxm-near{word-break:keep-all}
 /* 근처 목록 — 마트 정보·길찾기 둘 (2026-10-02) */
-.pxm-near .go2{flex:none;display:flex;flex-direction:column;align-items:stretch;gap:6px;width:92px}.pxm-near .go2 a{white-space:nowrap;text-align:center;background:#fff;color:#11974B}.pxm-near .go2 a+a{background:#11974B;color:#fff}   /* 마트 정보는 흰 바탕 · 길찾기는 초록 바탕, 폭은 같게 (2026-10-02 사장님) */
+.pxm-near .go2{flex:none;display:flex;flex-direction:column;align-items:stretch;gap:6px;width:92px}.pxm-near .go2 a{display:block;white-space:nowrap;text-align:center;background:#fff;color:#11974B;padding-left:4px;padding-right:4px}.pxm-near .go2 a+a{background:#11974B;color:#fff}   /* 마트 정보는 흰 바탕 · 길찾기는 초록 바탕, 폭은 같게 (2026-10-02 사장님) */
 @media (min-width:640px){.pxm-near .go2{width:108px}}
