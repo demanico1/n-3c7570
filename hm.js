@@ -21,7 +21,7 @@ document.querySelectorAll('.up').forEach(el=>io.observe(el));
  const e=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
  const L=S.filter(a=>a.length).map(pick);let q=0,c=0,g=0;
  m.querySelector('.its').innerHTML=L.map(x=>{q+=x.q;c+=x.c*x.q;g+=x.g*x.q;
-   return '<div class="it"><img src="'+x.i+'" alt="" loading="lazy" decoding="async"><div class="n">'+e(x.n)+'<br><b>'+w(x.g)+'</b></div><span class="q">－<b>'+x.q+'</b>＋</span></div>';}).join('');
+   return '<div class="it"><img src="'+x.i+'" alt="'+e(x.n)+'" loading="lazy" decoding="async"><div class="n">'+e(x.n)+'<br><b>'+w(x.g)+'</b></div><span class="q">－<b>'+x.q+'</b>＋</span></div>';}).join('');
  m.querySelector('.sum small').textContent=q+'개 · 온라인보다';m.querySelector('.sum b').textContent=w(c-g)+' 아껴요';
  m.querySelector('.sum .t').textContent=w(g);})();
 // 비교 카드 넘김 — 10초마다 · 4.2초 동안 아주 천천히(사장님: 3배 이상 느리게) · 늘 같은 방향 (마지막 → 첫 카드도)
