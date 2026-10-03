@@ -1,8 +1,9 @@
 (function(){
 // 한국 시각으로 오늘 요일·지금 시각 → 영업 상태 · 오늘 줄 칠하기
+const HOLI={"2026-01-01": "신정", "2026-02-16": "설 연휴", "2026-02-17": "설날", "2026-02-18": "설 연휴", "2026-03-01": "삼일절", "2026-03-02": "삼일절 대체공휴일", "2026-05-05": "어린이날", "2026-05-24": "부처님오신날", "2026-05-25": "부처님오신날 대체공휴일", "2026-06-03": "지방선거일", "2026-06-06": "현충일", "2026-08-15": "광복절", "2026-08-17": "광복절 대체공휴일", "2026-09-24": "추석 연휴", "2026-09-25": "추석", "2026-09-26": "추석 연휴", "2026-10-03": "개천절", "2026-10-05": "개천절 대체공휴일", "2026-10-09": "한글날", "2026-12-25": "성탄절", "2027-01-01": "신정", "2027-02-06": "설 연휴", "2027-02-07": "설날", "2027-02-08": "설 연휴", "2027-02-09": "설 대체공휴일", "2027-03-01": "삼일절", "2027-05-05": "어린이날", "2027-05-13": "부처님오신날", "2027-06-06": "현충일", "2027-08-15": "광복절", "2027-08-16": "광복절 대체공휴일", "2027-09-14": "추석 연휴", "2027-09-15": "추석", "2027-09-16": "추석 연휴", "2027-10-03": "개천절", "2027-10-04": "개천절 대체공휴일", "2027-10-09": "한글날", "2027-10-11": "한글날 대체공휴일", "2027-12-25": "성탄절", "2027-12-27": "성탄절 대체공휴일"},HOLX={};function HOL(n){const d=new Date(Date.now()+9*36e5),k=d.toISOString().slice(0,10);return HOLX[n]?'':(HOLI[k]||'')}
 (function(){const el=document.getElementById('mst');if(!el)return;const H=JSON.parse(el.dataset.h);
  const now=new Date(Date.now()+(9*60+new Date().getTimezoneOffset())*60000);const wd=now.getDay();
- const key=wd===0?'일':wd===6?'토':'평일';const row=document.querySelector('.hrs tr[data-k="'+key+'"]');if(row)row.classList.add('today');
+ const key=wd===0?'일':wd===6?'토':'평일';const ho=HOL(((document.querySelector('h1')||{}).textContent||'').trim());if(ho){el.className='st shut';el.innerHTML='<i></i>오늘 쉬어요 <em>· '+ho+'</em>';return;}const row=document.querySelector('.hrs tr[data-k="'+key+'"]');if(row)row.classList.add('today');
  const v=H[key]||'';const m=v.match(/^(\d{1,2}):(\d{2})~(\d{1,2}):(\d{2})$/);const t=now.getHours()*60+now.getMinutes();
  const set=(c,a,b)=>{el.className='st '+c;el.innerHTML='<i></i>'+a+(b?' <em>· '+b+'</em>':'');};
  if(!m){set('',key==='평일'?'영업시간 정보 없음':'오늘('+(key==='토'?'토요일':'일요일')+') 영업시간 안내가 없어요','전화로 확인해 주세요');return;}
