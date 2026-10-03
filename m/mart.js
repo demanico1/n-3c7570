@@ -6,7 +6,8 @@ const HOLI={"2026-01-01": "신정", "2026-02-16": "설 연휴", "2026-02-17": "�
  const key=wd===0?'일':wd===6?'토':'평일';const ho=HOL(((document.querySelector('h1')||{}).textContent||'').trim());if(ho){el.className='st shut';el.innerHTML='<i></i>오늘 쉬어요 <em>· '+ho+'</em>';return;}const row=document.querySelector('.hrs tr[data-k="'+key+'"]');if(row)row.classList.add('today');
  const v=H[key]||'';const m=v.match(/^(\d{1,2}):(\d{2})~(\d{1,2}):(\d{2})$/);const t=now.getHours()*60+now.getMinutes();
  const set=(c,a,b)=>{el.className='st '+c;el.innerHTML='<i></i>'+a+(b?' <em>· '+b+'</em>':'');};
- if(!m){set('',key==='평일'?'영업시간 정보 없음':'오늘('+(key==='토'?'토요일':'일요일')+') 영업시간 안내가 없어요','전화로 확인해 주세요');return;}
+ if(!m){if(key!=='평일'&&/\d~\d/.test(H['평일']||'')){set('shut','오늘 쉬어요',(key==='토'?'토요일':'일요일')+'은 쉬는 날이에요');return;}   // 평일 시간은 있고 그 요일만 비었으면 쉬는 날 (2026-10-04 — 목록 지도와 같은 규칙)
+ set('',key==='평일'?'영업시간 정보 없음':'오늘('+(key==='토'?'토요일':'일요일')+') 영업시간 안내가 없어요','전화로 확인해 주세요');return;}
  const o=+m[1]*60+ +m[2],c=+m[3]*60+ +m[4];
  if(t<o)set(o-t<=60?'soon':'shut','영업 전',m[1]+':'+m[2]+'에 열어요');
  else if(t<c)set(c-t<=60?'soon':'open','지금 영업 중',m[3]+':'+m[4]+'에 닫아요');

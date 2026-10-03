@@ -524,6 +524,9 @@ header.hd .so .tags a{font-size:14px;color:#E5E7EB;background:#252C36;border-rad
 header.hd.hdk .row1{background:#000}header.hd.hdk .brand{color:#fff}
 header.hd.hdk .row2{background:rgba(24,31,41,.92);backdrop-filter:blur(8px);color:rgba(255,255,255,.62);border-bottom:0}
 header.hd.hdk .row2 a.on{color:#fff}
+/* 내리면 메뉴 줄이 로고 줄 뒤로 숨는다 — 홈과 같게 (2026-10-04 사장님: 마트 페이지만 안 접혔다. 스크립트는 붙어 있는데 이 두 줄이 없었다) */
+header.hd .row1{position:relative;z-index:2}header.hd .row2{position:relative;z-index:1;transition:transform .22s ease}
+header.hd.slim .row2{transform:translateY(-100%);pointer-events:none}
 
 /* ── 영외마트 목록 지역 탭 (2026-10-02) — 칩을 누르면 그 지역 목록만 보인다 (접기 14줄은 칩과 겹쳐 없앴다) */
 section.rg[hidden]{display:none}
