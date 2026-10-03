@@ -12,8 +12,10 @@ const HOLI={"2026-01-01": "신정", "2026-02-16": "설 연휴", "2026-02-17": "�
  if(t<o)set(o-t<=60?'soon':'shut','영업 전',m[1]+':'+m[2]+'에 열어요');
  else if(t<c)set(c-t<=60?'soon':'open','지금 영업 중',m[3]+':'+m[4]+'에 닫아요');
  else set('shut','오늘 영업 끝',m[3]+':'+m[4]+'에 닫았어요');})();
-// 작은 지도 — 보일 때만 불러온다. 페이지 가운데 있어서 한 손가락은 페이지 스크롤, 지도는 두 손가락
-function guard(el){const tip=document.createElement('div');tip.className='pxm-tip';el.appendChild(tip);let t=0,two=false;const P=new Set();
+// 작은 지도 — 보일 때만 불러온다. (꺼 둠) 한 손가락은 페이지 스크롤, 지도는 두 손가락
+// ★ 2026-10-04 사장님 — 목록 지도처럼 끈다(두 손가락 확대가 화면 전체 확대로 느껴졌다). 다시 켜려면 GUARD_ON 을 true 로
+const GUARD_ON=false;
+function guard(el){el.classList.add('guard');const tip=document.createElement('div');tip.className='pxm-tip';el.appendChild(tip);let t=0,two=false;const P=new Set();
  const say=s=>{tip.innerHTML='<span>'+s+'</span>';tip.classList.add('on');clearTimeout(t);t=setTimeout(()=>tip.classList.remove('on'),1300)};
  const mac=/Mac|iPhone|iPad/.test(navigator.platform||'');const o={capture:true,passive:true};
  const T=e=>{if(e.touches.length>=2)two=true;if(!two)e.stopPropagation();if(!e.touches.length)two=false};
@@ -26,7 +28,7 @@ function guard(el){const tip=document.createElement('div');tip.className='pxm-ti
 (function(){const e=document.getElementById('mmap');if(!e)return;
  const io=new IntersectionObserver(es=>{if(!es.some(x=>x.isIntersecting))return;io.disconnect();const s=document.createElement('script');
   s.src='https://dapi.kakao.com/v2/maps/sdk.js?appkey=f6f4f84fa14889b2737f2812b1b27a98&autoload=false';s.onerror=()=>{e.querySelector('.ph').textContent='지도를 불러오지 못했어요'};
-  s.onload=()=>kakao.maps.load(()=>{e.innerHTML='';const p=new kakao.maps.LatLng(+e.dataset.la,+e.dataset.lo),m=new kakao.maps.Map(e,{center:p,level:4});guard(e);
+  s.onload=()=>kakao.maps.load(()=>{e.innerHTML='';const p=new kakao.maps.LatLng(+e.dataset.la,+e.dataset.lo),m=new kakao.maps.Map(e,{center:p,level:4});if(GUARD_ON)guard(e);
    const d=document.createElement('div');d.className='mpin';d.innerHTML='<b>'+e.dataset.n+'</b><i></i>';
    new kakao.maps.CustomOverlay({position:p,content:d,yAnchor:1}).setMap(m)});document.head.appendChild(s)},{rootMargin:'200px'});io.observe(e)})();
 // 공유하기 — 카카오톡(미리 받아 둔 공유 도구) → 폰 공유 창 → 링크 복사

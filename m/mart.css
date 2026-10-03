@@ -22,7 +22,7 @@
 .mpin i{width:0;height:0;border:7px solid transparent;border-top-color:#0B5E3A;margin-top:-2px}
 .mpg .mmap .pxm-tip{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(17,24,39,.35);color:#fff;font-size:16px;font-weight:700;opacity:0;transition:opacity .25s;pointer-events:none;text-align:center;padding:0 20px}
 .mpg .mmap .pxm-tip.on{opacity:1}.mpg .mmap .pxm-tip span{background:rgba(17,24,39,.88);border-radius:999px;padding:11px 18px}
-.mpg .mmap,.mpg .mmap *{touch-action:pan-y!important}
+.mpg .mmap.guard,.mpg .mmap.guard *{touch-action:pan-y!important}
 .mpg .card{margin-top:12px;border-radius:18px;background:#fff;border:1px solid #EEF0F2;padding:18px;box-shadow:none}
 .mpg .card h2{font-size:17px;font-weight:800;display:flex;align-items:center;gap:6px;margin:0;border:0;padding:0}
 .mpg .hrs{width:100%;border-collapse:collapse;margin-top:10px;border:0;background:none}
