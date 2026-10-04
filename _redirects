@@ -64,6 +64,15 @@
 /c/beauty/%EB%B0%94%EB%94%94 /c/beauty/%EB%B0%94%EB%94%94%EC%BC%80%EC%96%B4/ 301
 /c/beauty/바디/ /c/beauty/%EB%B0%94%EB%94%94%EC%BC%80%EC%96%B4/ 301
 /c/beauty/바디 /c/beauty/%EB%B0%94%EB%94%94%EC%BC%80%EC%96%B4/ 301
+# 2026-10-04 브랜드가 아니라 재료 이름이라 브랜드 페이지에서 뺐다 (한 브랜드 = 한 회사 규칙)
+/b/%EC%96%B4%EC%84%B1%EC%B4%88/ /b/%EC%95%84%EB%B9%84%EB%B8%8C/ 301
+/b/%EC%96%B4%EC%84%B1%EC%B4%88 /b/%EC%95%84%EB%B9%84%EB%B8%8C/ 301
+/b/어성초/ /b/%EC%95%84%EB%B9%84%EB%B8%8C/ 301
+/b/어성초 /b/%EC%95%84%EB%B9%84%EB%B8%8C/ 301
+/b/%EB%A7%88%EC%B9%B4%EB%8B%A4%EB%AF%B8%EC%95%84/ /c/food/%EA%B2%AC%EA%B3%BC%C2%B7%EB%A7%90%EB%A6%B0%EA%B3%BC%EC%9D%BC/ 301
+/b/%EB%A7%88%EC%B9%B4%EB%8B%A4%EB%AF%B8%EC%95%84 /c/food/%EA%B2%AC%EA%B3%BC%C2%B7%EB%A7%90%EB%A6%B0%EA%B3%BC%EC%9D%BC/ 301
+/b/마카다미아/ /c/food/%EA%B2%AC%EA%B3%BC%C2%B7%EB%A7%90%EB%A6%B0%EA%B3%BC%EC%9D%BC/ 301
+/b/마카다미아 /c/food/%EA%B2%AC%EA%B3%BC%C2%B7%EB%A7%90%EB%A6%B0%EA%B3%BC%EC%9D%BC/ 301
 
 # >>> 광고 검수 동안 담배 숨김 (2026-09-30 사장님) — 네이버 광고 기준 [48]① '담배 정보제공 사이트 광고 불가'
 #     파일은 그대로 두고 잠깐(302) 홈으로 넘긴다. 검수 끝나면 이 칸(>>> ~ <<<)을 통째로 빼면 원래대로 돌아온다
