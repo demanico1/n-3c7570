@@ -1,4 +1,16 @@
-@keyframes pxflow{0%{background-position:0% 50%}100%{background-position:200% 50%}}.pxm-app{position:absolute;right:0;bottom:0;z-index:30;display:block;text-align:left;text-decoration:none;white-space:nowrap;color:#fff;font-size:11px;font-weight:800;line-height:1.25;padding:6px 10px 6px 11px;border-radius:12px 0 0 0;background:linear-gradient(110deg,#0B7A4B 0%,#22C55E 25%,#0B7A4B 50%,#22C55E 75%,#0B7A4B 100%);background-size:200% 100%;animation:pxflow 3.2s linear infinite}.pxm-app b{display:block;font-size:12.5px}@media (prefers-reduced-motion:reduce){.pxm-app{animation:none}}.pxm-pop.on~.pxm-app{display:none}
+/* ★ 2026-10-06 사장님 — 지도 위 '가격 미리 보기' 단추는 뺐다. 대신 지도 바로 아래 초록 띠(pxm-bn, 마트 페이지 C안 디자인) */
+@keyframes pxbn{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+.pxm-bn{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 22px;padding:13px 14px 13px 16px;border-radius:14px;color:#fff;text-decoration:none;
+ background:linear-gradient(110deg,#0B7A4B 0%,#169A57 17%,#0B7A4B 33%,#169A57 50%,#0B7A4B 67%,#169A57 83%,#0B7A4B 100%);background-size:300% 100%;animation:pxbn 18s linear infinite}
+.pxm-bn small{display:block;font-size:12.5px;font-weight:600;opacity:.85}.pxm-bn b{display:block;font-size:16px;font-weight:800;margin-top:2px;letter-spacing:-.3px}
+.pxm-bn i{flex:none;font-style:normal;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:18px;font-weight:800;background:rgba(255,255,255,.2);color:#fff}
+@media (prefers-reduced-motion:reduce){.pxm-bn{animation:none}}
+@media (min-width:640px){.pxm-bn small{font-size:14px}.pxm-bn b{font-size:18px}}
+/* 지도 길게 누르기 (2026-10-06 사장님 — 마트 한 곳과 같은 방식). 평소엔 잠가서 페이지가 내려가고, 길게 누르면 지도를 움직인다 */
+.pxm-km{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.pxm-km.lock,.pxm-km.lock *{touch-action:pan-y!important}
+.pxm-lp{position:absolute;right:8px;bottom:8px;z-index:45;background:rgba(17,24,39,.82);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:6px 11px;pointer-events:none;opacity:0;transition:opacity .2s}
+.pxm-km.touching:not(.live) .pxm-lp{opacity:1}
 
 .pxm-tip{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(17,24,39,.35);color:#fff;font-size:16px;font-weight:700;opacity:0;transition:opacity .25s;pointer-events:none;text-align:center;padding:0 20px}.pxm-tip.on{opacity:1}.pxm-tip span{background:rgba(17,24,39,.88);border-radius:999px;padding:11px 18px;box-shadow:0 4px 16px rgba(0,0,0,.25)}
 .pxm-km.guard,.pxm-km.guard *,.mmap,.mmap *{touch-action:pan-y!important}   /* 한 손가락 세로 밀기는 브라우저 몫 (문지기를 켤 때만) */
@@ -64,7 +76,8 @@ ul.mk li{flex-wrap:wrap;border:0;border-bottom:1px solid #E9ECEF;border-radius:0
 /* ── 마트 목록 장 (2026-10-02 사장님) — 지도를 머리에 붙이고, 지역별 전체 목록은 맨 아래 */
 .pxm.top{margin-top:0!important}
 .mh1{margin:18px 0 6px}
-.mall{margin-top:36px;padding-top:22px;border-top:1px solid #E9ECEF}
+.mall{margin-top:36px;padding-top:22px;border-top:1px solid #E9ECEF}.mall.up{margin-top:0;padding-top:0;border-top:0}.mall.up+.note{margin-bottom:28px}
+.rtop{margin:0 0 26px}.rtop .rgl{margin:10px 0 0}.rtop .jump a.on{background:#0B5E3A;border-color:#0B5E3A;color:#fff}
 .mall h2{margin:0 0 4px}
 .mall section.rg h3{margin:18px 0 6px;font-size:16px}
 .rgs ul.mk[hidden]{display:none}

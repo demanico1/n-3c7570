@@ -22,14 +22,13 @@ document.querySelectorAll('ul.mk li[data-n]').forEach(li=>{const m=BY[li.dataset
 const now=document.getElementById('pxm-now');if(now)now.textContent=kst().txt+' 기준 영업 표시예요 · 표시한 시간은 자료 기준이라 가시기 전에 전화로 확인해 보세요';
 // ── 지도 (지도 칸이 화면에 보일 때만 불러온다)
 const box=document.getElementById('pxmap');if(!box)return;
-// ★ 지도 위 앱 단추 (2026-10-05 사장님 '모든 지도에') — 두 줄 · 오른쪽 아래 구석. 마트 카드가 뜨면 숨는다. 세기 data-hit=map-app
-box.insertAdjacentHTML('beforeend','<a class="pxm-app" href="/app/" data-hit="map-app">PX 상품 2,240개<b>가격 미리 보기 ›</b></a>');
+// (지도 위 앱 단추는 2026-10-06 사장님 결정으로 뺐다 — 지도 아래 초록 띠가 대신한다)
 const el=box.querySelector('.pxm-km'),pop=box.querySelector('.pxm-pop');let map=null,all=null,cur='';
 function loadSDK(){return new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://dapi.kakao.com/v2/maps/sdk.js?appkey='+KEY+'&autoload=false';s.onload=()=>kakao.maps.load(ok);s.onerror=no;document.head.appendChild(s)})}
 function openPop(m,d){box.querySelectorAll('.pxm-pin.sel').forEach(x=>{x.classList.remove('sel');if(x.parentNode)x.parentNode.style.zIndex=2});
  if(d){d.classList.add('sel');if(d.parentNode)d.parentNode.style.zIndex=20}
  pop.innerHTML='<button class="x" aria-label="닫기">×</button><b>'+m.n+'</b> '+pill(m)+'<div class="s">'+m.a+'<br>'+(dayHours(m)||'오늘 영업시간 정보 없음')+(m.tel?' · '+m.tel:'')+'</div>'+
-  '<div class="bt"><a href="'+m.u+'">마트 정보 보기</a>'+(m.pu?'<a class="go" href="'+m.pu+'" target="_blank" rel="noopener">실시간 영업시간 보기 ›</a>':'')+'</div>';
+  '<div class="bt"><a href="'+m.u+'">마트 정보 보기</a><a class="go" href="/app/" data-hit="kmap-app">가기 전 PX 가격 보기 ›</a></div>';   // ★ 2026-10-06 사장님 — 실시간 영업시간 자리에 앱 단추
  pop.classList.add('on');pop.querySelector('.x').onclick=()=>{pop.classList.remove('on');box.querySelectorAll('.pxm-pin.sel').forEach(x=>x.classList.remove('sel'))}}
 function zoomTo(r){if(window.pxmOpen)pxmOpen(r);if(!map)return;cur=r;el.classList.remove('nat');box.classList.add('zoom');pop.classList.remove('on');
  const L=M.filter(m=>m.r==r),bd=new kakao.maps.LatLngBounds();L.forEach(m=>bd.extend(new kakao.maps.LatLng(m.lat,m.lng)));
@@ -92,6 +91,22 @@ function guard(el,map){el.classList.add('guard');const tip=document.createElemen
  el.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey)return;e.stopPropagation();say((mac?'⌘':'Ctrl')+' + 휠로 지도를 키워요')},o)}
 // ★ 2026-10-05 — 표시들의 기준점을 왼쪽 위(0,0)로. 카카오 기준점(가운데) + 모양 규칙 translate(-50%,-50%) 가 겹쳐
 //   늘 반 칸씩 위·왼쪽으로 밀려 그려졌다(축소할수록 멀리 떨어져 보임). 이제 모양 규칙 하나로만 가운데를 맞춘다
+// ★ 지도 길게 누르기 (2026-10-06 사장님 — 마트 한 곳과 같은 방식) — 손가락 화면에서만. 평소엔 지도가 손가락을 안 받아 페이지가 내려가고,
+//   0.45초 길게 누르면 초록 테두리 + 진동 → 한 손가락으로 지도를 옮기고 키운다. 손 떼고 3초 또는 지도 밖을 누르면 다시 잠근다.
+//   안내는 잠긴 지도에 손가락이 닿았을 때만 오른쪽 아래에 1.5초. 숫자 딱지·마트 점은 톡 누르기(click)라 잠겨 있어도 눌린다
+function lpress(el,m){el.classList.add('lock');m.setDraggable(false);m.setZoomable(false);
+ const tip=document.createElement('div');tip.className='pxm-lp';tip.textContent='길게 누르면 지도를 움직일 수 있어요';el.appendChild(tip);
+ let on=false,pt=0,rt=0,ht=0,sx=0,sy=0;
+ const lock=()=>{on=false;clearTimeout(rt);el.classList.remove('live');el.classList.add('lock');m.setDraggable(false);m.setZoomable(false)};
+ const open=()=>{on=true;clearTimeout(ht);el.classList.remove('touching');el.classList.add('live');el.classList.remove('lock');m.setDraggable(true);m.setZoomable(true);try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}};
+ const C={capture:true,passive:true};
+ el.addEventListener('touchstart',e=>{clearTimeout(rt);if(on)return;e.stopPropagation();clearTimeout(ht);el.classList.add('touching');const t=e.touches[0];sx=t.clientX;sy=t.clientY;clearTimeout(pt);if(e.touches.length===1)pt=setTimeout(open,450)},C);
+ el.addEventListener('touchmove',e=>{if(on){if(e.cancelable)e.preventDefault();return}e.stopPropagation();const t=e.touches[0];if(Math.abs(t.clientX-sx)+Math.abs(t.clientY-sy)>10)clearTimeout(pt)},{capture:true,passive:false});
+ const end=e=>{clearTimeout(pt);if(on){clearTimeout(rt);rt=setTimeout(lock,3000)}else{e.stopPropagation();clearTimeout(ht);ht=setTimeout(()=>el.classList.remove('touching'),1500)}};
+ el.addEventListener('touchend',end,C);el.addEventListener('touchcancel',end,C);
+ ['pointerdown','pointermove','pointerup','pointercancel'].forEach(k=>el.addEventListener(k,e=>{if(e.pointerType==='touch'&&!on)e.stopPropagation()},C));
+ el.addEventListener('contextmenu',e=>e.preventDefault());
+ document.addEventListener('touchstart',e=>{if(on&&!el.contains(e.target))lock()},{passive:true})}
 let started=null;function init(){return started||(started=init0())}
 const PINS=[];
 // ★ 이름표 (2026-10-05 사장님 '좀 멀어도 마트 이름이 보이게') — 화면 안의 마트마다 이름표를 켜 보고, 실제 크기를 재서
@@ -129,7 +144,7 @@ function labelize(){if(!map||el.classList.contains('nat'))return;const P=map.get
  // 이름표 달린 마트는 점보다 위층 — 옆 마트 점이 글자를 가리지 않게
  PINS.forEach(p=>{const w=p.d.parentElement;if(w)w.style.zIndex=p.d.classList.contains('lab')||p.d.classList.contains('sel')?4:2})}
 async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').textContent='지도를 불러오지 못했어요';return}
- el.innerHTML='';map=new kakao.maps.Map(el,{center:new kakao.maps.LatLng(36.3,127.8),level:13});if(GUARD_ON)guard(el,map);all=new kakao.maps.LatLngBounds();
+ el.innerHTML='';map=new kakao.maps.Map(el,{center:new kakao.maps.LatLng(36.3,127.8),level:13});if(GUARD_ON)guard(el,map);if(matchMedia('(pointer:coarse)').matches)lpress(el,map);all=new kakao.maps.LatLngBounds();
  M.forEach(m=>{const s=st(m),pos=new kakao.maps.LatLng(m.lat,m.lng);all.extend(pos);
   const d=document.createElement('div');d.className='pxm-pin '+s[0]+((window.PXM_OWN||[]).indexOf(m.n)>=0?' own':'');d.innerHTML='<u></u><b><s></s>'+m.n+'</b>';d.onclick=()=>openPop(m,d);
   new kakao.maps.CustomOverlay({position:pos,content:d,xAnchor:0,yAnchor:0,zIndex:2}).setMap(map);PINS.push({m,d,pos,own:d.classList.contains('own')?1:0,i:PINS.length})});
@@ -160,4 +175,4 @@ async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').
 addEventListener('resize',()=>{if(map)map.relayout()});   // 창 크기가 바뀌면 지도도 다시 맞춘다
 const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){io.disconnect();init()}},{rootMargin:'200px'});io.observe(box);
 })();
-;(function(){try{var m=document.cookie.match(/(?:^|; )pxv=([a-z0-9]{10})\.(\d{1,4})\./),V=m?'/~v'+Math.min(+m[2],99)+'.'+m[1]:'',s='etc',w='';try{s=sessionStorage.getItem('pxp-src')||'etc';w=sessionStorage.getItem('pxp-srcw')||''}catch(e){}function hit(a){var u='/hit/mart/'+a+'/'+s+(w?'/'+encodeURIComponent(w):'')+V;try{if(!(navigator.sendBeacon&&navigator.sendBeacon(u)))fetch(u,{method:'POST',keepalive:true})}catch(e){}}document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('a,button');if(!t)return;var h=t.getAttribute('href')||'',x=t.textContent||'';var k=/^tel:/.test(h)?'call':/map\.kakao\.com\/link\/to/.test(h)?'route':(/place\.map\.kakao\.com/.test(h)||/실시간 영업시간/.test(x))?'live':t.hasAttribute('data-share')?'share':/내 근처 마트/.test(x)?'near':(t.closest('.pxm')&&/\/m\//.test(h))?'kmap':'';if(k)hit(k)},true)}catch(e){}})();
+;(function(){try{var m=document.cookie.match(/(?:^|; )pxv=([a-z0-9]{10})\.(\d{1,4})\./),V=m?'/~v'+Math.min(+m[2],99)+'.'+m[1]:'',s='etc',w='';try{s=sessionStorage.getItem('pxp-src')||'etc';w=sessionStorage.getItem('pxp-srcw')||''}catch(e){}function hit(a){var u='/hit/mart/'+a+'/'+s+(w?'/'+encodeURIComponent(w):'')+V;try{if(!(navigator.sendBeacon&&navigator.sendBeacon(u)))fetch(u,{method:'POST',keepalive:true})}catch(e){}}document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('a,button');if(!t)return;var h=t.getAttribute('href')||'',x=t.textContent||'';var k=/^tel:/.test(h)?'call':/map\.kakao\.com\/link\/to/.test(h)?'route':(/place\.map\.kakao\.com/.test(h)||/실시간 영업시간/.test(x))?'live':t.hasAttribute('data-share')?(t.classList.contains('shr')?'share-top':'share'):/내 근처 마트/.test(x)?'near':(t.closest('.pxm')&&/\/m\//.test(h))?'kmap':'';if(k)hit(k)},true)}catch(e){}})();
