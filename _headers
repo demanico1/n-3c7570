@@ -15,7 +15,7 @@
 
 # >>> 미리 부르기 (굽는 스크립트가 씀)
 /app/
-  Link: </data.json?v=9598a493eb>; rel=preload; as=fetch; crossorigin=anonymous; nopush
+  Link: </data.json?v=5ac688125f>; rel=preload; as=fetch; crossorigin=anonymous; nopush
   Link: </big/28438.jpg>; rel=preload; as=image; nopush
   Link: </big/35032.jpg>; rel=preload; as=image; nopush
   Link: </big/3098.jpg>; rel=preload; as=image; nopush
