@@ -928,6 +928,20 @@ html.cart-on:not(.shop) #toast{bottom:calc(116px + env(safe-area-inset-bottom))}
 html.pre #preapp[data-w]::after{content:attr(data-w)}
 html.pre #preapp .item.pt{transform:scale(.97);box-shadow:0 0 0 2px var(--good);transition:transform .12s}
 html.pre #preapp::after{content:"여는 중…";position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:rgba(17,24,39,.82);color:#fff;font-size:13px;font-weight:700;padding:7px 14px;border-radius:999px;pointer-events:none}
+
+.pkbk{display:inline-flex!important;align-items:center;gap:4px;width:auto!important;min-height:0!important;border:0!important;background:none!important;color:var(--muted);font:inherit;font-size:14px;font-weight:700;padding:0 0 6px!important;margin:0 0 2px!important;cursor:pointer;box-shadow:none!important}
+html.selmode #cartsum,html.selmode #listtabs,html.selmode #cartbar{display:none!important}
+html.selmode .item{position:relative}
+.ck{position:absolute;left:8px;top:8px;z-index:3;width:26px;height:26px;border-radius:50%;border:2px solid #CBD5E1;background:#fff;display:grid;place-items:center;font:900 15px sans-serif;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.item.sel{border-color:var(--p)!important;background:var(--good-bg,#F1FAF5)!important}.item.sel .ck{background:var(--p);border-color:var(--p)}
+#seltop{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--good-bg,#ECF7F0);font-weight:800;font-size:15px;color:#0B7A4B}
+#seltop button{border:0;background:none;font:inherit;font-weight:800;color:var(--muted);padding:4px 2px;cursor:pointer}
+#selbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,0,0,.08);padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:8px}
+#selbar .n{flex:1;min-width:0}#selbar .n b{display:block;font-size:16px;font-weight:800;color:var(--ink)}
+#selbar .n .all{border:0;background:none;padding:0;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);text-decoration:underline;cursor:pointer}
+#selbar>button{border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:11px 12px;font:inherit;font-weight:800;font-size:14.5px;color:var(--ink);cursor:pointer}
+#selbar>button.go{background:var(--p);border-color:var(--p);color:#fff}#selbar>button:disabled{opacity:.4}
+html.selmode body{padding-bottom:80px}
 </style>
 </head>
 <body>
@@ -1243,7 +1257,7 @@ const iGa = w => { const c = w.charCodeAt(w.length - 1) - 0xAC00;
 let ONLY = "";
 const HIDE_FOOT_ACT = true;
 const OLD_LISTBAR = false;
-let PICK = null, UNDO = null;   // 다른 목록으로 옮기기·복사하기 (2026-10-03)
+let PICK = null, UNDO = null, PICKMENU = "";   // 다른 목록으로 옮기기·복사하기 (2026-10-03)
 let WLIST = null;
 let SUB = "";
 const subN = k => DATA.reduce((n, x) => n + (x.sub === k ? 1 : 0), 0);
@@ -2734,7 +2748,10 @@ $("#sheet").addEventListener("click", e => {
     const it = DATA.find(x => x.p === b.dataset.p);
     return coupang(b.dataset.q, it && it.a, b.dataset.p);
   }
-  if (act === "pk-move" || act === "pk-copy"){ closeSheet(); return setTimeout(() => openPick(p, act === "pk-move" ? "move" : "copy"), 260); }
+  if (act === "pk-move" || act === "pk-copy"){ PICKMENU = $("#sheetbox").innerHTML; return openPick(p, act === "pk-move" ? "move" : "copy", true); }
+  if (act === "pk-back"){ PICK = null; if (PICKMENU){ $("#sheetbox").innerHTML = PICKMENU; $("#sheetbox").scrollTop = 0; } return; }
+  if (act === "sel-start"){ closeSheet(); return setTimeout(selStart, 260); }
+  if (act === "cart-moveall"){ VR.hit("lall");   /* l- 로 시작하면 listAct 로 먼저 빠진다 */ return openPickMulti(CART.slice(), "move", "내 찜 " + CART.length + "개를 어느 목록으로 옮길까요?", "수량도 같이 가고, 내 찜은 비워져요 · 바로 되돌릴 수 있어요"); }
   if (act === "pk-to") return pickDo(b.dataset.to);
   if (act === "pk-new"){ closeSheet(); return setTimeout(() => { const N = makeOwn(); if (N) pickDo(N.id, true); else PICK = null; }, 260); }
   if (act === "add"){ CART.push(p); saveCart(); closeSheet(); inappJit(); homeHint(); return run(); }
@@ -3594,11 +3611,12 @@ function makeOwn(){
   LISTS.push(N); saveLists(); VR.hit("lnew");
   return N;
 }
-function openPick(p, mode){
+function openPick(p, mode, back){
   const from = CUR || "", it = DATA.find(x => x.p === p);
   PICK = {p: p, mode: mode, from: from, q: qtyOf(p)};
   const opts = [["", "내 찜", CART.length]].concat(LISTS.filter(l => !l.arch).map(l => [l.id, lname(l), l.items.length]));
-  openSheet("<h3>" + (mode === "move" ? "어느 목록으로 옮길까요?" : "어느 목록에 복사할까요?") + "</h3>" +
+  openSheet((back ? '<button class="pkbk" data-act="pk-back">‹ 상품 메뉴로</button>' : "") +
+    "<h3>" + (mode === "move" ? "어느 목록으로 옮길까요?" : "어느 목록에 복사할까요?") + "</h3>" +
     (it ? '<p class="note">' + esc(dName(it)) + " · " + PICK.q + "개</p>" : "") +
     opts.map(o => o[0] === from
       ? '<button class="pk dim" disabled>' + esc(o[1]) + "<i>" + o[2] + " · 지금 보는 곳</i></button>"
@@ -3611,6 +3629,17 @@ function pickDo(to, fresh){
   if (to === "@mine") to = "";
   const T = to ? LISTS.find(l => l.id === to) : null;
   if (to && !T){ if (!fresh) closeSheet(); return; }
+  if (P.multi){                                   // B·C — 여러 개를 한 번에 (2026-10-06)
+    UNDO = JSON.stringify([CART, CQ, LISTS]);
+    const had = moveItems(P.multi, P.mode, to, P.from);
+    saveCart(); saveCQ(); saveLists();
+    VR.hit(P.mode === "move" ? "lmovem" : "lcopym");
+    if (!fresh) closeSheet();
+    selEnd(); run();
+    const w = T ? "'" + lname(T) + "' 목록" : "내 찜";
+    return setTimeout(() => undoToast(P.multi.length + "개를 " + w + (P.mode === "move" ? "으로 옮겼어요" : "에 복사했어요") +
+                                      (had ? " · " + had + "개는 이미 있어 수량만 맞췄어요" : "")), fresh ? 0 : 150);
+  }
   UNDO = JSON.stringify([CART, CQ, LISTS]);
   const had = T ? T.items.indexOf(P.p) >= 0 : inCart(P.p);
   if (T){ if (!had) T.items.push(P.p); const n = Math.max(T.q[P.p] || 1, P.q); if (n > 1) T.q[P.p] = n; }
@@ -3626,8 +3655,82 @@ function pickDo(to, fresh){
   run();
   const where = T ? "'" + lname(T) + "' 목록" : "내 찜";
   setTimeout(() => undoToast(where + (P.mode === "move" ? "으로 옮겼어요" : "에 복사했어요") +
-                             (had ? " · 이미 있어서 수량만 맞췄어요" : "")), fresh ? 0 : 280);
+                             (had ? " · 이미 있어서 수량만 맞췄어요" : "")), fresh ? 0 : 150);
 }
+let SEL = null;     // {set: Set, from: 보던 칸('' = 내 찜)}
+function moveItems(ids, mode, to, from){
+  const T = to ? LISTS.find(l => l.id === to) : null, F = from ? LISTS.find(l => l.id === from) : null;
+  let had = 0;
+  for (const p of ids){
+    const q = F ? (F.q[p] || 1) : (CQ[p] || 1);
+    const h = T ? T.items.indexOf(p) >= 0 : inCart(p); if (h) had++;
+    if (T){ if (!h) T.items.push(p); const n = Math.max(T.q[p] || 1, q); if (n > 1) T.q[p] = n; }
+    else  { if (!h) CART.push(p);    const n = Math.max(CQ[p] || 1, q);  if (n > 1) CQ[p] = n; }
+    if (mode === "move" && (to || "") !== (from || "")){
+      if (F){ F.items = F.items.filter(x => x !== p); delete F.q[p]; }
+      else  { CART = CART.filter(x => x !== p); delete CQ[p]; }
+    }
+  }
+  return had;
+}
+function openPickMulti(ids, mode, title, note){
+  const from = CUR || "";
+  PICK = {multi: ids, mode: mode, from: from};
+  const opts = [["", "내 찜", CART.length]].concat(LISTS.filter(l => !l.arch).map(l => [l.id, lname(l), l.items.length]));
+  openSheet("<h3>" + (title || ids.length + "개를 어느 목록으로 " + (mode === "move" ? "옮길까요?" : "복사할까요?")) + "</h3>" +
+    '<p class="note">' + (note || "수량도 같이 가요") + "</p>" +
+    opts.filter(o => o[0] !== from).map(o => '<button class="pk" data-act="pk-to" data-to="' + (o[0] || "@mine") + '">' +
+      esc(o[1]) + "<i>" + o[2] + "</i></button>").join("") +
+    '<button class="pk new" data-act="pk-new">+ 새 목록 만들어서 넣기</button>');
+}
+function selSrc(){ const L = curList(); return L ? L.items : CART; }
+function selStart(){
+  if ($("#view").value !== "cart" || WLIST || shopOn()) return;
+  SEL = {set: new Set(), from: CUR || ""};
+  document.documentElement.classList.add("selmode");
+  if (!$("#seltop")) $("#listtabs").insertAdjacentHTML("beforebegin",
+    '<div id="seltop"><span>옮길 상품을 골라 주세요</span><button type="button" data-s="x">취소</button></div>');
+  if (!$("#selbar")) document.body.insertAdjacentHTML("beforeend",
+    '<div id="selbar"><div class="n"><b>0개 골랐어요</b><button type="button" class="all" data-s="all">모두 고르기</button></div>' +
+    '<button type="button" data-s="copy">복사</button><button type="button" class="go" data-s="move">옮기기 ›</button></div>');
+  selPaint(); VR.hit("lsel");
+}
+function selEnd(){
+  SEL = null; document.documentElement.classList.remove("selmode");
+  ["#seltop", "#selbar"].forEach(q => { const e = $(q); if (e) e.remove(); });
+  document.querySelectorAll("#list .ck").forEach(e => e.remove());
+  document.querySelectorAll("#list .item.sel").forEach(e => e.classList.remove("sel"));
+}
+function selPaint(){
+  if (!SEL) return;
+  if ($("#view").value !== "cart" || (CUR || "") !== SEL.from) return selEnd();   // 칸을 바꾸거나 찜을 나가면 끝
+  document.querySelectorAll("#list .item[data-p]").forEach(e => {
+    if (!e.querySelector(".ck")) e.insertAdjacentHTML("afterbegin", '<span class="ck" aria-hidden="true"></span>');
+    const on = SEL.set.has(e.dataset.p);
+    e.classList.toggle("sel", on); e.querySelector(".ck").textContent = on ? "✓" : "";
+  });
+  const b = $("#selbar"); if (!b) return;
+  const n = SEL.set.size, src = selSrc();
+  b.querySelector("b").textContent = n + "개 골랐어요";
+  b.querySelector(".all").textContent = src.length && src.every(p => SEL.set.has(p)) ? "모두 풀기" : "모두 고르기";
+  b.querySelectorAll("[data-s=copy],[data-s=move]").forEach(x => x.disabled = !n);
+}
+$("#list").addEventListener("click", e => {          // 고르는 동안엔 카드를 눌러도 메뉴·하트 대신 고르기만 (먼저 받는다)
+  if (!SEL) return;
+  const it = e.target.closest(".item[data-p]"); if (!it) return;
+  e.preventDefault(); e.stopPropagation();
+  const p = it.dataset.p; if (SEL.set.has(p)) SEL.set.delete(p); else SEL.set.add(p);
+  selPaint();
+}, true);
+document.addEventListener("click", e => {
+  const b = e.target.closest("#seltop [data-s], #selbar [data-s]"); if (!b || !SEL) return;
+  const s = b.dataset.s;
+  if (s === "x") return selEnd();
+  if (s === "all"){ const src = selSrc(); const all = src.every(p => SEL.set.has(p)); SEL.set = new Set(all ? [] : src); return selPaint(); }
+  if (!SEL.set.size) return;
+  openPickMulti([...SEL.set], s === "move" ? "move" : "copy");
+});
+new MutationObserver(() => { if (SEL) selPaint(); }).observe($("#list"), {childList: true});
 function undoToast(msg){
   toast(msg);
   const t = $("#toast"); if (!t) return;
@@ -3642,6 +3745,8 @@ function undoToast(msg){
 function openListMenu(){
   const L = curList();
   if (!L) return openSheet("<h3>내 찜 · " + CART.length + "개</h3>" +
+    (CART.length ? '<button class="ssub" data-act="sel-start"><i class="ico">☑</i><span class="mt"><b>골라서 옮기기</b><s>여러 개를 한 번에 다른 목록으로</s></span></button>' +
+      '<button class="ssub" data-act="cart-moveall"><i class="ico">→</i><span class="mt"><b>내 찜 전부 다른 목록으로 옮기기</b><s>내 찜 ' + CART.length + '개를 통째로</s></span></button>' : "") +
     '<button data-act="l-share">목록 공유하기</button>' +
     '<button data-act="l-import">목록 가져오기</button>' +
     '<button data-act="l-new">+ 새 목록 만들기</button>' +
@@ -3649,6 +3754,7 @@ function openListMenu(){
   openSheet("<h3>" + esc(lname(L)) + "</h3>" +
     '<p class="note">' + (L.own ? "내가 만든 목록" : mdate(L.at) + " 받음") + " · " + L.items.length + "가지" +
       (L.arch ? " · 보관함" : "") + "</p>" +
+    (L.items.length ? '<button class="ssub" data-act="sel-start"><i class="ico">☑</i><span class="mt"><b>골라서 옮기기</b><s>여러 개를 한 번에 다른 목록으로</s></span></button>' : "") +
     '<button data-act="l-share">목록 공유하기</button>' +
     '<button data-act="l-rename">이름 바꾸기</button>' +
     '<button data-act="l-move">내 찜으로 옮겨 담기</button>' +
