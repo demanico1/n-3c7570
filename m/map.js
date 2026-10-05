@@ -89,11 +89,29 @@ function guard(el,map){el.classList.add('guard');const tip=document.createElemen
  ['pointerdown','pointermove','pointerup','pointercancel'].forEach(k=>el.addEventListener(k,Q,o));
  el.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey)return;e.stopPropagation();say((mac?'⌘':'Ctrl')+' + 휠로 지도를 키워요')},o)}
 let started=null;function init(){return started||(started=init0())}
+const PINS=[];
+// ★ 이름표 (2026-10-05 사장님 '좀 멀어도 마트 이름이 보이게') — 화면 안의 마트마다 이름표를 켜 보고, 실제 크기를 재서
+//   먼저 자리 잡은 이름표와 겹치는 것만 점으로 둔다. 확대 9 이상(멀리)은 작은 이름표. 지도를 움직일 때마다 다시 잰다.
+//   차례: 지역 페이지의 그 지역 마트(own) → 누른 마트(sel) → 나머지
+function labelize(){if(!map||el.classList.contains('nat'))return;const P=map.getProjection(),W=el.clientWidth,H=el.clientHeight;
+ el.classList.toggle('sm',map.getLevel()>8);
+ const L=[];PINS.forEach(p=>{const q=P.containerPointFromCoords(p.pos);p.d.classList.remove('lab');
+  if(q.x>-60&&q.x<W+60&&q.y>-30&&q.y<H+30)L.push({p,x:q.x,y:q.y})});
+ L.forEach(o=>{o.p.d.classList.remove('off');o.p.d.style.removeProperty('--dy');o.p.d.classList.add('lab')});
+ L.forEach(o=>{const b=o.p.d.querySelector('b');o.w=b.offsetWidth+4;o.h=b.offsetHeight+4});
+ L.sort((a,b)=>(b.p.own-a.p.own)||(b.p.d.classList.contains('sel')-a.p.d.classList.contains('sel'))||(a.p.i-b.p.i));
+ // 제자리 → 점 위 → 점 아래 차례로 놓아 본다. 셋 다 겹치면 점으로 (비켜 놓을 땐 점도 같이 보여 어느 마트인지 안다)
+ const put=[],hit=r=>put.some(q=>!(r.r<q.l||r.l>q.r||r.b<q.t||r.t>q.b));
+ L.forEach(o=>{for(const dy of [0,-(o.h+6),o.h+6]){const r={l:o.x-o.w/2,r:o.x+o.w/2,t:o.y+dy-o.h/2,b:o.y+dy+o.h/2};
+   if(!hit(r)){put.push(r);if(dy){o.p.d.classList.add('off');o.p.d.style.setProperty('--dy',dy+'px')}return}}
+  o.p.d.classList.remove('lab')});
+ // 이름표 달린 마트는 점보다 위층 — 옆 마트 점이 글자를 가리지 않게
+ PINS.forEach(p=>{const w=p.d.parentElement;if(w)w.style.zIndex=p.d.classList.contains('lab')||p.d.classList.contains('sel')?4:2})}
 async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').textContent='지도를 불러오지 못했어요';return}
  el.innerHTML='';map=new kakao.maps.Map(el,{center:new kakao.maps.LatLng(36.3,127.8),level:13});if(GUARD_ON)guard(el,map);all=new kakao.maps.LatLngBounds();
  M.forEach(m=>{const s=st(m),pos=new kakao.maps.LatLng(m.lat,m.lng);all.extend(pos);
-  const d=document.createElement('div');d.className='pxm-pin '+s[0];d.innerHTML='<u></u><b><s></s>'+m.n+'</b>';d.onclick=()=>openPop(m,d);
-  new kakao.maps.CustomOverlay({position:pos,content:d,yAnchor:.5,zIndex:2}).setMap(map)});
+  const d=document.createElement('div');d.className='pxm-pin '+s[0]+((window.PXM_OWN||[]).indexOf(m.n)>=0?' own':'');d.innerHTML='<u></u><b><s></s>'+m.n+'</b>';d.onclick=()=>openPop(m,d);
+  new kakao.maps.CustomOverlay({position:pos,content:d,yAnchor:.5,zIndex:2}).setMap(map);PINS.push({m,d,pos,own:d.classList.contains('own')?1:0,i:PINS.length})});
  // 시도 딱지 — 마트들의 가운데에 두고, 화면에서 겹치는 딱지끼리는 저절로 비켜 가게 한다(폰 크기마다 달라서 손으로는 못 맞춘다)
  const RB=[];Object.keys(C).forEach(r=>{const L=M.filter(m=>m.r==r);
   const base=new kakao.maps.LatLng(L.reduce((s,m)=>s+m.lat,0)/L.length,L.reduce((s,m)=>s+m.lng,0)/L.length);
@@ -107,7 +125,7 @@ async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').
    it.forEach(a=>{a.px=Math.min(Math.max(a.px,a.w/2),W-a.w/2);a.py=Math.min(Math.max(a.py,a.h/2),H-a.h/2)});   // 화면 밖으로 안 나가게
    if(!mv)break}
   it.forEach(a=>a.x.ov.setPosition(P.coordsFromContainerPoint(new kakao.maps.Point(a.px,a.py))))}
- kakao.maps.event.addListener(map,'idle',declutter);
+ kakao.maps.event.addListener(map,'idle',declutter);kakao.maps.event.addListener(map,'idle',labelize);
  // 넓게 볼 땐 점만, 확대하면 이름표 — 누른 마트는 늘 이름표
  kakao.maps.event.addListener(map,'zoom_changed',()=>{const v=map.getLevel();el.classList.toggle('nat',!cur&&v>=11);el.classList.toggle('big',v<=8);box.classList.toggle('zoom',!!cur||v<11)});
  el.classList.add('nat');map.setBounds(all,30,20,30,20);
@@ -115,7 +133,7 @@ async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').
  //   '‹ 전국' 단추를 누르면 평소처럼 전국으로 돌아간다
  const F=(window.PXM_FOCUS||[]).map(n=>BY[n]).filter(Boolean);
  if(F.length){cur='focus';el.classList.remove('nat');box.classList.add('zoom');const fb=new kakao.maps.LatLngBounds();
-  F.forEach(m=>fb.extend(new kakao.maps.LatLng(m.lat,m.lng)));if(F.length==1){map.setCenter(fb.getSouthWest());map.setLevel(7)}else map.setBounds(fb,40,30,40,30)}
+  F.forEach(m=>fb.extend(new kakao.maps.LatLng(m.lat,m.lng)));if(F.length==1){map.setCenter(fb.getSouthWest());map.setLevel(8)}else map.setBounds(fb,60,50,40,50)}
  // (지역 칩은 2026-10-02 에 페이지 맨 아래로 옮겨 지도와 묶지 않는다)
 }
 addEventListener('resize',()=>{if(map)map.relayout()});   // 창 크기가 바뀌면 지도도 다시 맞춘다
