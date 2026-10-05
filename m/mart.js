@@ -3,18 +3,40 @@
 const HOLI={"2026-01-01": "신정", "2026-02-16": "설 연휴", "2026-02-17": "설날", "2026-02-18": "설 연휴", "2026-03-01": "삼일절", "2026-03-02": "삼일절 대체공휴일", "2026-05-05": "어린이날", "2026-05-24": "부처님오신날", "2026-05-25": "부처님오신날 대체공휴일", "2026-06-03": "지방선거일", "2026-06-06": "현충일", "2026-08-15": "광복절", "2026-08-17": "광복절 대체공휴일", "2026-09-24": "추석 연휴", "2026-09-25": "추석", "2026-09-26": "추석 연휴", "2026-10-03": "개천절", "2026-10-05": "개천절 대체공휴일", "2026-10-09": "한글날", "2026-12-25": "성탄절", "2027-01-01": "신정", "2027-02-06": "설 연휴", "2027-02-07": "설날", "2027-02-08": "설 연휴", "2027-02-09": "설 대체공휴일", "2027-03-01": "삼일절", "2027-05-05": "어린이날", "2027-05-13": "부처님오신날", "2027-06-06": "현충일", "2027-08-15": "광복절", "2027-08-16": "광복절 대체공휴일", "2027-09-14": "추석 연휴", "2027-09-15": "추석", "2027-09-16": "추석 연휴", "2027-10-03": "개천절", "2027-10-04": "개천절 대체공휴일", "2027-10-09": "한글날", "2027-10-11": "한글날 대체공휴일", "2027-12-25": "성탄절", "2027-12-27": "성탄절 대체공휴일"},HOLX={};function HOL(n){const d=new Date(Date.now()+9*36e5),k=d.toISOString().slice(0,10);return HOLX[n]?'':(HOLI[k]||'')}
 (function(){const el=document.getElementById('mst');if(!el)return;const H=JSON.parse(el.dataset.h);
  const now=new Date(Date.now()+(9*60+new Date().getTimezoneOffset())*60000);const wd=now.getDay();
- const key=wd===0?'일':wd===6?'토':'평일';const ho=HOL(((document.querySelector('h1')||{}).textContent||'').trim());if(ho){el.className='st shut';el.innerHTML='<i></i>오늘 쉬어요 <em>· '+ho+'</em>';return;}const row=document.querySelector('.hrs tr[data-k="'+key+'"]');if(row)row.classList.add('today');
+ const key=wd===0?'일':wd===6?'토':'평일';const nm=((document.querySelector('h1')||{}).textContent||'').trim();
+ // 다음에 여는 때 — 일요일·쉬는 요일·공휴일을 건너뛴다 (2026-10-06 사장님 '내일(화) 10:30에 열어요')
+ const nxt=()=>{const W='일월화수목금토';for(let i=1;i<=8;i++){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i),w=d.getDay(),
+   k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');if(HOLI[k]&&!HOLX[nm])continue;
+   const q=(H[w===0?'일':w===6?'토':'평일']||'').match(/^(\d{1,2}:\d{2})~/);if(q)return (i===1?'내일('+W[w]+')':i===2?'모레('+W[w]+')':W[w]+'요일')+' '+q[1]+'에 열어요';}return '';};
+ const ho=HOL(nm);if(ho){el.className='st shut';el.innerHTML='<i></i>오늘 쉬어요 <em>· '+(nxt()||ho)+'</em>';return;}const row=document.querySelector('.hrs tr[data-k="'+key+'"]');if(row)row.classList.add('today');
  const v=H[key]||'';const m=v.match(/^(\d{1,2}):(\d{2})~(\d{1,2}):(\d{2})$/);const t=now.getHours()*60+now.getMinutes();
  const set=(c,a,b)=>{el.className='st '+c;el.innerHTML='<i></i>'+a+(b?' <em>· '+b+'</em>':'');};
- if(!m){if(key!=='평일'&&/\d~\d/.test(H['평일']||'')){set('shut','오늘 쉬어요',(key==='토'?'토요일':'일요일')+'은 쉬는 날이에요');return;}   // 평일 시간은 있고 그 요일만 비었으면 쉬는 날 (2026-10-04 — 목록 지도와 같은 규칙)
+ if(!m){if(key!=='평일'&&/\d~\d/.test(H['평일']||'')){set('shut','오늘 쉬어요',nxt()||((key==='토'?'토요일':'일요일')+'은 쉬는 날이에요'));return;}   // 평일 시간은 있고 그 요일만 비었으면 쉬는 날 (2026-10-04 — 목록 지도와 같은 규칙)
  set('',key==='평일'?'영업시간 정보 없음':'오늘('+(key==='토'?'토요일':'일요일')+') 영업시간 안내가 없어요','전화로 확인해 주세요');return;}
  const o=+m[1]*60+ +m[2],c=+m[3]*60+ +m[4];
  if(t<o)set(o-t<=60?'soon':'shut','영업 전',m[1]+':'+m[2]+'에 열어요');
  else if(t<c)set(c-t<=60?'soon':'open','지금 영업 중',m[3]+':'+m[4]+'에 닫아요');
- else set('shut','오늘 영업 끝',m[3]+':'+m[4]+'에 닫았어요');})();
+ else set('shut','오늘 영업 끝',nxt()||(m[3]+':'+m[4]+'에 닫았어요'));})();
 // 작은 지도 — 보일 때만 불러온다. (꺼 둠) 한 손가락은 페이지 스크롤, 지도는 두 손가락
 // ★ 2026-10-04 사장님 — 목록 지도처럼 끈다(두 손가락 확대가 화면 전체 확대로 느껴졌다). 다시 켜려면 GUARD_ON 을 true 로
 const GUARD_ON=false;
+// ★ 지도 길게 누르기 (2026-10-06 사장님) — 손가락 화면에서만. 평소엔 지도가 손가락을 안 받아 페이지가 그대로 내려가고,
+//   0.45초 길게 누르면 초록 테두리 + 진동 → 한 손가락으로 지도를 옮기고 키운다. 손을 떼고 3초 지나거나 지도 밖을 누르면 다시 잠근다
+//   안내는 잠긴 지도에 손가락이 닿았을 때만 오른쪽 아래에 1.5초 (풀린 동안엔 초록 테두리만)
+function lpress(el,m){el.classList.add('lock');m.setDraggable(false);m.setZoomable(false);
+ const tip=document.createElement('div');tip.className='lp';el.appendChild(tip);
+ tip.textContent='길게 누르면 지도를 움직일 수 있어요';
+ let on=false,pt=0,rt=0,ht=0,sx=0,sy=0;
+ const lock=()=>{on=false;clearTimeout(rt);el.classList.remove('live');el.classList.add('lock');m.setDraggable(false);m.setZoomable(false)};
+ const open=()=>{on=true;clearTimeout(ht);el.classList.remove('touching');el.classList.add('live');el.classList.remove('lock');m.setDraggable(true);m.setZoomable(true);try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}};
+ const C={capture:true,passive:true};
+ el.addEventListener('touchstart',e=>{clearTimeout(rt);if(on)return;e.stopPropagation();clearTimeout(ht);el.classList.add('touching');const t=e.touches[0];sx=t.clientX;sy=t.clientY;clearTimeout(pt);if(e.touches.length===1)pt=setTimeout(open,450)},C);
+ el.addEventListener('touchmove',e=>{if(on){if(e.cancelable)e.preventDefault();return}e.stopPropagation();const t=e.touches[0];if(Math.abs(t.clientX-sx)+Math.abs(t.clientY-sy)>10)clearTimeout(pt)},{capture:true,passive:false});
+ const end=e=>{clearTimeout(pt);if(on){clearTimeout(rt);rt=setTimeout(lock,3000)}else{e.stopPropagation();clearTimeout(ht);ht=setTimeout(()=>el.classList.remove('touching'),1500)}};
+ el.addEventListener('touchend',end,C);el.addEventListener('touchcancel',end,C);
+ ['pointerdown','pointermove','pointerup','pointercancel'].forEach(k=>el.addEventListener(k,e=>{if(e.pointerType==='touch'&&!on)e.stopPropagation()},C));
+ el.addEventListener('contextmenu',e=>e.preventDefault());
+ document.addEventListener('touchstart',e=>{if(on&&!el.contains(e.target))lock()},{passive:true})}
 function guard(el){el.classList.add('guard');const tip=document.createElement('div');tip.className='pxm-tip';el.appendChild(tip);let t=0,two=false;const P=new Set();
  const say=s=>{tip.innerHTML='<span>'+s+'</span>';tip.classList.add('on');clearTimeout(t);t=setTimeout(()=>tip.classList.remove('on'),1300)};
  const mac=/Mac|iPhone|iPad/.test(navigator.platform||'');const o={capture:true,passive:true};
@@ -28,7 +50,7 @@ function guard(el){el.classList.add('guard');const tip=document.createElement('d
 (function(){const e=document.getElementById('mmap');if(!e)return;
  const io=new IntersectionObserver(es=>{if(!es.some(x=>x.isIntersecting))return;io.disconnect();const s=document.createElement('script');
   s.src='https://dapi.kakao.com/v2/maps/sdk.js?appkey=f6f4f84fa14889b2737f2812b1b27a98&autoload=false';s.onerror=()=>{e.querySelector('.ph').textContent='지도를 불러오지 못했어요'};
-  s.onload=()=>kakao.maps.load(()=>{e.innerHTML='';const p=new kakao.maps.LatLng(+e.dataset.la,+e.dataset.lo),m=new kakao.maps.Map(e,{center:p,level:4});if(GUARD_ON)guard(e);
+  s.onload=()=>kakao.maps.load(()=>{e.innerHTML='';const p=new kakao.maps.LatLng(+e.dataset.la,+e.dataset.lo),m=new kakao.maps.Map(e,{center:p,level:4});if(GUARD_ON)guard(e);if(matchMedia('(pointer:coarse)').matches)lpress(e,m);
    const d=document.createElement('div');d.className='mpin';d.innerHTML='<b>'+e.dataset.n+'</b><i></i>';
    // ★ 2026-10-05 — 위치를 두 번 옮기고 있었다(카카오 기준점 아래 가운데 + 모양 규칙 translate(-50%,-100%)). 이름표가 늘 약 60px
    //   위·왼쪽에 그려져, 축소하면 수십 km 떨어져(북한 쪽까지) 보였다. 기준점을 왼쪽 위(0,0)로 두고 모양 규칙 하나로만 맞춘다
@@ -44,7 +66,6 @@ function guard(el){el.classList.add('guard');const tip=document.createElement('d
    const dc=()=>{const far=m.getLevel()>8;e.classList.toggle('far',far);if(far)return;
     const P=m.getProjection(),c=P.containerPointFromCoords(p),pw=d.querySelector('b').offsetWidth;
     const put=[{l:c.x-pw/2-4,r:c.x+pw/2+4,t:c.y-52,b:c.y+2}],W=e.clientWidth,H=e.clientHeight;
-    const bt=e.parentElement.querySelector('.mapp');if(bt){const br=bt.getBoundingClientRect(),mr=e.getBoundingClientRect();put.push({l:br.left-mr.left-4,r:br.right-mr.left+4,t:br.top-mr.top-4,b:br.bottom-mr.top+4})}   // 지도 위 단추 자리
     NR.forEach(o=>{o.el.classList.remove('nl');const q=P.containerPointFromCoords(o.pos),w=o.el.querySelector('b').offsetWidth;
      if(q.x<-40||q.y<-20||q.x>W+40||q.y>H+20)return;
      const R={l:q.x-10,r:q.x+24+w,t:q.y-14,b:q.y+14};
@@ -66,4 +87,4 @@ function guard(el){el.classList.add('guard');const tip=document.createElement('d
   copy(u)}));
  document.addEventListener('click',e=>{if(e.target.id==='cpman'||e.target.closest('#cpman button'))document.getElementById('cpman').hidden=true;});})();
 })();
-;(function(){try{var m=document.cookie.match(/(?:^|; )pxv=([a-z0-9]{10})\.(\d{1,4})\./),V=m?'/~v'+Math.min(+m[2],99)+'.'+m[1]:'',s='etc',w='';try{s=sessionStorage.getItem('pxp-src')||'etc';w=sessionStorage.getItem('pxp-srcw')||''}catch(e){}function hit(a){var u='/hit/mart/'+a+'/'+s+(w?'/'+encodeURIComponent(w):'')+V;try{if(!(navigator.sendBeacon&&navigator.sendBeacon(u)))fetch(u,{method:'POST',keepalive:true})}catch(e){}}document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('a,button');if(!t)return;var h=t.getAttribute('href')||'',x=t.textContent||'';var k=/^tel:/.test(h)?'call':/map\.kakao\.com\/link\/to/.test(h)?'route':(/place\.map\.kakao\.com/.test(h)||/실시간 영업시간/.test(x))?'live':t.hasAttribute('data-share')?'share':/내 근처 마트/.test(x)?'near':(t.closest('.pxm')&&/\/m\//.test(h))?'kmap':'';if(k)hit(k)},true)}catch(e){}})();
+;(function(){try{var m=document.cookie.match(/(?:^|; )pxv=([a-z0-9]{10})\.(\d{1,4})\./),V=m?'/~v'+Math.min(+m[2],99)+'.'+m[1]:'',s='etc',w='';try{s=sessionStorage.getItem('pxp-src')||'etc';w=sessionStorage.getItem('pxp-srcw')||''}catch(e){}function hit(a){var u='/hit/mart/'+a+'/'+s+(w?'/'+encodeURIComponent(w):'')+V;try{if(!(navigator.sendBeacon&&navigator.sendBeacon(u)))fetch(u,{method:'POST',keepalive:true})}catch(e){}}document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('a,button');if(!t)return;var h=t.getAttribute('href')||'',x=t.textContent||'';var k=/^tel:/.test(h)?'call':/map\.kakao\.com\/link\/to/.test(h)?'route':(/place\.map\.kakao\.com/.test(h)||/실시간 영업시간/.test(x))?'live':t.hasAttribute('data-share')?(t.classList.contains('shr')?'share-top':'share'):/내 근처 마트/.test(x)?'near':(t.closest('.pxm')&&/\/m\//.test(h))?'kmap':'';if(k)hit(k)},true)}catch(e){}})();

@@ -1,21 +1,39 @@
 /* 영외마트 한 곳 (시안 2, 2026-10-02) — .mpg 안에만 걸린다 */
-.mpg{margin-top:4px}
-.mpg .mh{border-radius:20px;padding:22px 20px 20px;background:linear-gradient(135deg,#0F8A44 0%,#11974B 55%,#2BB06A 100%);color:#fff;position:relative;overflow:hidden}
+.mpg{margin-top:14px}
+/* ★ 2026-10-06 사장님 — 머리 카드: 첫 줄 지역+국군복지단, 둘째 줄 마트 이름 · 영업시간 한 줄. h1 은 글자 그대로 두고(display:contents) 자리만 옮긴다 */
+.mpg .mh{border-radius:20px;padding:20px 18px 20px;background:linear-gradient(135deg,#0F8A44 0%,#11974B 55%,#2BB06A 100%);color:#fff;position:relative;overflow:hidden;display:flex;flex-wrap:wrap;align-items:center;column-gap:8px}
+.mpg .mh::before{content:"";flex-basis:100%;height:0;order:3}
 .mpg .mh::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.08)}
-.mpg .mh .rg{display:inline-block;font-size:12.5px;font-weight:700;background:rgba(255,255,255,.18);border-radius:999px;padding:4px 10px}
-.mpg .mh h1{font-size:26px;font-weight:800;line-height:1.3;letter-spacing:-.5px;margin:10px 0 0;color:#fff;border:0;padding:0}
-.mpg .mh h1 .h1s{display:block;font-size:16px;font-weight:700;opacity:.9;margin-top:4px;letter-spacing:-.2px}
-.mpg .mh h1 small{display:block;font-size:14px;font-weight:600;opacity:.8;letter-spacing:0;margin-bottom:2px;color:#fff}
-.mpg .mh .ad{font-size:14px;line-height:1.5;opacity:.92;margin-top:8px}
-.mpg .st{display:inline-flex;align-items:center;gap:7px;margin-top:14px;background:#fff;color:#111;border-radius:999px;padding:7px 14px 7px 11px;font-size:14px;font-weight:700}
+.mpg .mh .rg{order:1;flex:none;display:inline-block;font-size:12.5px;font-weight:700;background:rgba(255,255,255,.18);border-radius:999px;padding:4px 10px}
+.mpg .mh h1{display:contents;font-size:24px;font-weight:800;line-height:1.3;letter-spacing:-.5px;color:#fff}
+.mpg .mh h1 small{order:2;display:block;font-size:13px;font-weight:400;opacity:.92;letter-spacing:0;color:#fff}
+.mpg .mh h1 .nm{order:4;align-self:baseline;margin-top:12px}
+.mpg .mh h1 .h1s{order:5;align-self:baseline;margin-top:12px;font-size:14px;font-weight:700;opacity:.9;letter-spacing:-.2px}
+.mpg .mh .ad{order:6;flex-basis:100%;font-size:13px;line-height:1.5;opacity:.92;margin:6px 0 0}
+.mpg .mh .hrsl{order:8;flex-basis:100%;display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.mpg .mh .hrsl span{background:rgba(255,255,255,.16);border-radius:8px;padding:5px 7px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.mpg .mh .hrsl b{font-weight:800;margin-left:3px}.mpg .mh .hrsl .off b{opacity:.75;font-weight:600}
+@media (max-width:379px){.mpg .mh .hrsl{gap:4px}.mpg .mh .hrsl span{font-size:11.5px;padding:5px 5px}.mpg .mh .hrsl b{margin-left:2px}}   /* 360 폰에서 세 칸이 한 줄에 */
+.mpg .mh .shr{position:absolute;right:14px;top:14px;z-index:2;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;display:grid;place-items:center;cursor:pointer;padding:0}
+.mpg .mh .shr svg{width:18px;height:18px}
+.mpg .st{order:7;display:inline-flex;align-items:center;gap:7px;margin-top:16px;background:#fff;color:#111;border-radius:999px;padding:6px 12px 6px 10px;font-size:13.5px;font-weight:700;white-space:nowrap;max-width:100%}
 .mpg .st i{width:9px;height:9px;border-radius:50%;background:#9CA3AF;flex:none}
 .mpg .st.open i{background:#12B76A;box-shadow:0 0 0 4px rgba(18,183,106,.18)}.mpg .st.soon i{background:#F79009}.mpg .st.shut i{background:#F04438}
-.mpg .st em{font-style:normal;font-weight:500;color:#6B7280}
-.mpg .acts2{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
-.mpg .acts2 a,.mpg .acts2 button{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;word-break:keep-all;line-height:1.25;min-height:84px;gap:7px;background:#fff;border:1px solid #E5E7EB;border-radius:14px;padding:12px 4px;font-size:13px;font-weight:700;color:#111827;text-decoration:none;cursor:pointer;font-family:inherit}
-.mpg .acts2 a.g{background:#E8F5EE;border-color:#BFE3CE;color:#0B7A4B}.mpg .acts2 svg{width:22px;height:22px}
+.mpg .st em{font-style:normal;font-weight:500;color:#6B7280;overflow:hidden;text-overflow:ellipsis}
+/* 첫 화면 검정 띠 — 앱으로 (data-hit=mart-top). 빛이 한 바퀴 4초로 계속 흐른다 (2026-10-06 사장님 ⓐ-1) */
+.mpg .bnr{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:13px 14px 13px 16px;border-radius:14px;background:#111827;color:#fff;text-decoration:none}
+.mpg .bnr>*{position:relative;z-index:1}
+.mpg .bnr small{display:block;font-size:12.5px;font-weight:600;color:#86EFAC}
+.mpg .bnr b{display:block;font-size:16px;font-weight:800;margin-top:2px;letter-spacing:-.3px}.mpg .bnr b em{font-style:normal;color:#4ADE80}
+.mpg .bnr i{flex:none;font-style:normal;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:18px;font-weight:800;background:#16A34A;color:#fff}
+@keyframes bnrfl{0%{left:-70%}100%{left:130%}}
+.mpg .bnr::after{content:"";position:absolute;top:0;bottom:0;left:-70%;width:60%;transform:skewX(-20deg);pointer-events:none;background:linear-gradient(100deg,transparent 0%,rgba(255,255,255,.05) 30%,rgba(255,255,255,.13) 50%,rgba(255,255,255,.05) 70%,transparent 100%);animation:bnrfl 4s linear infinite}
+@media (prefers-reduced-motion:reduce){.mpg .bnr::after{animation:none;display:none}}
+.mpg .acts2{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:10px}
+.mpg .acts2 a,.mpg .acts2 button{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;white-space:nowrap;line-height:1.25;min-height:58px;gap:4px;background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:8px 2px;font-size:12.5px;font-weight:700;color:#111827;text-decoration:none;cursor:pointer;font-family:inherit}
+.mpg .acts2 svg{width:19px;height:19px}
 .mpg .acts2 a[aria-disabled]{color:#9CA3AF}
-.mpg .mmap{margin-top:12px;height:210px;border-radius:16px;overflow:hidden;background:#EEF1F4;position:relative}
+.mpg .mmap{margin-top:10px;height:210px;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;border-radius:16px;overflow:hidden;background:#EEF1F4;position:relative}
 .mpg .mmap .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-size:13px}
 .mpin{transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center}
 .mpin b{background:#0B5E3A;color:#fff;font-size:14px;font-weight:800;padding:6px 11px;border-radius:10px;border:3px solid #fff;box-shadow:0 0 0 5px rgba(17,151,75,.3),0 4px 12px rgba(0,0,0,.25);white-space:nowrap}
@@ -25,7 +43,11 @@
 .mnear b{position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;color:#0B5E3A;background:#fff;border-radius:8px;padding:2px 7px;box-shadow:0 1px 4px rgba(0,0,0,.2);white-space:nowrap}
 .mpg .mmap.far .mnear b,.mpg .mmap .mnear.nl b{display:none}
 .mpg .mmw{position:relative}
-@keyframes pxflow{0%{background-position:0% 50%}100%{background-position:200% 50%}}.mpg .mapp{position:absolute;right:0;bottom:0;z-index:30;display:block;text-align:left;text-decoration:none;white-space:nowrap;color:#fff;font-size:11px;font-weight:800;line-height:1.25;padding:6px 10px 6px 11px;border-radius:12px 0 0 0;background:linear-gradient(110deg,#0B7A4B 0%,#22C55E 25%,#0B7A4B 50%,#22C55E 75%,#0B7A4B 100%);background-size:200% 100%;animation:pxflow 3.2s linear infinite}.mpg .mapp b{display:block;font-size:12.5px}@media (prefers-reduced-motion:reduce){.mpg .mapp{animation:none}}
+/* 지도 길게 누르기 (2026-10-06 사장님) — 평소엔 잠가서 페이지가 내려가고, 0.45초 길게 누르면 지도를 움직인다 */
+.mpg .mmap.lock,.mpg .mmap.lock *{touch-action:pan-y!important}
+.mpg .mmap.live{box-shadow:inset 0 0 0 3px #11974B}
+.mpg .mmap .lp{position:absolute;right:8px;bottom:8px;z-index:40;background:rgba(17,24,39,.82);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:6px 11px;pointer-events:none;opacity:0;transition:opacity .2s}
+.mpg .mmap.touching:not(.live) .lp{opacity:1}   /* 잠긴 지도에 손가락이 닿았을 때만 (2026-10-06 사장님 — 풀린 동안엔 안 띄운다) */
 .mpg .mmap .pxm-tip{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(17,24,39,.35);color:#fff;font-size:16px;font-weight:700;opacity:0;transition:opacity .25s;pointer-events:none;text-align:center;padding:0 20px}
 .mpg .mmap .pxm-tip.on{opacity:1}.mpg .mmap .pxm-tip span{background:rgba(17,24,39,.88);border-radius:999px;padding:11px 18px}
 .mpg .mmap.guard,.mpg .mmap.guard *{touch-action:pan-y!important}
@@ -59,6 +81,7 @@
 .mpg .near2 a{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 2px;border-bottom:1px solid #F2F4F7;text-decoration:none;color:#111827}
 .mpg .near2 a b{font-size:15.5px}.mpg .near2 a small{display:block;font-size:12.5px;color:#9CA3AF;margin-top:3px}
 .mpg .near2 a em{flex:none;font-style:normal;font-size:13px;font-weight:700;color:#0B7A4B;white-space:nowrap}
+.mpg .crumb{margin:18px 2px 0;font-size:12.5px}
 .mpg .allm{display:block;margin-top:16px;text-align:center;border-radius:12px;background:#F2F4F7;padding:14px;font-size:14px;font-weight:700;color:#374151;text-decoration:none}
 .toastc{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#111;color:#fff;font-size:14px;border-radius:999px;padding:10px 16px;opacity:0;transition:opacity .25s;z-index:90;pointer-events:none}
 .toastc.on{opacity:1}
@@ -66,5 +89,6 @@
 #cpman .bx{width:100%;max-width:520px;background:#fff;border-radius:20px 20px 0 0;padding:22px 20px 28px}
 #cpman b{font-size:16px}#cpman p{margin-top:14px;background:#F2F4F7;border-radius:12px;padding:14px;font-size:16px;line-height:1.5;-webkit-user-select:all;user-select:all;word-break:break-all}
 #cpman button{margin-top:14px;width:100%;height:48px;border:0;border-radius:12px;background:#11974B;color:#fff;font:inherit;font-size:15px;font-weight:700}
-@media (min-width:640px){.mpg .mh h1{font-size:32px}.mpg .mh .ad,.mpg .st{font-size:16px}.mpg .acts2 a,.mpg .acts2 button{font-size:15px}
+@media (min-width:640px){.mpg .mh h1{font-size:30px}.mpg .mh h1 small{font-size:15px}.mpg .mh h1 .h1s{font-size:16px}.mpg .mh .ad,.mpg .st{font-size:16px}.mpg .mh .hrsl span{font-size:14px}
+ .mpg .bnr small{font-size:14px}.mpg .bnr b{font-size:18px}.mpg .acts2 a,.mpg .acts2 button{font-size:15px;min-height:70px}
  .mpg .mmap{height:300px}.mpg .hrs td{font-size:16.5px}.mpg .near2 a b{font-size:17px}.mpg .near2 a small{font-size:14px}.mpg .cx h2{font-size:26px}.mpg .cx .big{font-size:36px}.mpg .it .n b{font-size:16px}.mpg .cx p.d{font-size:15.5px}}
