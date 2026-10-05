@@ -95,16 +95,33 @@ const PINS=[];
 //   차례: 지역 페이지의 그 지역 마트(own) → 누른 마트(sel) → 나머지
 function labelize(){if(!map||el.classList.contains('nat'))return;const P=map.getProjection(),W=el.clientWidth,H=el.clientHeight;
  el.classList.toggle('sm',map.getLevel()>8);
+ PINS.forEach(p=>{p.d.classList.remove('hid');const e=p.d.querySelector('b em');if(e)e.remove()});   // 지난번에 숨긴 것도 다시 재게(숨긴 채면 폭이 0)
  const L=[];PINS.forEach(p=>{const q=P.containerPointFromCoords(p.pos);p.d.classList.remove('lab');
   if(q.x>-60&&q.x<W+60&&q.y>-30&&q.y<H+30)L.push({p,x:q.x,y:q.y})});
  L.forEach(o=>{o.p.d.classList.remove('off');o.p.d.style.removeProperty('--dy');o.p.d.classList.add('lab')});
- L.forEach(o=>{const b=o.p.d.querySelector('b');o.w=b.offsetWidth+4;o.h=b.offsetHeight+4});
+ const EM=el.classList.contains('sm')?36:46;   // '+N' 숫자 자리를 미리 잡아 둔다 — 붙인 뒤 옆 이름표와 겹치지 않게
+ L.forEach(o=>{const b=o.p.d.querySelector('b');o.w=b.offsetWidth+4+EM;o.h=b.offsetHeight+4});
  L.sort((a,b)=>(b.p.own-a.p.own)||(b.p.d.classList.contains('sel')-a.p.d.classList.contains('sel'))||(a.p.i-b.p.i));
  // 제자리 → 점 위 → 점 아래 차례로 놓아 본다. 셋 다 겹치면 점으로 (비켜 놓을 땐 점도 같이 보여 어느 마트인지 안다)
  const put=[],hit=r=>put.some(q=>!(r.r<q.l||r.l>q.r||r.b<q.t||r.t>q.b));
  L.forEach(o=>{for(const dy of [0,-(o.h+6),o.h+6]){const r={l:o.x-o.w/2,r:o.x+o.w/2,t:o.y+dy-o.h/2,b:o.y+dy+o.h/2};
    if(!hit(r)){put.push(r);if(dy){o.p.d.classList.add('off');o.p.d.style.setProperty('--dy',dy+'px')}return}}
-  o.p.d.classList.remove('lab')});
+  o.p.d.classList.remove('lab');o.hid=1});
+ // ★ 2026-10-05 사장님 '점은 왜 남아? 깔끔하게' — 이름표를 못 단 마트는 점으로 두지 않고 숨기고,
+ //   가장 가까운 이름표 끝에 '+N' 으로 센다. +N 을 누르면 그 마트들이 다 보이게 확대한다
+ // 숫자를 붙인 뒤 실제 그려진 자리로 다시 재서, 그래도 겹치면 뒤 차례 이름표를 숫자로 접는다(비켜 놓은 이름표는 계산과 몇 px 어긋난다)
+ const ov=(a,b)=>a.left<b.right-1&&b.left<a.right-1&&a.top<b.bottom-1&&b.top<a.bottom-1;
+ for(let k=0;k<4;k++){const shown=L.filter(o=>!o.hid);
+  shown.forEach(s=>{s.grp=null;const e=s.p.d.querySelector('b em');if(e)e.remove()});
+  if(shown.length)L.filter(o=>o.hid).forEach(o=>{let best=shown[0],bd=1e12;
+   shown.forEach(s=>{const dd=(s.x-o.x)*(s.x-o.x)+(s.y-o.y)*(s.y-o.y);if(dd<bd){bd=dd;best=s}});
+   o.p.d.classList.remove('lab','off');o.p.d.classList.add('hid');(best.grp=best.grp||[best.p]).push(o.p)});
+  shown.forEach(s=>{if(!s.grp)return;const e=document.createElement('em');e.textContent='+'+(s.grp.length-1);
+   e.onclick=ev=>{ev.stopPropagation();const B=new kakao.maps.LatLngBounds();s.grp.forEach(p=>B.extend(p.pos));map.setBounds(B,80,60,80,60)};
+   s.p.d.querySelector('b').appendChild(e)});
+  const kept=[];let moved=false;
+  shown.forEach(s=>{const r=s.p.d.querySelector('b').getBoundingClientRect();if(kept.some(q=>ov(q,r))){s.hid=1;moved=true}else kept.push(r)});
+  if(!moved)break}
  // 이름표 달린 마트는 점보다 위층 — 옆 마트 점이 글자를 가리지 않게
  PINS.forEach(p=>{const w=p.d.parentElement;if(w)w.style.zIndex=p.d.classList.contains('lab')||p.d.classList.contains('sel')?4:2})}
 async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').textContent='지도를 불러오지 못했어요';return}
