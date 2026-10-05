@@ -22,6 +22,8 @@ document.querySelectorAll('ul.mk li[data-n]').forEach(li=>{const m=BY[li.dataset
 const now=document.getElementById('pxm-now');if(now)now.textContent=kst().txt+' 기준 영업 표시예요 · 표시한 시간은 자료 기준이라 가시기 전에 전화로 확인해 보세요';
 // ── 지도 (지도 칸이 화면에 보일 때만 불러온다)
 const box=document.getElementById('pxmap');if(!box)return;
+// ★ 지도 위 앱 단추 (2026-10-05 사장님 '모든 지도에') — 두 줄 · 오른쪽 아래 구석. 마트 카드가 뜨면 숨는다. 세기 data-hit=map-app
+box.insertAdjacentHTML('beforeend','<a class="pxm-app" href="/app/" data-hit="map-app">PX 상품 2,240개<b>가격 미리 보기 ›</b></a>');
 const el=box.querySelector('.pxm-km'),pop=box.querySelector('.pxm-pop');let map=null,all=null,cur='';
 function loadSDK(){return new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://dapi.kakao.com/v2/maps/sdk.js?appkey='+KEY+'&autoload=false';s.onload=()=>kakao.maps.load(ok);s.onerror=no;document.head.appendChild(s)})}
 function openPop(m,d){box.querySelectorAll('.pxm-pin.sel').forEach(x=>{x.classList.remove('sel');if(x.parentNode)x.parentNode.style.zIndex=2});
@@ -59,7 +61,7 @@ box.querySelector('.pxm-me').onclick=()=>{const b=box.querySelector('.pxm-me');i
   const la=p.coords.latitude,lo=p.coords.longitude;const L=M.map(m=>({m,d:km(la,lo,m.lat,m.lng)})).sort((a,b)=>a.d-b.d);
   const near=L.slice(0,3),in20=L.filter(x=>x.d<=20).length;
   if(you)you.setMap(null);const yd=document.createElement('div');yd.className='pxm-you';
-  you=new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(la,lo),content:yd,zIndex:50});you.setMap(map);
+  you=new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(la,lo),content:yd,xAnchor:0,yAnchor:0,zIndex:50});you.setMap(map);
   cur='near';el.classList.remove('nat');box.classList.add('zoom');
   const bd=new kakao.maps.LatLngBounds();bd.extend(new kakao.maps.LatLng(la,lo));near.forEach(x=>bd.extend(new kakao.maps.LatLng(x.m.lat,x.m.lng)));map.setBounds(bd,60,40,230,40);
   pop.innerHTML='<button class="x" aria-label="닫기">×</button><b>내 근처 영외마트</b><div class="s" style="margin-bottom:0">가장 가까운 3곳'+(in20?' · 20km 안에 '+in20+'곳':'')+' (거리는 직선, 시간은 대략)</div><ul class="pxm-near">'+
@@ -88,6 +90,8 @@ function guard(el,map){el.classList.add('guard');const tip=document.createElemen
   if(e.type==='pointerup'||e.type==='pointercancel'){P.delete(e.pointerId);if(!P.size)two=false}};
  ['pointerdown','pointermove','pointerup','pointercancel'].forEach(k=>el.addEventListener(k,Q,o));
  el.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey)return;e.stopPropagation();say((mac?'⌘':'Ctrl')+' + 휠로 지도를 키워요')},o)}
+// ★ 2026-10-05 — 표시들의 기준점을 왼쪽 위(0,0)로. 카카오 기준점(가운데) + 모양 규칙 translate(-50%,-50%) 가 겹쳐
+//   늘 반 칸씩 위·왼쪽으로 밀려 그려졌다(축소할수록 멀리 떨어져 보임). 이제 모양 규칙 하나로만 가운데를 맞춘다
 let started=null;function init(){return started||(started=init0())}
 const PINS=[];
 // ★ 이름표 (2026-10-05 사장님 '좀 멀어도 마트 이름이 보이게') — 화면 안의 마트마다 이름표를 켜 보고, 실제 크기를 재서
@@ -128,12 +132,12 @@ async function init0(){try{await loadSDK()}catch(e){el.querySelector('.pxm-ph').
  el.innerHTML='';map=new kakao.maps.Map(el,{center:new kakao.maps.LatLng(36.3,127.8),level:13});if(GUARD_ON)guard(el,map);all=new kakao.maps.LatLngBounds();
  M.forEach(m=>{const s=st(m),pos=new kakao.maps.LatLng(m.lat,m.lng);all.extend(pos);
   const d=document.createElement('div');d.className='pxm-pin '+s[0]+((window.PXM_OWN||[]).indexOf(m.n)>=0?' own':'');d.innerHTML='<u></u><b><s></s>'+m.n+'</b>';d.onclick=()=>openPop(m,d);
-  new kakao.maps.CustomOverlay({position:pos,content:d,yAnchor:.5,zIndex:2}).setMap(map);PINS.push({m,d,pos,own:d.classList.contains('own')?1:0,i:PINS.length})});
+  new kakao.maps.CustomOverlay({position:pos,content:d,xAnchor:0,yAnchor:0,zIndex:2}).setMap(map);PINS.push({m,d,pos,own:d.classList.contains('own')?1:0,i:PINS.length})});
  // 시도 딱지 — 마트들의 가운데에 두고, 화면에서 겹치는 딱지끼리는 저절로 비켜 가게 한다(폰 크기마다 달라서 손으로는 못 맞춘다)
  const RB=[];Object.keys(C).forEach(r=>{const L=M.filter(m=>m.r==r);
   const base=new kakao.maps.LatLng(L.reduce((s,m)=>s+m.lat,0)/L.length,L.reduce((s,m)=>s+m.lng,0)/L.length);
   const d=document.createElement('div');d.className='pxm-rb'+(C[r]<=3?' sm':'');d.innerHTML='<em>'+C[r]+'</em>'+r.replace('전남·광주','전남');d.onclick=()=>zoomTo(r);
-  const ov=new kakao.maps.CustomOverlay({position:base,content:d,zIndex:3});ov.setMap(map);RB.push({ov,d,base})});
+  const ov=new kakao.maps.CustomOverlay({position:base,content:d,xAnchor:0,yAnchor:0,zIndex:3});ov.setMap(map);RB.push({ov,d,base})});
  function declutter(){if(!el.classList.contains('nat'))return;const P=map.getProjection(),W=el.clientWidth,H=el.clientHeight;
   const it=RB.map(x=>{const p=P.containerPointFromCoords(x.base);return{x,px:p.x,py:p.y,w:x.d.offsetWidth+6,h:x.d.offsetHeight+6}});
   for(let k=0;k<80;k++){let mv=false;
