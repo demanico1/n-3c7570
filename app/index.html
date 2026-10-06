@@ -509,7 +509,7 @@ header.peek > :not(.top){visibility:hidden}   /* 로고 줄만 꺼낼 때 그 �
 #sheet .pk i{font-style:normal;color:var(--dim);font-size:13px}
 #sheet .pk.dim{opacity:.45}
 #sheet .pk.new{color:var(--good);font-weight:700}
-#toast.act{pointer-events:auto}
+#toast.act.on{pointer-events:auto}   /* 사라진 뒤에도 투명하게 남아 아래 단추를 막았다 (2026-10-06) */
 #toast .tundo{margin-left:10px;padding:2px 8px;border:1px solid currentColor;border-radius:7px;background:transparent;color:inherit;font-size:12.5px;cursor:pointer}
 #listhead{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 0}
 #listhead.on{display:flex}
@@ -929,18 +929,18 @@ html.pre #preapp[data-w]::after{content:attr(data-w)}
 html.pre #preapp .item.pt{transform:scale(.97);box-shadow:0 0 0 2px var(--good);transition:transform .12s}
 html.pre #preapp::after{content:"여는 중…";position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:rgba(17,24,39,.82);color:#fff;font-size:13px;font-weight:700;padding:7px 14px;border-radius:999px;pointer-events:none}
 
-.pkbk{display:inline-flex!important;align-items:center;gap:4px;width:auto!important;min-height:0!important;border:0!important;background:none!important;color:var(--muted);font:inherit;font-size:14px;font-weight:700;padding:0 0 6px!important;margin:0 0 2px!important;cursor:pointer;box-shadow:none!important}
+.pkbk{display:inline-flex!important;align-items:center;gap:4px;width:auto!important;min-height:0!important;border:0!important;background:none!important;color:var(--dim);font:inherit;font-size:14px;font-weight:700;padding:0 0 6px!important;margin:0 0 2px!important;cursor:pointer;box-shadow:none!important}
 html.selmode #cartsum,html.selmode #listtabs,html.selmode #cartbar{display:none!important}
 html.selmode .item{position:relative}
 .ck{position:absolute;left:8px;top:8px;z-index:3;width:26px;height:26px;border-radius:50%;border:2px solid #CBD5E1;background:#fff;display:grid;place-items:center;font:900 15px sans-serif;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15)}
-.item.sel{border-color:var(--p)!important;background:var(--good-bg,#F1FAF5)!important}.item.sel .ck{background:var(--p);border-color:var(--p)}
+.item.sel{border-color:var(--accent)!important;background:var(--good-bg,#F1FAF5)!important}.item.sel .ck{background:var(--accent);border-color:var(--accent)}
 #seltop{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--good-bg,#ECF7F0);font-weight:800;font-size:15px;color:#0B7A4B}
-#seltop button{border:0;background:none;font:inherit;font-weight:800;color:var(--muted);padding:4px 2px;cursor:pointer}
+#seltop button{border:0;background:none;font:inherit;font-weight:800;color:var(--dim);padding:4px 2px;cursor:pointer}
 #selbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,0,0,.08);padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:8px}
 #selbar .n{flex:1;min-width:0}#selbar .n b{display:block;font-size:16px;font-weight:800;color:var(--ink)}
-#selbar .n .all{border:0;background:none;padding:0;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);text-decoration:underline;cursor:pointer}
+#selbar .n .all{border:0;background:none;padding:0;font:inherit;font-size:12.5px;font-weight:600;color:var(--dim);text-decoration:underline;cursor:pointer}
 #selbar>button{border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:11px 12px;font:inherit;font-weight:800;font-size:14.5px;color:var(--ink);cursor:pointer}
-#selbar>button.go{background:var(--p);border-color:var(--p);color:#fff}#selbar>button:disabled{opacity:.4}
+#selbar>button.go{background:var(--accent);border-color:var(--accent);color:#fff}#selbar>button:disabled{opacity:.4}
 html.selmode body{padding-bottom:80px}
 </style>
 </head>
@@ -2338,6 +2338,8 @@ function closeTip(){
 }
 function showTip(name, el, text, after){
   if (TIP_ON || !el) return false;
+  const hcl = document.documentElement.classList;
+  if (hcl.contains("sheet-on") || hcl.contains("selmode")) return false;   // 창·고르기 중엔 안 띄운다 (2026-10-06)
   const st = tipState(), t = st[name] || {};
   if (t.u || (t.n || 0) >= 2) return false;
   try { if (sessionStorage.getItem("gmpx-tip-" + name)) return false; } catch(e){ return false; }
@@ -2636,6 +2638,8 @@ function openSheet(html, cls){
     clearTimeout(SH_OUT); sh.classList.remove("out"); sh.style.display = "none"; void sh.offsetWidth;
   }
   sh.style.display = "flex";
+  const tt = $("#toast"); if (tt){ clearTimeout(toast._t); tt.classList.remove("on", "act"); }
+  if (TIP_ON){ const t = TIP_ON; t.after = null; closeTip(); }
   $("#sheetbox").scrollTop = 0;                        // 늘 맨 위(1번)부터
   document.documentElement.classList.add("sheet-on");
   markOverlay();
@@ -3050,7 +3054,7 @@ function toast(msg){
   t.classList.remove("act");
   t.classList.add("on");
   clearTimeout(toast._t);
-  toast._t = setTimeout(() => t.classList.remove("on"), 3500);
+  toast._t = setTimeout(() => t.classList.remove("on", "act"), 3500);
 }
 
 function zPack(codes, qq){
@@ -3687,6 +3691,7 @@ function selSrc(){ const L = curList(); return L ? L.items : CART; }
 function selStart(){
   if ($("#view").value !== "cart" || WLIST || shopOn()) return;
   SEL = {set: new Set(), from: CUR || ""};
+  if (TIP_ON){ const t = TIP_ON; t.after = null; closeTip(); }
   document.documentElement.classList.add("selmode");
   if (!$("#seltop")) $("#listtabs").insertAdjacentHTML("beforebegin",
     '<div id="seltop"><span>옮길 상품을 골라 주세요</span><button type="button" data-s="x">취소</button></div>');
