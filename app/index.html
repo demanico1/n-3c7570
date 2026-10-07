@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded",function(){var b=document.createEle
 }catch(e){}})();</script>
 <script>/* 처음부터 밝게 — 다크를 고른 사람만 어둡게 (2026-10-04 사장님: 아래쪽에서 박으면 느린 폰에서 까만 화면이 번쩍일 수 있다) */try{document.documentElement.setAttribute("data-theme",localStorage.getItem("gmpx-theme")==="dark"?"dark":"light")}catch(e){document.documentElement.setAttribute("data-theme","light")}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="preload" href="/data.json?v=f71a51fa74" as="fetch" crossorigin="anonymous" referrerpolicy="same-origin">
+<link rel="preload" href="/data.json?v=9a1df83356" as="fetch" crossorigin="anonymous" referrerpolicy="same-origin">
 <link rel="preload" href="/big/28438.jpg" as="image">
 <link rel="preload" href="/big/35032.jpg" as="image">
 <link rel="preload" href="/big/3098.jpg" as="image">
@@ -1119,7 +1119,7 @@ async function derive(pw, salt){
 let KEY = null;
 
 async function unlock(pw, remember){
-  if (OPEN) return await (await fetch("/data.json?v=f71a51fa74",
+  if (OPEN) return await (await fetch("/data.json?v=9a1df83356",
                                       {referrerPolicy: "same-origin"})).json();
   const buf = await (await fetch("data.bin", {cache:"no-cache"})).arrayBuffer();
   const raw = new Uint8Array(buf);
@@ -1320,6 +1320,20 @@ const VR = (function(){
   const myId = V ? V.slice(-10, -4) : "";                // 내 번호 앞 6자 (V = '/~v<n>.<번호10>')
   return {hit: hit, tag: () => "r=" + me.o + "." + Math.min(me.g + 1, 99) + (myId ? "." + myId : "")};
 })();
+(function(){
+  let n = 0; const seen = {};
+  const send = m => { m = String(m || "").replace(/\s+/g, " ").slice(0, 60); if (!m || seen[m] || n >= 3) return; seen[m] = 1; n++; VR.hit("err", null, null, m); };
+  addEventListener("error", e => send((e.lineno ? "@" + e.lineno + " " : "") + (e.message || "").replace(/^Uncaught /, "")));
+  addEventListener("unhandledrejection", e => send("p " + ((e.reason && e.reason.message) || e.reason)));
+  const back = () => { try { const t = +sessionStorage.getItem("pxp-cpat"); if (!t) return; sessionStorage.removeItem("pxp-cpat");
+      const s = (Date.now() - t) / 1000; VR.hit("cpback", null, null, s < 30 ? "30" : s < 120 ? "120" : s < 600 ? "600" : "999"); } catch(e){} };
+  addEventListener("pageshow", back);
+  addEventListener("pagehide", () => { try {
+    if (sessionStorage.getItem("pxp-cpat") || typeof filtered !== "function" || !filtered() || $("#view").value !== "all") return;
+    VR.hit("leavef", null, null, [$("#q").value.trim() ? "q" : "", BIG !== "전체" ? "big" : "", SUB ? "sub" : ""].filter(Boolean).join("."));
+  } catch(e){} });
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") back(); });
+})();
 let CARRY = null;
 (function(){
   try {
@@ -1391,6 +1405,7 @@ function start(d){
   $("#subchips").addEventListener("click", e => {
     const b = e.target.closest(".sc"); if (!b) return;
     SUB = b.dataset.s;
+    VR.hit("subchip", null, null, SUB || "전체");
     tipUsed("subs");
     run();
     toTop();
@@ -1399,6 +1414,7 @@ function start(d){
     const b = e.target.closest(".chip"); if (!b) return;
     leaveCart();
     BIG = b.dataset.b;
+    VR.hit("chip", null, null, BIG);
     SUB = "";
     $("#chips").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === b));
     runFresh();
@@ -1652,6 +1668,7 @@ function useSort(k){
 }
 function setSort(k){
   stamp("sort");                    // 손님이 누를 때만 불린다 — 꿀팁 '줄 세우기' 를 거둔다
+  VR.hit("sort", null, null, k);
   const was = $("#view").value;
   const sel = $("#sort");
   if (k === "mine"){
@@ -1675,7 +1692,7 @@ $("#view").addEventListener("change", runFresh);
 function shopBack(){ $("#q").value = ""; $("#q").blur(); run(); toTop(); }
 $("#clr").addEventListener("click", () => {
   if (shopOn()) return shopBack();
-  $("#q").value = ""; run(); toTop(); $("#q").focus();
+  $("#q").value = ""; SUB = ""; run(); toTop(); $("#q").focus();   // 세부 종류도 푼다 — 글자를 지울 때와 같게 (2026-10-08)
 });
 $("#shopstrip").addEventListener("click", () => { if (shopOn() && $("#q").value.trim()) shopBack(); });
 function themeLabel(){
@@ -1707,9 +1724,12 @@ function srchHit(raw){
     if ($("#q").value.trim() !== raw) return;
     SRCH_LAST = raw; SRCH_N++;
     VR.hit("srch", null, null, raw.slice(0, 30));
+    if (!VIEW.length) VR.hit("srch0", null, null, raw.slice(0, 30));   // 못 찾은 말 — 별칭에 더할 거리 (2026-10-08)
   }, 1500);
 }
+var HOME_PEND = false;
 function run(){
+  if (HOME_PEND){ HOME_PEND = false; setTimeout(() => inbar("home"), 0); }
   syncBar();
   const raw = $("#q").value.trim();
   srchHit(raw);
@@ -1810,8 +1830,59 @@ function run(){
   }
   more();
   scheduleTips();
+  fltMark();
+}
+var FLT_ON = false, FLT_T = 0;
+function filtered(){ return !!$("#q").value.trim() || BIG !== "전체" || !!SUB; }
+function fltMark(){
+  clearTimeout(FLT_T);
+  FLT_T = setTimeout(() => {
+    if (FLT_ON || !filtered() || $("#view").value !== "all" || SHOP || WLIST || ONLY) return;
+    if (history.state && (history.state.ov || history.state.cart)) return;
+    try { history.pushState({flt:1}, ""); FLT_ON = true; } catch(e){}
+  }, 700);
 }
 
+let VOCAB = null;
+function vocab(){
+  if (VOCAB) return VOCAB;
+  const m = new Map();
+  for (const it of DATA)
+    for (const w of ((it.dn || it.name) + " " + (it.sub || "")).split(/[\s·()\[\]_\/,+*&]+/)){
+      if (w.length < 2 || w.length > 10 || /^\d/.test(w)) continue;
+      m.set(w, (m.get(w) || 0) + 1);
+    }
+  VOCAB = [...m.entries()].map(([w, n]) => [w, n, toJamo(w.toLowerCase())]);
+  return VOCAB;
+}
+function jdist(a, b, max){
+  let prev = Array.from({length: b.length + 1}, (_, i) => i);
+  for (let i = 1; i <= a.length; i++){
+    const cur = [i]; let best = i;
+    for (let j = 1; j <= b.length; j++){
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (cur[j] < best) best = cur[j];
+    }
+    if (best > max) return max + 1;
+    prev = cur;
+  }
+  return prev[b.length];
+}
+function suggest(raw){
+  if (PARTIAL) return [];
+  const q = toJamo(raw.replace(/\s+/g, "").toLowerCase());
+  if (q.length < 3) return [];
+  const lim = q.length <= 7 ? 1 : 2, out = [];
+  for (const [w, n, j] of vocab()){
+    if (Math.abs(j.length - q.length) > lim) continue;
+    if (j[0] !== q[0]) continue;                // 첫 자음이 같은 말만 — '키엘' 에 '지엘' 을 내밀지 않게
+    const d = jdist(q, j, lim);
+    if (d > 0 && d <= lim) out.push([d, -n, w]);
+  }
+  out.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const seen = new Set();
+  return out.map(x => x[2]).filter(w => !seen.has(w) && seen.add(w)).slice(0, 3);
+}
 function emptyHTML(raw, view, pass){
   const vName = n => {
     const o = [...$("#view").options].find(o => o.value === n);
@@ -1849,6 +1920,11 @@ function emptyHTML(raw, view, pass){
   if (raw && BIG !== "전체")
     head = quoted + jo(raw, "은", "는") + " " + esc(BIG) + "에 없어요";
   let html = '<div class="empty"><div class="e-head">' + head + "</div>";
+  const sg = raw ? suggest(raw) : [];
+  if (sg.length){
+    html += '<div class="e-sub">혹시 이 말인가요?</div><div class="e-btns">' +
+      sg.map(w => '<button class="e-go" data-act="sugg" data-w="' + esc(w) + '">' + esc(w) + "</button>").join("") + "</div>";
+  }
   if (outs.length){
     html += '<div class="e-sub">이렇게 찾아보세요</div><div class="e-btns">';
     for (const o of outs)
@@ -2484,6 +2560,7 @@ function curTag(){
 }
 
 function sameSub(it){
+  VR.hit("same", null, null, it.sub || "");
   if ($("#view").value === "cart" || $("#view").value === "mine") $("#view").value = "all";
   ONLY = ""; WLIST = null; $("#onlytake").hidden = true; $("#onlysave").hidden = true;
   const bar = $("#onlybar"); if (bar) bar.style.display = "none";
@@ -2654,7 +2731,8 @@ function coupang(name, link, pc){
   } catch(e){}
   const url = link || ("https://www.coupang.com/np/search?q="
                        + encodeURIComponent(name));
-  VR.hit("cp", null, null, "", pc);                         // ★ 쿠팡 단추 (2026-10-02) — sendBeacon 이라 페이지를 떠나도 간다
+  VR.hit("cp", null, null, "", pc);
+  try { sessionStorage.setItem("pxp-cpat", String(Date.now())); } catch(e){}                         // ★ 쿠팡 단추 (2026-10-02) — sendBeacon 이라 페이지를 떠나도 간다
 
   location.href = url;
 }
@@ -2690,7 +2768,20 @@ function dismiss(){
 addEventListener("popstate", () => {
   const open = $("#zoom").style.display === "flex"
             || ($("#sheet").style.display === "flex" && !$("#sheet").classList.contains("out"));
+  if (open) itemClose("back");
+  const wasCart = $("#view").value === "cart";
   hideOverlays();
+  if (!open && !wasCart && FLT_ON){
+    FLT_ON = false;
+    if (filtered()){
+      VR.hit("fltback", null, null, [$("#q").value.trim() ? "q" : "", BIG !== "전체" ? "big" : "", SUB ? "sub" : ""].filter(Boolean).join("."));
+      $("#q").value = ""; BIG = "전체"; SUB = "";
+      $("#chips").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c.dataset.b === "전체"));
+      run(); toTop();
+    } else history.back();             // 손님이 이미 다 풀어 둔 채 뒤로 — 원래대로 나간다
+    return;
+  }
+  if (!open && $("#view").value === "cart" && SHOP){ VR.hit("shopback"); try { history.pushState({cart:1}, ""); } catch(e){} return; }
   if (!open && $("#view").value === "cart") restorePrev();
 });
 
@@ -2706,6 +2797,7 @@ function openSheet(html, cls){
   const tt = $("#toast"); if (tt){ clearTimeout(toast._t); tt.classList.remove("on", "act"); }
   if (TIP_ON){ const t = TIP_ON; t.after = null; closeTip(); }
   $("#sheetbox").scrollTop = 0;                        // 늘 맨 위(1번)부터
+  SHEET_AT = Date.now(); ITEM_OPEN = 0;
   document.documentElement.classList.add("sheet-on");
   markOverlay();
 }
@@ -2753,11 +2845,18 @@ function helpGo(id){
   body.parentNode.querySelectorAll(".hchips button").forEach(b => b.classList.toggle("on", b.dataset.go === id));
 }
 
+var SHEET_AT = 0, ITEM_OPEN = 0, QTY_T = 0;
+function itemClose(how){                       // 상품 메뉴를 아무것도 안 하고 닫았을 때 — 열려 있던 시간까지 (신호 itemx)
+  if (!ITEM_OPEN) return;
+  const d = Date.now() - ITEM_OPEN; ITEM_OPEN = 0;
+  VR.hit("itemx", null, null, how + "." + (d < 500 ? "05" : d < 2000 ? "2" : d < 10000 ? "10" : "99"));
+}
 $("#sheet").addEventListener("click", e => {
-  if (e.target.id === "sheet") closeSheet();
+  if (e.target.id === "sheet"){ if (Date.now() - SHEET_AT < 600) return; itemClose("bg"); closeSheet(); }
   const b = e.target.closest("button, .x"); if (!b) return;
   const p = b.dataset.p, act = b.dataset.act;
-  if (act === "close") return closeSheet();
+  if (act === "close"){ itemClose("x"); return closeSheet(); }
+  if (act) ITEM_OPEN = 0;                      // 메뉴에서 무엇이든 골랐다 — 그 일의 신호가 따로 간다
   if (act === "ask-yes"){ const f = ASK; ASK = null; closeSheet(); if (f) setTimeout(f, 260); return; }
   if (act === "ask-no"){ ASK = null; return closeSheet(); }
   if (act === "help") return openHelp();
@@ -2969,8 +3068,11 @@ function importText(t){
 }
 
 function openCart(){
-  if ($("#view").value === "cart") return backFromCart();   // 한 번 더 누르면 되돌아간다
-  VR.hit("wish");
+  if ($("#view").value === "cart"){
+    if (SHOP){ VR.hit("shopwish"); toTop(); return; }       // 장보기 중엔 찜 단추로 카트를 나가지 않는다 (2026-10-08)
+    return backFromCart();                                   // 한 번 더 누르면 되돌아간다
+  }
+  VR.hit("wish", null, null, "n" + CART.length);             // 열 때 찜 개수 (빈 찜 안내를 몇 명이 보나)
   const act = LISTS.filter(l => !l.arch);
   if (SHOP) CUR = SHOP.cur || "";
   if (!CART.length && !CUR && act.length) CUR = act[0].id;
@@ -3474,8 +3576,9 @@ function startShop(){
 }
 function basketTap(it){
   const p = it.p, L = curList();
-  if (inBasket(p)){ delete SHOP.b[p]; saveShop(); }
+  if (inBasket(p)){ delete SHOP.b[p]; saveShop(); VR.hit("bkx", null, null, "", p); }
   else {
+    VR.hit("bk", null, null, inCur(p) ? "" : "here", p);
     if (!inCur(p)){
       const q = (SHOP.pq && SHOP.pq[p]) || 1;
       if (L){ L.items.push(p); if (q > 1) L.q[p] = q; saveLists(); }
@@ -3565,7 +3668,7 @@ function finishShop(){
   if (!s.kin) return askSheet("아직 담은 게 없어요", "장보기를 끝내면 카트만 닫혀요. 찜 목록은 그대로 남아요.",
                               "장보기 끝내기", "계속 장보기", false, () => {
     VR.hit("shopend"); SHOP = null; saveShop(); run(); toast("장보기를 끝냈어요"); });
-  VR.hit("shopend");
+  VR.hit("shopend", null, null, "n" + s.kin);
   makeReceipt(new Date());
   SHOP = null; saveShop(); $("#q").value = ""; run();
   showReceipt(RCPT);
@@ -4102,6 +4205,7 @@ $("#list").addEventListener("click", e => {
   }
   if (act === "view" || act === "both") $("#view").value = "all";
   if (act === "clear") $("#q").value = "";
+  if (act === "sugg"){ VR.hit("sugg", null, null, b.dataset.w); $("#q").value = b.dataset.w; SUB = ""; }
   run();
 });
 
@@ -4116,6 +4220,7 @@ $("#list").addEventListener("click", e => {
   if (qb || e.target.closest(".got")) tipUsed("cartq");
   if (qb){
     const n = Math.min(99, Math.max(1, qtyOf(p) + Number(qb.dataset.q)));
+    clearTimeout(QTY_T); QTY_T = setTimeout(() => VR.hit("qty", null, null, shopOn() ? "shop" : "wish", p), 1500);
     const L = listOn();
     if ($("#view").value === "cart") stamp("qty");
     if (shopOn() && !inCur(p)){ SHOP.pq = SHOP.pq || {}; if (n > 1) SHOP.pq[p] = n; else delete SHOP.pq[p]; saveShop(); }
@@ -4145,12 +4250,13 @@ $("#list").addEventListener("click", e => {
   }
   if (cartIcon){
     if (inCart(p) && $("#view").value === "cart"){            // 찜 화면 — 그 카드만 흐려지며 빠진다 (2026-10-08 사장님)
+      VR.hit("unfav", null, null, "wish", p);
       const i0 = CART.indexOf(p);
       CART = CART.filter(x => x !== p); saveCart(); saveCQ(); showCartN(); bumpCart();
       return dropCard(card, p, () => { CART.splice(Math.max(0, i0), 0, p); saveCart(); saveCQ(); showCartN(); bumpCart(); });
     }
     const was = inCart(p);
-    if (was) CART = CART.filter(x => x !== p);
+    if (was){ CART = CART.filter(x => x !== p); VR.hit("unfav", null, null, "list", p); }
     else { CART.push(p); inappJit(); homeHint(); tipUsed("heart"); stamp("heart"); VR.hit("fav", null, null, "", p); flyHeart(cartIcon); }
     saveCart(); saveCQ();
     if ($("#view").value === "cart") return run();
@@ -4165,7 +4271,7 @@ $("#list").addEventListener("click", e => {
   let img = (GAL || e.target.closest(".cpg")) ? null : e.target.closest(".thumb");   // ⓘ 는 메뉴로
   if (img && (img.dataset.nopic || !img.getAttribute("src"))) img = null;
   if (img){
-    stamp("photo");
+    stamp("photo"); VR.hit("zoom", null, null, "", p);
     $("#zoom img").src = img.src || "";
     $("#zoom p").textContent = dName(it);
     $("#zoom").style.display = "flex";
@@ -4176,6 +4282,7 @@ $("#list").addEventListener("click", e => {
   const on = inCart(p);
   const wish = $("#view").value === "cart" && !WLIST && !shopOn();   // 찜 화면 (2026-10-03 사장님)
   stamp("menu"); VR.hit("item");
+  setTimeout(() => { ITEM_OPEN = Date.now(); }, 0);   // openSheet 가 0 으로 되돌린 뒤에 잰다
   openSheet("<h3>" + esc(dName(it)) + "</h3>" +
     '<p class="note">군마트 ' + won(it.g) +
       (it.c != null ? " · " + srcOf(it) + " " + won(it.c) : "") + "</p>" +
@@ -4353,7 +4460,7 @@ function homeHint(){
     if (localStorage.getItem("gmpx-homehint")) return;
     localStorage.setItem("gmpx-homehint", "1");
   } catch(e){ return; }
-  setTimeout(() => inbar("home"), 600);   // 목록 위 상자라 하트와 겹치지 않는다 — 날아가는 동안만 기다린다
+  HOME_PEND = true;
 }
 
 $("#addbar").addEventListener("click", e => {
