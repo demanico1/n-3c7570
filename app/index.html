@@ -291,6 +291,11 @@ html.sheet-on,html.sheet-on body{overflow:hidden;overscroll-behavior-y:none}
 .flyh svg path{fill:#e0301e}
 @keyframes cbump{30%{transform:scale(1.22)}60%{transform:scale(.94)}100%{transform:none}}
 #cartbtn.bump{animation:cbump .42s ease-out}
+@keyframes cdip{35%{transform:scale(.86)}70%{transform:scale(1.03)}100%{transform:none}}
+#cartbtn.dip{animation:cdip .36s ease-out}
+@keyframes hdeflate{0%{transform:scale(1)}40%{transform:scale(.62)}100%{transform:scale(1)}}
+.item .cart.deflate svg{animation:hdeflate .32s ease-out}
+.item .cart.deflate svg path{fill:rgba(202,33,12,0);transition:fill .3s ease-in,stroke .3s ease-in,opacity .3s ease-in}   /* fill:none 은 색과 안 섞인다 — 투명한 같은 빨강으로 빠지게 */
 .tip.mtip{position:fixed;width:auto!important;white-space:nowrap;z-index:85;font-weight:700}
 @keyframes mping{0%{box-shadow:0 0 0 0 rgba(11,122,75,.55)}100%{box-shadow:0 0 0 10px rgba(11,122,75,0)}}
 #more.ping{animation:mping .9s ease-out 2}
@@ -669,6 +674,10 @@ html.dark .tag.tag-here{background:#2a2412;color:#e6c455}
 #shoppop ul.steps{list-style:none;padding:12px 14px;margin:12px 0 10px;background:var(--bg);border-radius:12px;display:grid;grid-template-columns:auto 1fr;gap:8px 6px;text-align:left;font-size:15px;line-height:1.5}
 #shoppop ul.steps li{margin:0;padding:0}
 #shoppop ul.steps em{font-style:normal;font-weight:800;color:var(--good);white-space:nowrap}
+.item.unfaved{position:relative}
+.item.unfaved>*:not(.unfav){opacity:.25;transition:opacity .2s}
+.item .unfav{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:3;font-size:14px;font-weight:700;color:var(--ink);border-radius:inherit;background:color-mix(in srgb,var(--card) 62%,transparent)}
+.item .unfav button{border:1px solid var(--good);background:var(--card);color:var(--good);font-weight:800;font-size:14px;border-radius:999px;padding:7px 16px}
 #autoend{display:flex;align-items:center;gap:10px;margin:10px 12px 0;padding:10px 10px 10px 12px;border-radius:12px;background:var(--good-bg);color:var(--ink);border:1px solid rgba(15,123,63,.18)}
 #autoend .i{font-size:22px}
 #autoend .t{flex:1;min-width:0;word-break:keep-all}
@@ -2059,17 +2068,28 @@ function bugWhere(){
           "정렬 " + SORTK, GAL ? "사진 보기" : "한 줄 보기", "찜 " + CART.length + "개"].filter(Boolean).join(" · ");
 }
 async function sendBug(){
-  const t = ($("#fbt") || {}).value || "", b = document.querySelector('#sheet [data-act="bugsend"]');
+  const t = ($("#fbt") || {}).value || "";
   if (t.trim().length < 2) return toast("내용을 적어 주세요");
-  if (!FB_URL) return toast("보내지 못했어요. 잠시 뒤 다시 보내 주세요");
-  b.disabled = true; b.textContent = "보내는 중…";
+  const body = JSON.stringify({t: t.trim().slice(0, 1000), w: bugWhere(), s: innerWidth + "×" + innerHeight,
+                               n: visitsN(), c: window.__CHECK ? 1 : 0, hp: ($("#fbhp") || {}).value || ""});
+  closeSheet(); setTimeout(() => toast("고마워요! 잘 받았어요"), 250);
   try {
-    const r = await fetch(FB_URL, {method: "POST", headers: {"content-type": "text/plain;charset=utf-8"}, keepalive: true,
-      body: JSON.stringify({t: t.trim().slice(0, 1000), w: bugWhere(), s: innerWidth + "×" + innerHeight,
-                            n: visitsN(), c: window.__CHECK ? 1 : 0, hp: ($("#fbhp") || {}).value || ""})});
+    if (!FB_URL) throw new Error("no url");
+    const r = await fetch(FB_URL, {method: "POST", headers: {"content-type": "text/plain;charset=utf-8"}, keepalive: true, body});
     if (!r.ok) throw new Error(r.status);
-    VR.hit("bug"); closeSheet(); setTimeout(() => toast("고마워요! 잘 받았어요"), 250);
-  } catch(e){ b.disabled = false; b.textContent = "보내기"; toast("보내지 못했어요. 잠시 뒤 다시 보내 주세요"); }
+    VR.hit("bug");
+  } catch(e){ bugFail(t); }
+}
+function bugFail(text){
+  toast("제보가 안 갔어요");
+  const tt = $("#toast"); if (!tt) return;
+  const u = document.createElement("button"); u.className = "tundo"; u.textContent = "다시 보내기";
+  u.addEventListener("click", () => {
+    tt.classList.remove("on", "act"); openBug();
+    const f = $("#fbt"); if (f){ f.value = text; $("#fbn").textContent = text.length; }
+  });
+  tt.appendChild(u); tt.classList.add("act");
+  clearTimeout(toast._t); toast._t = setTimeout(() => tt.classList.remove("on", "act"), 8000);
 }
 $("#more").addEventListener("click", openMove);
 
@@ -2586,6 +2606,35 @@ function mineText(){
 function saveCart(){
   try { localStorage.setItem(CART_KEY, JSON.stringify(CART)); } catch(e){}
   showCartN();
+}
+var UNFAV_UNDO = false;
+function dropCard(card, p, undo){
+  const quiet = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const gone = () => {
+    if (!card.isConnected) return;
+    const list = $("#list"), near = [...list.children].filter(el => el !== card && (() => {
+      const r = el.getBoundingClientRect(); return r.bottom > -400 && r.top < innerHeight + 400; })());
+    const first = new Map(near.map(el => [el, el.getBoundingClientRect()]));
+    card.remove();
+    VIEW = VIEW.filter(i => i.p !== p); SHOWN = Math.max(0, SHOWN - 1);
+    if (!quiet) near.forEach(el => { const a = first.get(el), b = el.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top;
+      if (dx || dy) el.animate([{transform: "translate(" + dx + "px," + dy + "px)"}, {transform: "none"}], {duration: 250, easing: "cubic-bezier(.2,.7,.3,1)"}); });
+    stats(); cartSum(); listTabs($("#view").value);
+    if (!VIEW.length) run();
+    else if (SHOWN < VIEW.length && innerHeight + scrollY > document.body.offsetHeight - 700) more();
+  };
+  const fade = () => quiet ? gone() : card.animate([{opacity: 1, transform: "scale(1)"}, {opacity: 0, transform: "scale(.95)"}],
+                                                   {duration: 200, easing: "ease-in", fill: "forwards"}).finished.then(gone, gone);
+  if (!UNFAV_UNDO || !undo) return fade();
+  card.classList.add("unfaved");
+  const u = document.createElement("div"); u.className = "unfav";
+  u.innerHTML = '<span>찜에서 뺐어요</span><button type="button">되돌리기</button>';
+  card.appendChild(u);
+  const t = setTimeout(fade, 3000);
+  u.querySelector("button").addEventListener("click", e => {
+    e.stopPropagation(); clearTimeout(t); undo(); card.classList.remove("unfaved"); u.remove();
+  });
+  u.addEventListener("click", e => e.stopPropagation());
 }
 var FLY_N = 0;   // (var — 시작 때 먼저 불려도 오류가 안 나게) 찜 단추로 날아가는 중인 하트 수 — 숫자는 하트가 도착할 때 오른다 (2026-10-04)
 function showCartN(){
@@ -3665,7 +3714,9 @@ function listTabs(view){
     '<button class="ltb sh" data-act="ltshare">공유</button>' +
     '<button class="ltb mo" data-act="ltmore" aria-label="목록 메뉴">⋯</button>';
   box.classList.add("on");
-  const on = box.querySelector(".lt.on"); if (on) on.scrollIntoView({block: "nearest", inline: "nearest"});
+  const on = box.querySelector(".lt.on"), sc = box.querySelector(".ltsc");
+  if (on && sc){ const a = on.offsetLeft, b = a + on.offsetWidth;
+    if (a < sc.scrollLeft) sc.scrollLeft = a - 8; else if (b > sc.scrollLeft + sc.clientWidth) sc.scrollLeft = b - sc.clientWidth + 8; }
 }
 function makeOwn(){
   const v = prompt("새 목록 이름 (예: 화장품, 다음에 살 것)", "");
@@ -4087,17 +4138,28 @@ $("#list").addEventListener("click", e => {
   if (cartIcon && shopOn()) return basketTap(it);
   if (cartIcon && listOn()){          // 받은 목록 칸에서는 그 목록에서 뺀다 (내 찜은 안 건드린다)
     const L = listOn();
+    const i0 = L.items.indexOf(p), q0 = L.q[p];
     L.items = L.items.filter(x => x !== p); delete L.q[p];
     saveLists();
-    toast("이 목록에서 뺐어요");
-    return run();
+    return dropCard(card, p, () => { L.items.splice(Math.max(0, i0), 0, p); if (q0) L.q[p] = q0; saveLists(); });
   }
   if (cartIcon){
-    if (inCart(p)) CART = CART.filter(x => x !== p);
+    if (inCart(p) && $("#view").value === "cart"){            // 찜 화면 — 그 카드만 흐려지며 빠진다 (2026-10-08 사장님)
+      const i0 = CART.indexOf(p);
+      CART = CART.filter(x => x !== p); saveCart(); saveCQ(); showCartN(); bumpCart();
+      return dropCard(card, p, () => { CART.splice(Math.max(0, i0), 0, p); saveCart(); saveCQ(); showCartN(); bumpCart(); });
+    }
+    const was = inCart(p);
+    if (was) CART = CART.filter(x => x !== p);
     else { CART.push(p); inappJit(); homeHint(); tipUsed("heart"); stamp("heart"); VR.hit("fav", null, null, "", p); flyHeart(cartIcon); }
     saveCart(); saveCQ();
     if ($("#view").value === "cart") return run();
-    cartIcon.classList.toggle("on", inCart(p));
+    const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (was && !calm){ cartIcon.classList.remove("deflate"); void cartIcon.offsetWidth; cartIcon.classList.add("deflate"); void cartIcon.offsetWidth; }
+    cartIcon.classList.toggle("on", inCart(p));     // 색은 움직임을 건 다음에 끈다 — 먼저 끄면 서서히 안 빠진다
+    if (was && !calm){
+      const b = $("#cartbtn"); if (b){ b.classList.remove("bump", "dip"); void b.offsetWidth; b.classList.add("dip"); }
+    }
     return;
   }
   let img = (GAL || e.target.closest(".cpg")) ? null : e.target.closest(".thumb");   // ⓘ 는 메뉴로
