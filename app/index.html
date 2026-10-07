@@ -633,6 +633,7 @@ html.shop body{padding-bottom:calc(136px + env(safe-area-inset-bottom))}
 html.shop #toast, html.shop #stoast{bottom:calc(138px + env(safe-area-inset-bottom))}
 html.shop #inbar{display:none}
 html.wishview #addbar{display:none!important}
+#sheet input.askt{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;font-size:16px;color:var(--ink);background:var(--card);margin:4px 0 2px}
 #sheet textarea.fbt{width:100%;box-sizing:border-box;min-height:130px;border:1px solid var(--line);border-radius:12px;padding:11px 12px;font:inherit;font-size:16px;line-height:1.5;color:var(--ink);background:var(--card);resize:vertical}
 #sheet .fbn{text-align:right;font-size:12px;color:var(--dim);margin:5px 2px 12px}
 #sheet .fbhp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}   /* 로봇만 채우는 칸 — 채워져 오면 버린다 */   /* 찜 화면·장보기 중엔 홈 화면 추가 상자도 안 띄운다 (2026-10-04) */
@@ -1493,7 +1494,7 @@ function start(d){
       msg = "가져왔어요 — 찜 " + a + "개, 직접 입력한 가격 " + m + "개";
     } catch (e) {}
     try { history.replaceState({}, "", location.pathname); } catch(e){}
-    setTimeout(() => alert(msg), 300);
+    setTimeout(() => toast(msg), 300);
   } else if (wantBig) {
     BIG = wantBig;
     $("#chips").querySelectorAll(".chip").forEach(
@@ -1917,6 +1918,10 @@ function emptyHTML(raw, view, pass){
   if (!raw && view === "cart" && curList())   // 새로 만든 빈 목록 (2026-10-03)
     return '<div class="empty"><div class="e-head">아직 비어 있어요</div>' +
       '<div class="e-sub">내 찜에서 상품을 누르고 <b>다른 목록으로 옮기기</b>나 <b>복사하기</b>로 담을 수 있어요</div></div>';
+  if (!raw && view === "cart" && !curList() && !CART.length && BIG === "전체")
+    return '<div class="empty"><div class="e-head">찜한 상품을 다 뺐어요</div>' +
+      '<div class="e-sub">상품 카드의 ♡를 누르면 여기 모여요</div>' +
+      '<div class="e-btns"><button class="e-go" data-act="leave">상품 보러 가기 ›</button></div></div>';
   if (raw && BIG !== "전체")
     head = quoted + jo(raw, "은", "는") + " " + esc(BIG) + "에 없어요";
   let html = '<div class="empty"><div class="e-head">' + head + "</div>";
@@ -2179,7 +2184,7 @@ addEventListener("hashchange", () => {
     run();
   } catch (e) {}
   try { history.replaceState({}, "", location.pathname); } catch(e){}
-  alert(msg);
+  toast(msg);
 });
 
 const OUT = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
@@ -2802,7 +2807,17 @@ function openSheet(html, cls){
   markOverlay();
 }
 function closeSheet(){ dismiss(); }
-let ASK = null;
+let ASK = null, ASKT = null;
+function askText(title, note, init, ph, ok, max, multi, fn){
+  ASKT = fn;
+  openSheet("<h3>" + esc(title) + "</h3>" + (note ? '<p class="note">' + esc(note) + "</p>" : "") +
+    (multi ? '<textarea id="askt" class="fbt" style="min-height:90px" maxlength="' + max + '" placeholder="' + esc(ph || "") + '"></textarea>'
+           : '<input id="askt" class="askt" maxlength="' + max + '" placeholder="' + esc(ph || "") + '" autocomplete="off">') +
+    '<button class="go" data-act="ask-text">' + esc(ok) + "</button>");
+  const t = $("#askt"); t.value = init || "";
+  if (!multi) t.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); $('#sheet [data-act="ask-text"]').click(); } });
+  setTimeout(() => { try { t.focus(); } catch(e){} }, 320);
+}
 function askSheet(title, note, yes, no, danger, fn){
   ASK = fn;
   openSheet("<h3>" + esc(title) + "</h3>" + (note ? '<p class="note">' + esc(note) + "</p>" : "") +
@@ -2859,6 +2874,7 @@ $("#sheet").addEventListener("click", e => {
   if (act) ITEM_OPEN = 0;                      // 메뉴에서 무엇이든 골랐다 — 그 일의 신호가 따로 간다
   if (act === "ask-yes"){ const f = ASK; ASK = null; closeSheet(); if (f) setTimeout(f, 260); return; }
   if (act === "ask-no"){ ASK = null; return closeSheet(); }
+  if (act === "ask-text"){ const f = ASKT, v = ($("#askt") || {}).value || ""; ASKT = null; closeSheet(); if (f) setTimeout(() => f(v), 260); return; }
   if (act === "help") return openHelp();
   if (act === "helpctx") return openHelp($("#view").value === "cart" ? "h-cart" : undefined);
   if (act === "stamps") return openStamps();
@@ -2921,7 +2937,7 @@ $("#sheet").addEventListener("click", e => {
   if (act === "sel-start"){ closeSheet(); return setTimeout(selStart, 260); }
   if (act === "cart-moveall"){ VR.hit("lall");   /* l- 로 시작하면 listAct 로 먼저 빠진다 */ return openPickMulti(CART.slice(), "move", "내 찜 " + CART.length + "개를 어느 목록으로 옮길까요?", "수량도 같이 가고, 내 찜은 비워져요 · 바로 되돌릴 수 있어요"); }
   if (act === "pk-to") return pickDo(b.dataset.to);
-  if (act === "pk-new"){ closeSheet(); return setTimeout(() => { const N = makeOwn(); if (N) pickDo(N.id, true); else PICK = null; }, 260); }
+  if (act === "pk-new"){ closeSheet(); return setTimeout(() => makeOwn(N => { if (N) pickDo(N.id, true); else PICK = null; }), 260); }
   if (act === "add"){ CART.push(p); saveCart(); closeSheet(); inappJit(); homeHint(); return run(); }
   if (act === "del"){
     CART = CART.filter(x => x !== p);
@@ -2975,14 +2991,12 @@ $("#sheet").addEventListener("click", e => {
     return;
   }
   if (act === "movein"){
-    const t = prompt("옮길 링크나 글을 붙여 넣으세요");
-    if (!t) return;
-    try {
-      const [a, m] = unpack(t);
-      closeSheet(); run();
-      alert("가져왔어요 — 찜 " + a + "개, 직접 입력한 가격 " + m + "개");
-    } catch (e) { alert("읽지 못했어요. 링크를 통째로 붙여 넣어 주세요."); }
-    return;
+    closeSheet();
+    return setTimeout(() => askText("옮길 링크 붙여 넣기", "다른 기기에서 복사한 링크를 통째로 붙여 넣어 주세요.", "", "", "가져오기", 4000, true, t => {
+      if (!t.trim()) return;
+      try { const [a, m] = unpack(t.trim()); run(); toast("가져왔어요 — 찜 " + a + "개, 직접 입력한 가격 " + m + "개"); }
+      catch (e) { toast("읽지 못했어요. 링크를 통째로 붙여 넣어 주세요"); }
+    }), 260);
   }
   if (act === "price") return openPrice(p);
   if (act === "save"){
@@ -3821,10 +3835,11 @@ function listTabs(view){
   if (on && sc){ const a = on.offsetLeft, b = a + on.offsetWidth;
     if (a < sc.scrollLeft) sc.scrollLeft = a - 8; else if (b > sc.scrollLeft + sc.clientWidth) sc.scrollLeft = b - sc.clientWidth + 8; }
 }
-function makeOwn(){
-  const v = prompt("새 목록 이름 (예: 화장품, 다음에 살 것)", "");
-  if (v == null) return null;
-  const nm = cleanName(v, 16); if (!nm) return null;
+function makeOwn(cb){
+  askText("새 목록 만들기", "", "", "예: 화장품, 다음에 살 것", "만들기", 16, false, v => cb(ownNew(v)));
+}
+function ownNew(v){
+  const nm = cleanName(v || "", 16); if (!nm) return null;
   const no = LISTS.reduce((m, l) => Math.max(m, l.no || 0), 0) + 1;
   const N = {id: "L" + Date.now().toString(36), no: no, key: "", from: "", name: nm, items: [], q: {},
              at: new Date().toISOString(), arch: 0, own: 1};
@@ -4075,7 +4090,7 @@ function listAct(act, b){
   }
   if (act === "l-share"){ closeSheet(); return setTimeout(shareCart, 260); }
   if (act === "l-import"){ closeSheet(); return setTimeout(openImport, 260); }
-  if (act === "l-new"){ closeSheet(); return setTimeout(() => { const N = makeOwn(); if (N) openList(N.id); }, 260); }
+  if (act === "l-new"){ closeSheet(); return setTimeout(() => makeOwn(N => { if (N) openList(N.id); }), 260); }
   if (act === "l-clear"){
     if (!CART.length) return closeSheet();
     return askSheet("찜 " + CART.length + "개를 모두 지울까요?", "지운 뒤에는 되돌릴 수 없어요.", "모두 지우기", "그만두기", true,
@@ -4084,9 +4099,8 @@ function listAct(act, b){
   const L = curList(); if (!L) return closeSheet();
   if (act === "l-rename"){
     closeSheet();
-    const v = prompt("목록 이름", L.name || "");
-    if (v == null) return;
-    L.name = cleanName(v, 16); saveLists(); return run();
+    return setTimeout(() => askText("목록 이름 바꾸기", "", L.name || "", "", "바꾸기", 16, false,
+                                    v => { L.name = cleanName(v, 16); saveLists(); run(); }), 260);
   }
   if (act === "l-move"){
     let n = 0;
@@ -4205,6 +4219,7 @@ $("#list").addEventListener("click", e => {
   }
   if (act === "view" || act === "both") $("#view").value = "all";
   if (act === "clear") $("#q").value = "";
+  if (act === "leave") return backFromCart();      // 빈 찜 → 찜 화면을 나가 전체 목록으로
   if (act === "sugg"){ VR.hit("sugg", null, null, b.dataset.w); $("#q").value = b.dataset.w; SUB = ""; }
   run();
 });
