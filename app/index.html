@@ -305,6 +305,7 @@ header.peek > :not(.top){visibility:hidden}   /* 로고 줄만 꺼낼 때 그 �
 #sheet .box{animation:shup .3s cubic-bezier(.22,.9,.32,1)}
 #sheet.out{animation:shbgout .2s ease-in forwards;pointer-events:none}
 #sheet.out .box{animation:shdown .2s ease-in forwards}
+#sheet .box.kbd{animation:none}   /* 글을 받는 창 — 창이 올라온 뒤 키보드가 또 밀어 올려 튕겼다 (2026-10-08). 키보드와 한 번에 */
 @media(min-width:520px){#sheet .box{animation-name:shpop;animation-duration:.24s}#sheet.out .box{animation-name:shpopout}}
 #guide.on{animation:ovfade .22s ease-out}
 #guide.on .gcard{animation:shpop .28s cubic-bezier(.22,.9,.32,1)}
@@ -2786,7 +2787,7 @@ addEventListener("popstate", () => {
     } else history.back();             // 손님이 이미 다 풀어 둔 채 뒤로 — 원래대로 나간다
     return;
   }
-  if (!open && $("#view").value === "cart" && SHOP){ VR.hit("shopback"); try { history.pushState({cart:1}, ""); } catch(e){} return; }
+  if (!open && $("#view").value === "cart" && SHOP){ VR.hit("shopback"); try { history.pushState({cart:1}, ""); } catch(e){} return askShopEnd(); }
   if (!open && $("#view").value === "cart") restorePrev();
 });
 
@@ -2813,10 +2814,10 @@ function askText(title, note, init, ph, ok, max, multi, fn){
   openSheet("<h3>" + esc(title) + "</h3>" + (note ? '<p class="note">' + esc(note) + "</p>" : "") +
     (multi ? '<textarea id="askt" class="fbt" style="min-height:90px" maxlength="' + max + '" placeholder="' + esc(ph || "") + '"></textarea>'
            : '<input id="askt" class="askt" maxlength="' + max + '" placeholder="' + esc(ph || "") + '" autocomplete="off">') +
-    '<button class="go" data-act="ask-text">' + esc(ok) + "</button>");
+    '<button class="go" data-act="ask-text">' + esc(ok) + "</button>", "kbd");
   const t = $("#askt"); t.value = init || "";
   if (!multi) t.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); $('#sheet [data-act="ask-text"]').click(); } });
-  setTimeout(() => { try { t.focus(); } catch(e){} }, 320);
+  try { t.focus(); } catch(e){}               // 바로 — 창과 키보드가 한 번에 올라온다
 }
 function askSheet(title, note, yes, no, danger, fn){
   ASK = fn;
@@ -3083,7 +3084,7 @@ function importText(t){
 
 function openCart(){
   if ($("#view").value === "cart"){
-    if (SHOP){ VR.hit("shopwish"); toTop(); return; }       // 장보기 중엔 찜 단추로 카트를 나가지 않는다 (2026-10-08)
+    if (SHOP){ VR.hit("shopwish"); return askShopEnd(); }    // 장보기 중엔 찜 단추로 카트를 나가지 않는다 — 끝낼지 묻는다 (2026-10-08)
     return backFromCart();                                   // 한 번 더 누르면 되돌아간다
   }
   VR.hit("wish", null, null, "n" + CART.length);             // 열 때 찜 개수 (빈 찜 안내를 몇 명이 보나)
@@ -3752,6 +3753,13 @@ function autoBar(){
     (R.none ? "담은 게 없어서 영수증은 없어요" : esc(R.auto || "") + " · " + R.kin + "가지 담음") + "</span></div>" +
     (R.none ? "" : '<button class="go" type="button">영수증 보기</button>') +
     '<button class="x" type="button" aria-label="닫기">✕</button>';
+}
+function askShopEnd(){
+  if (!SHOP) return;
+  if (!shopStat().kin)
+    return askSheet("장보기를 끝낼까요?", "아직 담은 게 없어요. 끝내면 찜 화면으로 돌아가요.", "장보기 끝내기", "계속 장보기", false,
+                    () => { VR.hit("shopend", null, null, "n0"); SHOP = null; saveShop(); run(); });
+  askSheet("장보는 중이에요", "장보기를 끝내면 영수증이 나오고 찜 화면으로 돌아가요.", "🧾 장보기 종료", "계속 장보기", false, finishShop);
 }
 function askShopDone(){
   if (!SHOP) return;
