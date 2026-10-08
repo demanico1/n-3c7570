@@ -1769,6 +1769,27 @@ function qToks(raw){
   return raw.split(/[\s·]+/).map(t => t.replace(/^[.,!?~'"`;:…]+|[.,!?~'"`;:…]+$/g, "")).filter(Boolean);
 }
 let SRCH_T = 0, SRCH_N = 0, SRCH_LAST = "";
+let SQ = null, SQ_N = 0;
+function sqBin(n){ return n === 0 ? "0" : n <= 5 ? "5" : n <= 20 ? "20" : n <= 60 ? "60" : "99"; }
+function srchPick(p, how){
+  try {
+    const q = $("#q").value.trim();
+    if (q.length < 2 || ONLY || WLIST || SQ_N >= 12) return;
+    if (!SQ || SQ.q !== q.slice(0, 30)) SQ = {q: q.slice(0, 30), n: VIEW.length, at: Date.now()};   // 1.5초 안에 바로 누른 사람
+    if (SQ.done) return;
+    SQ.done = 1; SQ_N++;
+    const i = VIEW.findIndex(x => x.p === p);
+    VR.hit("srchpick", null, null, SQ.q + "@" + (i < 0 ? "x" : i + 1) + "." + how + ($("#view").value === "cart" ? "@찜" : ""), p);
+  } catch(e){}
+}
+function srchMiss(why, next){   // next = 바꿔 친 말 (`콜라@바꿈.5>코카콜라`)
+  try {
+    if (!SQ || SQ.done || SQ_N >= 12){ if (why !== "나감") SQ = null; return; }
+    SQ_N++; VR.hit("srchmiss", null, null, (SQ.q + "@" + why + "." + sqBin(SQ.n) + (next ? ">" + next : "")).slice(0, 64));
+    SQ = null;
+  } catch(e){}
+}
+addEventListener("pagehide", () => srchMiss("나감"));
 function srchHit(raw){
   clearTimeout(SRCH_T);
   if (raw.length < 2 || SRCH_N >= 6 || raw === SRCH_LAST || ONLY || WLIST) return;
@@ -1776,6 +1797,10 @@ function srchHit(raw){
     if ($("#q").value.trim() !== raw) return;
     SRCH_LAST = raw; SRCH_N++;
     VR.hit("srch", null, null, raw.slice(0, 30));
+    if (!SQ || SQ.q !== raw.slice(0, 30)){          // 1.5초 안에 먼저 눌렀으면 그 검색을 그대로 둔다
+      srchMiss("바꿈", raw);
+      SQ = {q: raw.slice(0, 30), n: VIEW.length, at: Date.now()};
+    }
     if (!VIEW.length) VR.hit("srch0", null, null, raw.slice(0, 30)
       + ($("#view").value === "cart" ? "@찜" : "") + (BIG !== "전체" ? "@" + BIG : "") + (SUB ? "@" + SUB : ""));
   }, 1500);
@@ -1785,6 +1810,7 @@ function run(){
   if (HOME_PEND){ HOME_PEND = false; setTimeout(() => inbar("home"), 0); }
   syncBar();
   const raw = $("#q").value.trim();
+  if (!raw && SQ) srchMiss("지움");
   srchHit(raw);
   $("#clr").style.display = raw ? "block" : "none";
   { let sq = false; try { sq = shopOn() && !!raw; } catch (e) {}
@@ -4380,6 +4406,8 @@ $("#list").addEventListener("click", e => {
   const card = e.target.closest(".item"); if (!card) return;
   const p = card.dataset.p;
   const it = DATA.find(x => x.p === p); if (!it) return;
+  if ($("#q").value.trim()) srchPick(p, e.target.closest(".cart") ? "찜" : e.target.closest(".bkb") ? "담기"
+    : e.target.closest(".qb, .cq") ? "수량" : e.target.closest(".stag") ? "종류" : (!GAL && e.target.closest(".thumb")) ? "사진" : "메뉴");
 
   if (e.target.closest(".stag")){ stamp("stag"); VR.hit("stag", null, null, it.sub || "", it.p); return sameSub(it); }   // 종류 꼬리표 (2026-10-08)
 
