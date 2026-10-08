@@ -305,7 +305,6 @@ header.peek > :not(.top){visibility:hidden}   /* 로고 줄만 꺼낼 때 그 �
 #sheet .box{animation:shup .3s cubic-bezier(.22,.9,.32,1)}
 #sheet.out{animation:shbgout .2s ease-in forwards;pointer-events:none}
 #sheet.out .box{animation:shdown .2s ease-in forwards}
-#sheet .box.kbd{animation:none}   /* 글을 받는 창 — 창이 올라온 뒤 키보드가 또 밀어 올려 튕겼다 (2026-10-08). 키보드와 한 번에 */
 @media(min-width:520px){#sheet .box{animation-name:shpop;animation-duration:.24s}#sheet.out .box{animation-name:shpopout}}
 #guide.on{animation:ovfade .22s ease-out}
 #guide.on .gcard{animation:shpop .28s cubic-bezier(.22,.9,.32,1)}
@@ -2814,10 +2813,9 @@ function askText(title, note, init, ph, ok, max, multi, fn){
   openSheet("<h3>" + esc(title) + "</h3>" + (note ? '<p class="note">' + esc(note) + "</p>" : "") +
     (multi ? '<textarea id="askt" class="fbt" style="min-height:90px" maxlength="' + max + '" placeholder="' + esc(ph || "") + '"></textarea>'
            : '<input id="askt" class="askt" maxlength="' + max + '" placeholder="' + esc(ph || "") + '" autocomplete="off">') +
-    '<button class="go" data-act="ask-text">' + esc(ok) + "</button>", "kbd");
+    '<button class="go" data-act="ask-text">' + esc(ok) + "</button>");
   const t = $("#askt"); t.value = init || "";
   if (!multi) t.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); $('#sheet [data-act="ask-text"]').click(); } });
-  try { t.focus(); } catch(e){}               // 바로 — 창과 키보드가 한 번에 올라온다
 }
 function askSheet(title, note, yes, no, danger, fn){
   ASK = fn;
@@ -3124,7 +3122,6 @@ function openPrice(p){
     '<button data-act="nomatch" data-p="' + p + '">같은 상품 없음</button>' +
     (MINE[p] ? '<button class="off" data-act="unset" data-p="' + p +
                '">입력한 가격 지우기</button>' : ""));
-  setTimeout(() => { const el = $("#pin"); if (el) el.focus(); }, 60);
 }
 
 const UA = navigator.userAgent;
