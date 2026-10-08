@@ -250,6 +250,13 @@ main{padding:10px 12px 28px;display:grid;gap:8px}
 #onlybar button{font-size:12.5px;padding:6px 12px;border-radius:7px;cursor:pointer;
         background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.45);color:#fff}
 .empty{grid-column:1/-1;text-align:center;color:var(--dim);padding:44px 12px}
+.widen{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 12px 4px;padding:10px 12px;
+  background:var(--good-bg);border-radius:12px;font-size:13.5px;color:var(--ink);line-height:1.4}
+.widen span{min-width:0;word-break:keep-all;text-wrap:balance}
+.wdn-b{flex:none;border:1px solid var(--good);background:var(--bg);color:var(--good);font:inherit;font-size:12.5px;font-weight:700;
+  padding:7px 10px;border-radius:999px;cursor:pointer}
+.empty.wfind{padding:26px 12px 14px}
+.empty.wfind2{padding:6px 12px 30px}
 .e-head{font-size:15px;font-weight:600;color:var(--fg);margin-bottom:6px}
 .e-sub{font-size:12.5px;line-height:1.7;margin-bottom:14px}
 .e-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
@@ -1717,6 +1724,15 @@ try {
 } catch(e){ document.documentElement.setAttribute("data-theme", "light"); }
 addEventListener("DOMContentLoaded", themeLabel);
 
+var WIDEN = null, WIDEN_T = 0, WIDEN_NO = "";   // 칩을 풀어 넓혀 찾은 상태 (2026-10-08)
+function chipSync(){ $("#chips").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c.dataset.b === BIG)); }
+function joEun(w){   // 은/는 — 받침을 보고 고른다
+  const c = w.charCodeAt(w.length - 1);
+  return (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28) ? "은" : "는";
+}
+function qToks(raw){
+  return raw.split(/[\s·]+/).map(t => t.replace(/^[.,!?~'"`;:…]+|[.,!?~'"`;:…]+$/g, "")).filter(Boolean);
+}
 let SRCH_T = 0, SRCH_N = 0, SRCH_LAST = "";
 function srchHit(raw){
   clearTimeout(SRCH_T);
@@ -1725,7 +1741,8 @@ function srchHit(raw){
     if ($("#q").value.trim() !== raw) return;
     SRCH_LAST = raw; SRCH_N++;
     VR.hit("srch", null, null, raw.slice(0, 30));
-    if (!VIEW.length) VR.hit("srch0", null, null, raw.slice(0, 30));   // 못 찾은 말 — 별칭에 더할 거리 (2026-10-08)
+    if (!VIEW.length) VR.hit("srch0", null, null, raw.slice(0, 30)
+      + ($("#view").value === "cart" ? "@찜" : "") + (BIG !== "전체" ? "@" + BIG : "") + (SUB ? "@" + SUB : ""));
   }, 1500);
 }
 var HOME_PEND = false;
@@ -1745,7 +1762,7 @@ function run(){
       history.replaceState(history.state, "", raw ? "#" + encodeURIComponent(raw) : " ");
   } catch(e){}
 
-  const toks = raw.split(/[\s·]+/).filter(Boolean).map(t => ({
+  const toks = qToks(raw).map(t => ({
     j: noSpace(t.toLowerCase()),
     c: toCho(t),
     cho: CHO_ONLY.test(t) && !/[가-힣]/.test(t)
@@ -1779,6 +1796,16 @@ function run(){
   const BASE = DATA.filter(it => pass(it, BIG, view, true));
   if (toks.some(t => t.cho) && BASE.length) stamp("cho");             // 📖 도장 — 초성으로 찾아 봤다
   VIEW = SUB ? BASE.filter(it => it.sub === SUB) : BASE;
+  clearTimeout(WIDEN_T);
+  if (WIDEN && BIG !== "전체") WIDEN = null;                     // 손님이 다른 칩을 골랐다
+  if (WIDEN && !raw){ BIG = WIDEN.big; SUB = WIDEN.sub; WIDEN = null; chipSync(); return run(); }
+  if (raw && !VIEW.length && view === "all" && !ONLY && !WLIST && !SHOP && (BIG !== "전체" || SUB) && WIDEN_NO !== raw
+      && DATA.some(it => pass(it, "전체", view, false)))
+    WIDEN_T = setTimeout(() => {
+      if ($("#q").value.trim() !== raw || VIEW.length) return;
+      VR.hit("widen", null, null, raw.slice(0, 30) + "@" + BIG + (SUB ? "@" + SUB : ""));
+      WIDEN = {big: BIG, sub: SUB}; BIG = "전체"; SUB = ""; chipSync(); run();
+    }, 700);
   subChips(BASE, raw, view);
   curTag();
 
@@ -1826,8 +1853,27 @@ function run(){
   SHOWN = 0;
   $("#list").innerHTML = "";
   if (!VIEW.length){
+    if (raw && view === "cart" && !curList() && !SHOP && !WLIST && !ONLY){
+      const alt = DATA.filter(it => pass(it, "전체", "all", true))
+                      .sort((a, b) => (b._s - a._s) || ((b.rv || 0) - (a.rv || 0)));
+      if (alt.length){
+        const n = alt.length.toLocaleString("ko-KR");
+        $("#list").innerHTML =
+          '<div class="empty wfind"><div class="e-head">‘' + esc(raw) + '’' + joEun(raw) + " 찜에 없어요</div>" +
+          '<div class="e-sub">전체 상품에서 <b>' + n + "개</b> 찾았어요<br>♡ 누르면 바로 찜에 담겨요</div></div>" +
+          alt.slice(0, GAL ? 4 : 3).map(it => card(it, raw)).join("") +     // 갤러리는 두 장씩이라 4장 — 한 장이 혼자 남지 않게
+          (alt.length > (GAL ? 4 : 3) ? '<div class="empty wfind2"><div class="e-btns"><button class="e-go" data-act="wishall">전체에서 ' + n + "개 다 보기 ›</button></div></div>" : "");
+        sharpen_all();
+        return;
+      }
+    }
     $("#list").innerHTML = emptyHTML(raw, view, pass);
     return;
+  }
+  if (WIDEN && raw){
+    const w = esc(WIDEN.sub || WIDEN.big);
+    $("#list").insertAdjacentHTML("beforeend", '<div class="widen"><span><b>' + w + "</b>에는 없어서 전체에서 찾았어요</span>" +
+      '<button class="wdn-b" data-act="unwiden">' + w + "에서만 보기</button></div>");
   }
   more();
   scheduleTips();
@@ -1882,7 +1928,23 @@ function suggest(raw){
   }
   out.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
   const seen = new Set();
-  return out.map(x => x[2]).filter(w => !seen.has(w) && seen.add(w)).slice(0, 3);
+  const sp = splitSugg(raw);
+  return out.map(x => x[2]).concat(sp ? [sp] : []).filter(w => !seen.has(w) && seen.add(w)).slice(0, 3);
+}
+const ONE_WORD = "폼컵팩껌캔병빵김차밥면술잼티펜솔";
+function splitSugg(raw){
+  const s = raw.trim();
+  if (/\s/.test(s) || s.length < 3) return "";
+  let best = null;
+  for (let i = 1; i < s.length; i++){
+    const A = s.slice(0, i), B = s.slice(i);
+    if ((A.length < 2 && !ONE_WORD.includes(A)) || (B.length < 2 && !ONE_WORD.includes(B))) continue;
+    const a = " " + noSpace(A.toLowerCase()), b = " " + noSpace(B.toLowerCase());
+    let n = 0;
+    for (const it of DATA){ const w = " " + it._bw; if (w.includes(a) && w.includes(b)) n++; }
+    if (n && (!best || n > best[0])) best = [n, s.slice(0, i) + " " + s.slice(i)];
+  }
+  return best ? best[1] : "";
 }
 function emptyHTML(raw, view, pass){
   const vName = n => {
@@ -1998,7 +2060,7 @@ function hi(name, raw){
   const safe = esc(name);
   if (!raw) return safe;
   let out = safe;
-  for (const t of raw.split(/[\s·]+/).filter(Boolean)){
+  for (const t of qToks(raw)){
     const e = esc(t).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     if (e) out = out.replace(new RegExp(e, "gi"), m => "<mark>" + m + "</mark>");
   }
@@ -3679,7 +3741,7 @@ function finishShop(){
   const s = shopStat();
   if (!s.kin) return askSheet("아직 담은 게 없어요", "장보기를 끝내면 카트만 닫혀요. 찜 목록은 그대로 남아요.",
                               "장보기 끝내기", "계속 장보기", false, () => {
-    VR.hit("shopend"); SHOP = null; saveShop(); run(); toast("장보기를 끝냈어요"); });
+    VR.hit("shopend", null, null, "n0"); SHOP = null; saveShop(); run(); toast("장보기를 끝냈어요"); });
   VR.hit("shopend", null, null, "n" + s.kin);
   makeReceipt(new Date());
   SHOP = null; saveShop(); $("#q").value = ""; run();
@@ -4214,9 +4276,17 @@ $("#startcard").addEventListener("click", e => {
 });
 $("#helpgo").addEventListener("click", () => openHelp($("#view").value === "cart" ? "h-cart" : undefined));
 $("#list").addEventListener("click", e => {
-  const b = e.target.closest(".e-go");
+  const b = e.target.closest(".e-go, .wdn-b");
   if (!b) return;
   const act = b.dataset.act;
+  if (act === "unwiden" && WIDEN){   // 넓혀 찾기 되돌리기 — 이 검색어로는 다시 안 넓힌다
+    VR.hit("unwiden"); BIG = WIDEN.big; SUB = WIDEN.sub; WIDEN = null; WIDEN_NO = $("#q").value.trim(); chipSync(); return run();
+  }
+  if (act === "wishall"){   // 찜을 나가 전체 목록에서 같은 검색어로
+    VR.hit("wishall");
+    PREV = {q: $("#q").value.trim(), big: "전체", sub: "", view: "all", sort: SORTK, y: 0};
+    return backFromCart();
+  }
   if (act === "big" || act === "both"){
     BIG = "전체";
     $("#chips").querySelectorAll(".chip").forEach(
