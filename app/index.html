@@ -3559,6 +3559,7 @@ const TIP_EYE = "IntersectionObserver" in window ? new IntersectionObserver(es =
   const k = en.target.dataset.k; TIP_EYE.unobserve(en.target);
   if (TIP_COUNTED[k]) return; TIP_COUNTED[k] = 1;
   const s = jget(TIPSEEN_KEY, {}); s[k] = (s[k] || 0) + 1; jset(TIPSEEN_KEY, s);
+  VR.hit("tipsee", null, null, k);   // ★ 2026-10-08 — 팁 카드가 화면에 60% 넘게 들어왔다 (팁마다 한 방문 한 번)
 }), {threshold: .6}) : null;
 function tipsOK(){
   const v = $("#view").value;
@@ -4260,7 +4261,7 @@ $("#onlyall").addEventListener("click", () => {
 $("#list").addEventListener("click", e => {
   const c = e.target.closest(".tipc"); if (!c) return;
   const k = c.dataset.k;
-  if (e.target.closest(".tx")){ const x = jget(TIPX_KEY, {}); x[k] = 1; jset(TIPX_KEY, x); c.remove(); return; }
+  if (e.target.closest(".tx")){ VR.hit("tipx", null, null, k); const x = jget(TIPX_KEY, {}); x[k] = 1; jset(TIPX_KEY, x); c.remove(); return; }
   if (e.target.closest(".tstop")){                     // 팁 카드 전부 끔 (2026-10-04)
     try { localStorage.setItem(TIPOFF_KEY, "1"); } catch(err){}
     document.querySelectorAll("#list .tipc").forEach(z => z.remove());
@@ -4268,7 +4269,7 @@ $("#list").addEventListener("click", e => {
     VR.hit("tipoff");
     return;
   }
-  if (e.target.closest(".tgo")){ const t = TRY[k]; if (t) t.go(); }
+  if (e.target.closest(".tgo")){ VR.hit("tiptry", null, null, k); const t = TRY[k]; if (t) t.go(); }
 });
 $("#startcard").addEventListener("click", e => {
   if (e.target.closest(".sgo")){ tourDone("seen"); VR.hit("first-tour"); startTour(0); }
