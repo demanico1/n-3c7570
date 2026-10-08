@@ -178,3 +178,16 @@
 /c/etc/담배/ / 302
 /c/etc/담배 / 302
 # <<< 광고 검수 동안 담배 숨김
+
+# >>> 2026-10-08 작은 정리 (사장님 1차)
+# ⑨ 아이폰은 사이트 맨 앞 /apple-touch-icon.png 를 먼저 찾는다 — 파일도 맨 앞에 두었고, 옛 앱이 찾던 /app/icons/ 는 /icons/ 로
+/app/icons/*  /icons/:splat  301
+# ⑩ 사진 없는 상품 4개 — 상품 페이지 글을 바꾸지 않고 '사진 준비 중' 그림으로 (그림은 /no-photo.jpg)
+/big/33036.jpg  /no-photo.jpg  302
+/big/34742.jpg  /no-photo.jpg  302
+/big/32604.jpg  /no-photo.jpg  302
+/big/32606.jpg  /no-photo.jpg  302
+# ⑪ /b/ 를 잘라 들어온 사람·로봇 — 브랜드 목록 페이지가 없어 홈으로
+/b/  /  301
+/b  /  301
+# <<<
