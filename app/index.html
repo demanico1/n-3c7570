@@ -1352,6 +1352,8 @@ const VR = (function(){
     try { if (!(navigator.sendBeacon && navigator.sendBeacon(u))) fetch(u, {method: "POST", keepalive: true}); } catch(e){}
   }
   hit("view");
+  try { const F = JSON.parse(sessionStorage.getItem("pxp-from") || "null"); sessionStorage.removeItem("pxp-from");
+        if (F && Date.now() - F.t < 60000) hit("from", null, null, (F.l + "@" + F.f).slice(0, 60)); } catch(e){}
   if (via) hit(via, lo, lg, from ? "f" + from : "");    // 받은 쪽 신호에 보낸 사람 번호 → /hit/app/in-s/<곳>/<단계>/f<번호6>
   const myId = V ? V.slice(-10, -4) : "";                // 내 번호 앞 6자 (V = '/~v<n>.<번호10>')
   return {hit: hit, tag: () => "r=" + me.o + "." + Math.min(me.g + 1, 99) + (myId ? "." + myId : "")};
