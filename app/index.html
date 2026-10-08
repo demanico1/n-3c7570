@@ -686,6 +686,34 @@ html.dark .tag.tag-here{background:#2a2412;color:#e6c455}
 .item.unfaved>*:not(.unfav){opacity:.25;transition:opacity .2s}
 .item .unfav{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:3;font-size:14px;font-weight:700;color:var(--ink);border-radius:inherit;background:color-mix(in srgb,var(--card) 62%,transparent)}
 .item .unfav button{border:1px solid var(--good);background:var(--card);color:var(--good);font-weight:800;font-size:14px;border-radius:999px;padding:7px 16px}
+#nmbox{margin:10px 12px 0;padding:13px 14px 12px;border-radius:14px;background:var(--good-bg);color:var(--ink);font-size:14px;line-height:1.5;position:relative}
+#nmbox .t{font-weight:800;font-size:15px;margin:0 26px 8px 0}
+#nmbox .qs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}
+#nmbox .q{display:inline-flex;align-items:center;gap:7px;padding:6px 13px 6px 7px;border-radius:999px;background:var(--bg);border:1.5px solid #03c75a;font-weight:800;font-size:15px}
+#nmbox .q.g{border-color:#4285F4}
+#nmbox .ic{flex:none;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px}
+#nmbox .ic.n{background:#03c75a;color:#fff;font:900 15px/1 Arial,sans-serif}
+#nmbox .ic.gg{background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+#nmbox .sub{margin:0 0 10px;font-size:13.5px;color:var(--dim)}
+#nmbox .r{display:flex;gap:8px}
+#nmbox .r button{border:0;border-radius:10px;padding:9px 12px;font:inherit;font-weight:800;font-size:13.5px;cursor:pointer}
+#nmbox .go{background:#0b7a4b;color:#fff}#nmbox .no{background:transparent;color:var(--dim)}
+#nmbox .x{position:absolute;right:8px;top:6px;border:0;background:none;color:var(--dim);font-size:16px;padding:6px;cursor:pointer}
+html.shop #nmbox{display:none}
+.top .brand{container-type:inline-size}
+.top .brand>span{display:flex;align-items:center;gap:7px;overflow:hidden}
+.top .brand>span>i{flex:none;white-space:nowrap;font-weight:700;color:var(--dim);letter-spacing:.3px;margin-top:2px}
+.top .brand>span>b{flex:none}
+.top .brand>span>i{font-size:clamp(8px,calc((100cqw - 116px) / 4.15),13px)}   /* 남는 폭에 맞춰 글자 크기가 저절로 — 피엑스픽 네 글자 ≈ 4.15em */
+@container (max-width:149px){.top .brand>span>i{display:none}}   /* 8px 도 안 되면 못 읽으니 숨김 */   /* 체크 28 + 틈 8 + PXPICK 73 + 틈 7 + 피엑스픽 47 (10/8 잼) */
+.shc{grid-column:1/-1;margin:6px 12px 4px;padding:13px 14px;border-radius:14px;background:var(--good-bg);color:var(--ink);font-size:14px;line-height:1.45}
+#list.gal .shc{margin:6px 0 4px}
+.shc b.t{display:block;font-size:15px;margin-bottom:6px}.shc ol{margin:0 0 8px;padding-left:20px}.shc li{margin:2px 0}
+.shc .nm{margin:0 0 10px;padding-top:8px;border-top:1px dashed rgba(0,0,0,.15);font-size:13.5px}
+.shc .nm b,.rcpt .rnm b{color:#03a94f}
+.shc .r{display:flex;gap:8px}.shc button{border:0;border-radius:10px;padding:9px 12px;font:inherit;font-weight:800;font-size:13.5px;cursor:pointer}
+.shc .go{background:#0b7a4b;color:#fff}.shc .no{background:transparent;color:var(--dim)}
+.rcpt .rnm{margin:14px 0 4px;padding:11px 12px;border-radius:12px;background:var(--good-bg);font-size:14px;text-align:center;line-height:1.5}
 #autoend{display:flex;align-items:center;gap:10px;margin:10px 12px 0;padding:10px 10px 10px 12px;border-radius:12px;background:var(--good-bg);color:var(--ink);border:1px solid rgba(15,123,63,.18)}
 #autoend .i{font-size:22px}
 #autoend .t{flex:1;min-width:0;word-break:keep-all}
@@ -989,7 +1017,7 @@ document.addEventListener("click",function(e){var pa=document.getElementById("pr
 <div id="app" hidden>
   <header>
     <div class="top">
-      <a class="brand" id="home" href="./" title="처음 화면으로"><svg class="lg" viewBox="0 0 40 40" width="28" height="28" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#11974B"/><path d="M11.5 20.5l6 6 11-13" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b><svg class="wmsvg" viewBox="0 0 7520 1448" role="img" aria-label="PXPICK" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M98 1448H478V1012H702C1032 1012 1250 818 1250 508C1250 204 1038 0 714 0H98ZM478 716V304H626C770 304 852 382 852 508C852 636 770 716 626 716Z M1781.5 0H1353.5L1785.5 724L1339.5 1448H1773.5L2025.5 1010H2037.5L2291.5 1448H2727.5L2277.5 724L2711.5 0H2285.5L2037.5 432H2025.5Z"/><path fill="#11974B" d="M2863.0 1448H3243.0V1012H3467.0C3797.0 1012 4015.0 818 4015.0 508C4015.0 204 3803.0 0 3479.0 0H2863.0ZM3243.0 716V304H3391.0C3535.0 304 3617.0 382 3617.0 508C3617.0 636 3535.0 716 3391.0 716Z M4524.5 0H4144.5V1448H4524.5Z M5654.0 538H6040.0C6008.0 182 5746.0 -20 5386.0 -20C4996.0 -20 4690.0 242 4690.0 724C4690.0 1204 4988.0 1468 5386.0 1468C5802.0 1468 6020.0 1180 6040.0 932L5654.0 928C5634.0 1056 5540.0 1136 5394.0 1136C5198.0 1136 5082.0 996 5082.0 724C5082.0 466 5196.0 312 5396.0 312C5550.0 312 5642.0 402 5654.0 538Z M6203.6 1448H6583.6V1070L6717.6 898L7051.6 1448H7507.6L7001.6 646L7497.6 0H7051.6L6603.6 592H6583.6V0H6203.6Z"/></svg></b></span></a>
+      <a class="brand" id="home" href="./" title="처음 화면으로"><svg class="lg" viewBox="0 0 40 40" width="28" height="28" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#11974B"/><path d="M11.5 20.5l6 6 11-13" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b><svg class="wmsvg" viewBox="0 0 7520 1448" role="img" aria-label="PXPICK" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M98 1448H478V1012H702C1032 1012 1250 818 1250 508C1250 204 1038 0 714 0H98ZM478 716V304H626C770 304 852 382 852 508C852 636 770 716 626 716Z M1781.5 0H1353.5L1785.5 724L1339.5 1448H1773.5L2025.5 1010H2037.5L2291.5 1448H2727.5L2277.5 724L2711.5 0H2285.5L2037.5 432H2025.5Z"/><path fill="#11974B" d="M2863.0 1448H3243.0V1012H3467.0C3797.0 1012 4015.0 818 4015.0 508C4015.0 204 3803.0 0 3479.0 0H2863.0ZM3243.0 716V304H3391.0C3535.0 304 3617.0 382 3617.0 508C3617.0 636 3535.0 716 3391.0 716Z M4524.5 0H4144.5V1448H4524.5Z M5654.0 538H6040.0C6008.0 182 5746.0 -20 5386.0 -20C4996.0 -20 4690.0 242 4690.0 724C4690.0 1204 4988.0 1468 5386.0 1468C5802.0 1468 6020.0 1180 6040.0 932L5654.0 928C5634.0 1056 5540.0 1136 5394.0 1136C5198.0 1136 5082.0 996 5082.0 724C5082.0 466 5196.0 312 5396.0 312C5550.0 312 5642.0 402 5654.0 538Z M6203.6 1448H6583.6V1070L6717.6 898L7051.6 1448H7507.6L7001.6 646L7497.6 0H7051.6L6603.6 592H6583.6V0H6203.6Z"/></svg></b><i>피엑스픽</i></span></a>
             <button class="iconbtn" id="cartbtn" title="찜한 것"><span id="cartn"></span><em>찜</em></button>
       <span class="seg" id="mode" role="group" aria-label="보기 바꾸기"></span>
             <button class="iconbtn" id="more" title="메뉴">⋯<em>메뉴</em></button>
@@ -1049,7 +1077,7 @@ document.addEventListener("click",function(e){var pa=document.getElementById("pr
 <div id="preapp" aria-hidden="true">
   <header>
     <div class="top">
-      <a class="brand" id="home" href="./" title="처음 화면으로"><svg class="lg" viewBox="0 0 40 40" width="28" height="28" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#11974B"></rect><path d="M11.5 20.5l6 6 11-13" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b><svg class="wmsvg" viewBox="0 0 7520 1448" role="img" aria-label="PXPICK" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M98 1448H478V1012H702C1032 1012 1250 818 1250 508C1250 204 1038 0 714 0H98ZM478 716V304H626C770 304 852 382 852 508C852 636 770 716 626 716Z M1781.5 0H1353.5L1785.5 724L1339.5 1448H1773.5L2025.5 1010H2037.5L2291.5 1448H2727.5L2277.5 724L2711.5 0H2285.5L2037.5 432H2025.5Z"></path><path fill="#11974B" d="M2863.0 1448H3243.0V1012H3467.0C3797.0 1012 4015.0 818 4015.0 508C4015.0 204 3803.0 0 3479.0 0H2863.0ZM3243.0 716V304H3391.0C3535.0 304 3617.0 382 3617.0 508C3617.0 636 3535.0 716 3391.0 716Z M4524.5 0H4144.5V1448H4524.5Z M5654.0 538H6040.0C6008.0 182 5746.0 -20 5386.0 -20C4996.0 -20 4690.0 242 4690.0 724C4690.0 1204 4988.0 1468 5386.0 1468C5802.0 1468 6020.0 1180 6040.0 932L5654.0 928C5634.0 1056 5540.0 1136 5394.0 1136C5198.0 1136 5082.0 996 5082.0 724C5082.0 466 5196.0 312 5396.0 312C5550.0 312 5642.0 402 5654.0 538Z M6203.6 1448H6583.6V1070L6717.6 898L7051.6 1448H7507.6L7001.6 646L7497.6 0H7051.6L6603.6 592H6583.6V0H6203.6Z"></path></svg></b></span></a>
+      <a class="brand" id="home" href="./" title="처음 화면으로"><svg class="lg" viewBox="0 0 40 40" width="28" height="28" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#11974B"></rect><path d="M11.5 20.5l6 6 11-13" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b><svg class="wmsvg" viewBox="0 0 7520 1448" role="img" aria-label="PXPICK" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M98 1448H478V1012H702C1032 1012 1250 818 1250 508C1250 204 1038 0 714 0H98ZM478 716V304H626C770 304 852 382 852 508C852 636 770 716 626 716Z M1781.5 0H1353.5L1785.5 724L1339.5 1448H1773.5L2025.5 1010H2037.5L2291.5 1448H2727.5L2277.5 724L2711.5 0H2285.5L2037.5 432H2025.5Z"></path><path fill="#11974B" d="M2863.0 1448H3243.0V1012H3467.0C3797.0 1012 4015.0 818 4015.0 508C4015.0 204 3803.0 0 3479.0 0H2863.0ZM3243.0 716V304H3391.0C3535.0 304 3617.0 382 3617.0 508C3617.0 636 3535.0 716 3391.0 716Z M4524.5 0H4144.5V1448H4524.5Z M5654.0 538H6040.0C6008.0 182 5746.0 -20 5386.0 -20C4996.0 -20 4690.0 242 4690.0 724C4690.0 1204 4988.0 1468 5386.0 1468C5802.0 1468 6020.0 1180 6040.0 932L5654.0 928C5634.0 1056 5540.0 1136 5394.0 1136C5198.0 1136 5082.0 996 5082.0 724C5082.0 466 5196.0 312 5396.0 312C5550.0 312 5642.0 402 5654.0 538Z M6203.6 1448H6583.6V1070L6717.6 898L7051.6 1448H7507.6L7001.6 646L7497.6 0H7051.6L6603.6 592H6583.6V0H6203.6Z"></path></svg></b><i>피엑스픽</i></span></a>
             <button class="iconbtn" id="cartbtn" title="찜한 것"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.4C6.6 16.5 3 13.1 3 9.4 3 6.8 5 4.9 7.5 4.9c1.7 0 3.3.9 4.5 2.4C13.2 5.8 14.8 4.9 16.5 4.9 19 4.9 21 6.8 21 9.4c0 3.7-3.6 7.1-9 11z" stroke-linejoin="round"></path></svg><span id="cartn" style="display: none;">0</span><em>찜</em></button>
       <span class="seg" id="mode" role="group" aria-label="보기 바꾸기"><button type="button" data-v="1" class="on" aria-pressed="true" aria-label="사진 크게 보기"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"></rect><rect x="13" y="3" width="8" height="8" rx="2"></rect><rect x="3" y="13" width="8" height="8" rx="2"></rect><rect x="13" y="13" width="8" height="8" rx="2"></rect></svg><span class="sl">사진</span></button><button type="button" data-v="0" class="" aria-pressed="false" aria-label="한 줄씩 보기"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="6.4" height="6.4" rx="1.6"></rect><rect x="11.6" y="5.2" width="9.4" height="1.7" rx=".85"></rect><rect x="11.6" y="8.1" width="6.6" height="1.7" rx=".85"></rect><rect x="3" y="13.6" width="6.4" height="6.4" rx="1.6"></rect><rect x="11.6" y="14.8" width="9.4" height="1.7" rx=".85"></rect><rect x="11.6" y="17.7" width="6.6" height="1.7" rx=".85"></rect></svg><span class="sl">한 줄</span></button></span>
             <button class="iconbtn" id="more" title="메뉴">⋯<em>메뉴</em></button>
@@ -1334,7 +1362,8 @@ const VR = (function(){
   addEventListener("error", e => send((e.lineno ? "@" + e.lineno + " " : "") + (e.message || "").replace(/^Uncaught /, "")));
   addEventListener("unhandledrejection", e => send("p " + ((e.reason && e.reason.message) || e.reason)));
   const back = () => { try { const t = +sessionStorage.getItem("pxp-cpat"); if (!t) return; sessionStorage.removeItem("pxp-cpat");
-      const s = (Date.now() - t) / 1000; VR.hit("cpback", null, null, s < 30 ? "30" : s < 120 ? "120" : s < 600 ? "600" : "999"); } catch(e){} };
+      const s = (Date.now() - t) / 1000; VR.hit("cpback", null, null, s < 30 ? "30" : s < 120 ? "120" : s < 600 ? "600" : "999");
+      if (typeof nameBox === "function") nameBox(); } catch(e){} };
   addEventListener("pageshow", back);
   addEventListener("pagehide", () => { try {
     if (sessionStorage.getItem("pxp-cpat") || typeof filtered !== "function" || !filtered() || $("#view").value !== "all") return;
@@ -1870,6 +1899,8 @@ function run(){
     $("#list").innerHTML = emptyHTML(raw, view, pass);
     return;
   }
+  if (view === "cart" && !raw && !curList() && !SHOP && !WLIST && !ONLY && CART.length >= 3)
+    $("#list").insertAdjacentHTML("beforeend", shcCard());
   if (WIDEN && raw){
     const w = esc(WIDEN.sub || WIDEN.big);
     $("#list").insertAdjacentHTML("beforeend", '<div class="widen"><span><b>' + w + "</b>에는 없어서 전체에서 찾았어요</span>" +
@@ -3777,6 +3808,7 @@ function showReceipt(R){
       row("못 찾은 것", missTxt) +
       row("이번 달 PX", RCPT.mN + "번 · " + won(RCPT.mSave) + " 아낌") +
     "</table>" +
+    '<p class="rnm">다음 장보기도 네이버에서 <b>피엑스픽</b> 검색 🔍</p>' +   // ★ 이름 각인 (2026-10-08)
     '<button class="go" data-act="rc-done">📣 장보기 완료 알리기</button>' +
     '<button data-act="rc-brag">🔥 자랑 카드 만들기</button>' +
     '<p class="foot">카트는 비웠어요. 찜 목록은 지우기 전까지 그대로 남아요</p></div>');
@@ -3793,6 +3825,35 @@ function autoEndShop(){
   try { localStorage.setItem(AUTO_KEY, JSON.stringify(R || {none: 1})); } catch(e){}
   if (typeof cartSum === "function") cartSum();
   autoBar();
+}
+const NM_KEY = "gmpx-nm", SHC_KEY = "gmpx-shc";
+function nameBox(){
+  const st = jget(NM_KEY, {});
+  let home = false; try { home = !!localStorage.getItem("gmpx-home"); } catch(e){}
+  if (st.x || (st.n || 0) >= 3 || home || SHOP || ONLY || WLIST || $("#nmbox")) return;
+  try { if (sessionStorage.getItem("gmpx-nm-s")) return; sessionStorage.setItem("gmpx-nm-s", "1"); } catch(e){ return; }
+  st.n = (st.n || 0) + 1; jset(NM_KEY, st);
+  const el = document.createElement("div"); el.id = "nmbox"; el.setAttribute("role", "note");
+  el.innerHTML = '<button class="x" type="button" aria-label="닫기">✕</button><div class="t">다음엔 이렇게 오세요</div>' +
+    '<div class="qs"><span class="q"><span class="ic n">N</span>피엑스픽</span>' +
+    '<span class="q g"><span class="ic gg"><svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>피엑스픽</span></div>' +
+    '<div class="sub">네이버나 구글에 검색하면 돼요</div>' +
+    '<div class="r"><button class="go" type="button">홈 화면에 추가</button><button class="no" type="button">알겠어요</button></div>';
+  const l = $("#list"); l.parentNode.insertBefore(el, l);
+  VR.hit("nmshow", null, null, String(st.n));
+  el.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    const s2 = jget(NM_KEY, {}); s2.x = 1; jset(NM_KEY, s2); el.remove();
+    if (b.classList.contains("go")){ VR.hit("nmhome"); openInstall(); } else VR.hit("nmx");
+  });
+}
+function shcCard(){
+  if (jget(SHC_KEY, {}).x) return "";
+  try { if (!sessionStorage.getItem("gmpx-shc-s")){ sessionStorage.setItem("gmpx-shc-s", "1"); VR.hit("shcshow"); } } catch(e){}
+  return '<div class="shc"><b class="t">🛒 PX에서는 이렇게 써요</b><ol><li>도착하면 아래 <b>장보기 시작</b></li>' +
+    '<li>담을 때마다 <b>담기</b> → ✓</li><li>끝나면 <b>장보기 종료</b> → 아낀 돈 영수증</li></ol>' +
+    '<div class="nm">📌 다음엔 네이버에 <b>피엑스픽</b>만 치면 바로 와요</div>' +
+    '<div class="r"><button class="go" type="button">장보기 미리 해 보기</button><button class="no" type="button">알겠어요</button></div></div>';
 }
 function autoBar(){
   let el = $("#autoend"), R = null;
@@ -3836,6 +3897,7 @@ function doneText(){
   for (const n of R.miss) ln.push("✗ " + n + " (못 찾음)");
   for (const [n, q] of R.here) ln.push("+ " + n + (q > 1 ? " × " + q : "") + " (현장에서)");
   ln.push("총 " + won(R.amt) + (R.save > 0 ? " · " + ONL + "보다 " + won(R.save) + " 아꼈어요" : ""));
+  ln.push("🔍 네이버에서 '피엑스픽' 검색");   // ★ 받는 사람도 이름을 알게 (2026-10-08)
   return ln.join("\n");
 }
 async function bragCard(b){
@@ -4258,6 +4320,12 @@ $("#onlyall").addEventListener("click", () => {
   run();
 });
 
+$("#list").addEventListener("click", e => {   // 찜 화면 장보기 안내 카드 (2026-10-08)
+  const c = e.target.closest(".shc"); if (!c) return;
+  const b = e.target.closest("button"); if (!b) return;
+  jset(SHC_KEY, {x: 1}); c.remove();
+  if (b.classList.contains("go")){ VR.hit("shcgo"); startShop(); } else VR.hit("shcx");
+});
 $("#list").addEventListener("click", e => {
   const c = e.target.closest(".tipc"); if (!c) return;
   const k = c.dataset.k;
