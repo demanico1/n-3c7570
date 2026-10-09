@@ -700,6 +700,8 @@ html.dark .tag.tag-here{background:#2a2412;color:#e6c455}
 #nmbox .go{background:#0b7a4b;color:#fff}#nmbox .no{background:transparent;color:var(--dim)}
 #nmbox .x{position:absolute;right:8px;top:6px;border:0;background:none;color:var(--dim);font-size:16px;padding:6px;cursor:pointer}
 html.shop #nmbox{display:none}
+html.wishview #nmbox{display:none}
+#nmbox .r .hm{background:var(--bg);color:#0b7a4b;border:1.5px solid #11974B}
 #startcard hr{border:0;border-top:1px dashed rgba(0,0,0,.15);margin:2px 0 10px}
 #startcard .qs,#tour .qs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}
 #tour .qs{margin:10px 0 2px}
@@ -708,7 +710,13 @@ html.shop #nmbox{display:none}
 #startcard .ic,#tour .ic{flex:none;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px}
 #startcard .ic.n,#tour .ic.n{background:#03c75a;color:#fff;font:900 15px/1 Arial,sans-serif}
 #startcard .ic.gg,#tour .ic.gg{background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
-.q .w{display:inline-block;min-width:4.6em;transition:opacity .35s,transform .35s}.q .w.out{opacity:0;transform:translateY(-6px)}
+.q .w{display:inline-block;min-width:5.4em;text-align:center;font-weight:800;letter-spacing:.01em}
+.q .w .v{position:relative}.q .w .h{display:none}   /* 2026-10-09 사장님 B — 가운데에서 양옆으로 퍼지며 친다 */
+#startcard .q,#tour .q,#nmbox .q{position:relative;justify-content:center;padding:6px 24px 6px 36px}   /* 칸 정가운데보다 6px 오른쪽 — 사장님이 눈으로 고른 가운데 */
+#startcard .q .ic,#tour .q .ic,#nmbox .q .ic{position:absolute;left:6px;top:50%;transform:translateY(-50%)}
+.q .w.typing .v::after{content:"";position:absolute;right:-3px;top:.12em;bottom:.08em;width:2px;background:currentColor;animation:pxcar .7s steps(1) infinite}
+.q .w.typing.fade .v::after{animation:none;opacity:0;transition:opacity .35s}   /* 다 치면 커서가 서서히 사라진다 */
+@keyframes pxcar{50%{opacity:0}}
 #startcard .ln{font-size:13.5px;margin:0 0 10px;word-break:keep-all}
 #startcard .r3{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 #startcard .shm{border:1.5px solid #11974B;border-radius:9px;background:var(--bg);color:#0b7a4b;font-weight:800;font-size:13px;padding:6px 11px;cursor:pointer}
@@ -1140,7 +1148,7 @@ document.addEventListener("click",function(e){var pa=document.getElementById("pr
 
   <div id="onlybar"><span id="onlytext"></span><span class="ob"><button id="onlysave" hidden="">이 목록 따로 저장</button><button id="onlytake" hidden="">내 찜에 담기</button><button id="onlyall">전체 보기</button></span></div>
 
-  <div id="startcard"><button class="sx" aria-label="닫기">✕</button><b>검색 → 찜 → 장보기, 세 단계면 끝!</b><hr><div class="qs"><span class="q"><span class="ic n">N</span><span class="w" data-a="pxpick" data-b="피엑스픽">pxpick</span></span><span class="q g"><span class="ic gg"><svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg></span><span class="w" data-a="피엑스픽" data-b="pxpick">피엑스픽</span></span></div><div class="ln">네이버나 구글에 검색하면 바로 나와요</div><div class="r3"><button class="sgo">30초 둘러보기 ▶</button><button class="shm">📲 홈 화면에 추가</button><button class="sno">다음에 볼게요</button></div></div>
+  <div id="startcard"><button class="sx" aria-label="닫기">✕</button><b>검색 → 찜 → 장보기, 세 단계면 끝!</b><hr><div class="qs"><span class="q"><span class="ic n">N</span><span class="w" data-a="PXPICK" data-b="피엑스픽">PXPICK</span></span><span class="q g"><span class="ic gg"><svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg></span><span class="w" data-a="피엑스픽" data-b="PXPICK">피엑스픽</span></span></div><div class="ln">네이버나 구글에 검색하면 바로 나와요</div><div class="r3"><button class="sgo">30초 둘러보기 ▶</button><button class="shm">📲 홈 화면에 추가</button><button class="sno">다음에 볼게요</button></div></div>
   <main id="list" class="gal"><article class="item" data-p="28438"><i class="cart" title="찜하기"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.4C6.6 16.5 3 13.1 3 9.4 3 6.8 5 4.9 7.5 4.9c1.7 0 3.3.9 4.5 2.4C13.2 5.8 14.8 4.9 16.5 4.9 19 4.9 21 6.8 21 9.4c0 3.7-3.6 7.1-9 11z" stroke-linejoin="round"></path></svg></i><div class="left"><img class="thumb" loading="lazy" alt="" data-p="28438" data-nm="서울우유협동조합 서울우유 병2.3L 2300ml" src="/big/28438.jpg"><span class="gtg"><span class="tag stag" title="우유 만 보기">우유</span></span></div><div class="body"><div class="nm">서울우유 병2.3L 2300ml <span class="tag stag" title="우유 만 보기">우유</span></div><div class="pr"><span class="g">6,180원</span><span class="badge b-good">-11.5%</span></div><div class="rf"><span class="rl">쿠팡 6,980원</span><span class="df">-800원</span><i class="mv" aria-hidden="true">›</i></div></div></article><article class="item" data-p="35032"><i class="cart" title="찜하기"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.4C6.6 16.5 3 13.1 3 9.4 3 6.8 5 4.9 7.5 4.9c1.7 0 3.3.9 4.5 2.4C13.2 5.8 14.8 4.9 16.5 4.9 19 4.9 21 6.8 21 9.4c0 3.7-3.6 7.1-9 11z" stroke-linejoin="round"></path></svg></i><div class="left"><img class="thumb" loading="lazy" alt="" data-p="35032" data-nm="광동제약 제주삼다수그린 500ml*20pet" src="/big/35032.jpg"><span class="gtg"><span class="tag stag" title="생수 만 보기">생수</span></span></div><div class="body"><div class="nm">광동제약 제주삼다수그린 500ml*20pet <span class="tag stag" title="생수 만 보기">생수</span></div><div class="pr"><span class="g">8,190원</span><span class="badge b-good">-8.0%</span></div><div class="rf"><span class="rl">쿠팡 8,900원</span><span class="df">-710원</span><i class="mv" aria-hidden="true">›</i></div></div></article><article class="item" data-p="3098"><i class="cart" title="찜하기"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.4C6.6 16.5 3 13.1 3 9.4 3 6.8 5 4.9 7.5 4.9c1.7 0 3.3.9 4.5 2.4C13.2 5.8 14.8 4.9 16.5 4.9 19 4.9 21 6.8 21 9.4c0 3.7-3.6 7.1-9 11z" stroke-linejoin="round"></path></svg></i><div class="left"><img class="thumb" loading="lazy" alt="" data-p="3098" data-nm="농심 신라면 120G" src="/big/3098.jpg"><span class="gtg"><span class="tag stag" title="라면 만 보기">라면</span></span></div><div class="body"><div class="nm">농심 신라면 120G <span class="tag stag" title="라면 만 보기">라면</span></div><div class="pr"><span class="g">740원</span><span class="badge b-good">-0.9%</span></div><div class="rf"><span class="rl">쿠팡 747원 <i class="qn1">(20개들이 낱개)</i></span><span class="df">-7원</span><i class="mv" aria-hidden="true">›</i></div></div></article><article class="item" data-p="27928"><i class="cart" title="찜하기"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.4C6.6 16.5 3 13.1 3 9.4 3 6.8 5 4.9 7.5 4.9c1.7 0 3.3.9 4.5 2.4C13.2 5.8 14.8 4.9 16.5 4.9 19 4.9 21 6.8 21 9.4c0 3.7-3.6 7.1-9 11z" stroke-linejoin="round"></path></svg></i><div class="left"><img class="thumb" loading="lazy" alt="" data-p="27928" data-nm="맛있는오뚜기밥 210g" src="/big/27928.jpg"><span class="gtg"><span class="tag stag" title="즉석밥 만 보기">즉석밥</span></span></div><div class="body"><div class="nm">맛있는오뚜기밥 210g <span class="tag stag" title="즉석밥 만 보기">즉석밥</span></div><div class="pr"><span class="g">870원</span><span class="badge b-good">-6.8%</span></div><div class="rf"><span class="rl">쿠팡 933원 <i class="qn1">(24개들이 낱개)</i></span><span class="df">-63원</span><i class="mv" aria-hidden="true">›</i></div></div></article><article class="item" data-p="37840"><i class="cart" title="찜하기"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.4C6.6 16.5 3 13.1 3 9.4 3 6.8 5 4.9 7.5 4.9c1.7 0 3.3.9 4.5 2.4C13.2 5.8 14.8 4.9 16.5 4.9 19 4.9 21 6.8 21 9.4c0 3.7-3.6 7.1-9 11z" stroke-linejoin="round"></path></svg></i><div class="left"><img class="thumb" loading="lazy" alt="" data-p="37840" data-nm="스파클 먹는샘물 500ml*20" src="/big/37840.jpg"><span class="gtg"><span class="tag stag" title="생수 만 보기">생수</span></span></div><div class="body"><div class="nm">스파클 먹는샘물 500ml*20 <span class="tag stag" title="생수 만 보기">생수</span></div><div class="pr"><span class="g">3,350원</span><span class="badge b-good">-20.0%</span></div><div class="rf"><span class="rl">쿠팡 4,190원</span><span class="df">-840원</span><i class="mv" aria-hidden="true">›</i></div></div></article><article class="item" data-p="3030"><i class="cart" title="찜하기"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.4C6.6 16.5 3 13.1 3 9.4 3 6.8 5 4.9 7.5 4.9c1.7 0 3.3.9 4.5 2.4C13.2 5.8 14.8 4.9 16.5 4.9 19 4.9 21 6.8 21 9.4c0 3.7-3.6 7.1-9 11z" stroke-linejoin="round"></path></svg></i><div class="left"><img class="thumb" loading="lazy" alt="" data-p="3030" data-nm="동서식품 맥심모카골드믹스 1.2KG" src="/big/3030.jpg"><span class="gtg"><span class="tag stag" title="커피 만 보기">커피</span></span></div><div class="body"><div class="nm">동서 맥심모카골드믹스 1.2KG <span class="tag stag" title="커피 만 보기">커피</span></div><div class="pr"><span class="g">16,510원</span><span class="badge b-bad">+8.3%</span></div><div class="rf"><span class="rl">쿠팡 15,250원</span><span class="df">+1,260원</span><i class="mv" aria-hidden="true">›</i></div></div></article></main>
   <div id="helpline">처음이라 어려우세요? <button type="button" id="helpgo">사용법 보기</button></div>
 
@@ -1922,7 +1930,7 @@ function run(){
                                                 : "목록 비우기";
   stats();
   cartSum();
-  startCard();
+  startCard(); oldNameBox();
 
   SHOWN = 0;
   $("#list").innerHTML = "";
@@ -3664,8 +3672,29 @@ function startCard(){
       '<div class="r3"><button class="sgo">30초 둘러보기 ▶</button>' + (homeHave() || matchMedia("(display-mode: standalone)").matches ? "" : '<button class="shm">📲 홈 화면에 추가</button>') +
       '<button class="sno">다음에 볼게요</button></div>';
     pxSwap(box);
+    try { localStorage.setItem("gmpx-nmseen", "1"); } catch(e){}   // 첫 방문 카드에서 이름을 봤다 → 예전 손님 상자는 안 띄운다
     VR.hit("first-show");
   }
+}
+function oldNameBox(){
+  if ($("#nmbox")) return;
+  let seen = true; try { seen = !!(localStorage.getItem("gmpx-nmseen") || localStorage.getItem("gmpx-nmold")); } catch(e){ return; }
+  const sc = $("#startcard");
+  if (seen || (sc && !sc.hidden) || homeHave() || matchMedia("(display-mode: standalone)").matches || SHOP || ONLY || WLIST
+      || $("#view").value === "cart" || (visitsN() <= 1 && !stampN())) return;
+  try { localStorage.setItem("gmpx-nmold", "1"); } catch(e){ return; }
+  const el = document.createElement("div"); el.id = "nmbox"; el.setAttribute("role", "note");
+  el.innerHTML = '<button class="x" type="button" aria-label="닫기">✕</button><div class="t">피엑스픽만 기억하세요</div>' + pxPills() +
+    '<div class="sub">네이버나 구글에 검색하면 바로 나와요</div>' +
+    '<div class="r"><button class="go" type="button">알겠어요</button>' +
+    (homeHave() ? "" : '<button class="hm" type="button">📲 홈 화면에 추가</button>') + '</div>';
+  const l = $("#list"); l.parentNode.insertBefore(el, l);
+  pxSwap(el); VR.hit("nmold");
+  el.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    el.remove();
+    if (b.classList.contains("hm")){ VR.hit("nmoldhome"); openInstall(); } else VR.hit("nmoldx");
+  });
 }
 function visitsN(){ try { return Number(localStorage.getItem("gmpx-visits") || 0); } catch(e){ return 0; } }
 function tourDone(v){ try { localStorage.setItem("gmpx-tour", v); } catch(e){} $("#startcard").hidden = true; }
@@ -3881,19 +3910,37 @@ function autoEndShop(){
 const NM_KEY = "gmpx-nm", SHC_KEY = "gmpx-shc";
 function pxPills(){
   const g = '<svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';
-  return '<div class="qs"><span class="q"><span class="ic n">N</span><span class="w" data-a="pxpick" data-b="피엑스픽">pxpick</span></span>' +
-    '<span class="q g"><span class="ic gg">' + g + '</span><span class="w" data-a="피엑스픽" data-b="pxpick">피엑스픽</span></span></div>';
+  return '<div class="qs"><span class="q"><span class="ic n">N</span><span class="w" data-a="PXPICK" data-b="피엑스픽">PXPICK</span></span>' +
+    '<span class="q g"><span class="ic gg">' + g + '</span><span class="w" data-a="피엑스픽" data-b="PXPICK">피엑스픽</span></span></div>';
 }
 function pxSwap(box){
   if (!box || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   let f = 0;
-  const t = setInterval(() => {
-    if (!box.isConnected || box.hidden || box.offsetParent === null){ clearInterval(t); return; }
-    const ws = box.querySelectorAll(".q .w"); ws.forEach(w => w.classList.add("out"));
-    setTimeout(() => { f = 1 - f; ws.forEach(w => { w.textContent = f ? w.dataset.b : w.dataset.a; w.classList.remove("out"); }); }, 350);
-  }, 2500);
+  const put = (w, shown, rest) => { w.innerHTML = '<span class="v">' + esc(shown) + '</span><span class="h">' + esc(rest) + "</span>"; };
+  const type = (w, to) => {
+    const cur = Array.from(w.textContent.replace(/\u200b/g, "")), tgt = Array.from(to);
+    w.classList.add("typing");
+    let k = cur.length;
+    const back = setInterval(() => {
+      if (k > 0){ k--; put(w, cur.slice(0, k).join(""), cur.slice(k).join("")); return; }
+      clearInterval(back); let m = 0;
+      const fwd = setInterval(() => {
+        m++; put(w, tgt.slice(0, m).join(""), tgt.slice(m).join(""));
+        if (m >= tgt.length){ clearInterval(fwd); setTimeout(() => w.classList.add("fade"), 350);
+          setTimeout(() => { w.classList.remove("typing", "fade"); w.textContent = to; }, 750); }
+      }, 110);
+    }, 55);
+    return cur.length * 55 + tgt.length * 110 + 750;
+  };
+  const step = () => {
+    if (!box.isConnected || box.hidden || box.offsetParent === null) return;
+    f = 1 - f;
+    let longest = 0;
+    box.querySelectorAll(".q .w").forEach(w => { longest = Math.max(longest, type(w, f ? w.dataset.b : w.dataset.a)); });
+    setTimeout(step, longest + 3000);
+  };
+  setTimeout(step, 3000);
 }
-const NM_BOX = false;
 function nameBox(){
   if (!NM_BOX) return;
   const st = jget(NM_KEY, {});
@@ -3915,8 +3962,9 @@ function nameBox(){
     if (b.classList.contains("go")){ VR.hit("nmhome"); openInstall(); } else VR.hit("nmx");
   });
 }
+const SHC_ON = false;
 function shcCard(){
-  if (jget(SHC_KEY, {}).x) return "";
+  if (!SHC_ON || jget(SHC_KEY, {}).x) return "";
   try { if (!sessionStorage.getItem("gmpx-shc-s")){ sessionStorage.setItem("gmpx-shc-s", "1"); VR.hit("shcshow"); } } catch(e){}
   return '<div class="shc"><b class="t">🛒 PX에서는 이렇게 써요</b><ol><li>도착하면 아래 <b>장보기 시작</b></li>' +
     '<li>담을 때마다 <b>담기</b> → ✓</li><li>끝나면 <b>장보기 종료</b> → 아낀 돈 영수증</li></ol>' +
