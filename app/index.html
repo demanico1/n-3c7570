@@ -702,6 +702,7 @@ html.dark .tag.tag-here{background:#2a2412;color:#e6c455}
 html.shop #nmbox{display:none}
 html.wishview #nmbox{display:none}
 #nmbox .r .hm{background:var(--bg);color:#0b7a4b;border:1.5px solid #11974B}
+#nmbox .r{flex-wrap:wrap;align-items:center}#nmbox .r .off{margin-left:auto;padding:9px 4px;font-weight:600;font-size:12.5px;text-decoration:underline;text-underline-offset:3px}
 #startcard hr{border:0;border-top:1px dashed rgba(0,0,0,.15);margin:2px 0 10px}
 #startcard .qs,#tour .qs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}
 #tour .qs{margin:10px 0 2px}
@@ -1019,6 +1020,12 @@ html.selmode .item{position:relative}
 #selbar>button{border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:11px 12px;font:inherit;font-weight:800;font-size:14.5px;color:var(--ink);cursor:pointer}
 #selbar>button.go{background:var(--accent);border-color:var(--accent);color:#fff}#selbar>button:disabled{opacity:.4}
 html.selmode body{padding-bottom:80px}
+html.iossafari.cart-on #cartsum{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));border-radius:18px;box-shadow:0 6px 22px rgba(0,0,0,.18)}
+html.iossafari.cart-on:not(.shop) #cartsum{padding-bottom:12px}
+html.iossafari.shop #cartsum{height:126px;padding-bottom:6px}
+html.iossafari.cart-on body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+html.iossafari.cart-on:not(.shop) body{padding-bottom:calc(122px + env(safe-area-inset-bottom))}
+html.iossafari.shop body{padding-bottom:calc(146px + env(safe-area-inset-bottom))}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "PXPICK", "alternateName": ["피엑스픽", "PX픽"], "url": "https://pxpick.com/app/", "applicationCategory": "ShoppingApplication", "operatingSystem": "Web", "inLanguage": "ko", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}, "description": "PXPICK(피엑스픽)은 군마트(PX) 상품 2,240개의 가격을 온라인 가격과 하나씩 비교해 보여 주는 무료 서비스예요. 상품 이름이나 초성으로 찾고, 할인율 순으로 보고, 살 것만 찜하면 합계와 아끼는 돈이 바로 나와요. 장보기 목록은 카톡으로 가족과 나눌 수 있고, 전국 영외마트 129곳의 영업시간도 볼 수 있어요.", "featureList": ["상품 이름이나 초성으로 찾기", "할인율 순·가격 순으로 보기", "살 것만 찜하면 PX 합계와 아끼는 돈 계산", "장보기 목록 카톡 공유", "PX에서 담으면서 체크하는 장보기", "전국 영외마트 129곳 영업시간"]}</script></head>
 <body>
@@ -1599,6 +1606,10 @@ function start(d){
 }
 
 function goHome(){
+  if (!ONLY && !WLIST && !$("#q").value && BIG === "전체" && !SUB && SORTK === "rv"
+      && (!$("#view").options.length || $("#view").selectedIndex === 0) && !location.hash){
+    scrollTo(0, 0); return;
+  }
   ONLY = "";
   WLIST = null; $("#onlytake").hidden = true; $("#onlysave").hidden = true;
   document.title = TITLE0;
@@ -2175,9 +2186,10 @@ function card(it, raw){
       '<span class="qn">' + qtyOf(it.p) + '</span>' +
       '<button class="qb" data-q="1" aria-label="하나 더">&#43;</button></span>' + bkb + "</div>" : "";
   const b = PICS[it.p];
+  let sp = false; try { sp = SHARP.has(it.p) && BIGPIC[it.p]; } catch(e){}   // SHARP 이 생기기 전 첫 그림에서도 죽지 않게
   const img = '<img class="thumb" loading="lazy" alt="" data-p="' + it.p +
       '" data-nm="' + esc(it.name) + '"' +
-      (b ? ' src="data:image/webp;base64,' + b + '"'
+      (sp ? ' src="' + esc(BIGPIC[it.p]) + '"' : b ? ' src="data:image/webp;base64,' + b + '"'
          : (PICSDONE ? ' src="' + BLANK + '" data-nopic="1"' : "")) + ">";
   const icon = sh ? ""
     : '<i class="cart' + ((inL ? inCur(it.p) : inCart(it.p)) ? " on" : "") + '" title="' + (inL ? "이 목록에서 빼기" : "찜하기") + '">' +
@@ -2563,6 +2575,7 @@ const noDate = b => String(b || "").replace(/\s*\(\d{1,2}\/\d{1,2} 기준\)/g, "
 const mdate = iso => { const d = new Date(iso || Date.now()); return (d.getMonth() + 1) + "월 " + d.getDate() + "일"; };
 function dName(it){ return it.dn || it.name; }
 if (/SamsungBrowser/i.test(navigator.userAgent)) document.documentElement.classList.add("samsung");
+if (/iPhone|iPad|iPod/i.test(navigator.userAgent) && !/CriOS|FxiOS|EdgiOS|NAVER|KAKAOTALK|Instagram|FBAN|FBAV|Line\//i.test(navigator.userAgent)) document.documentElement.classList.add("iossafari");
 function lname(l){ return (l.from ? l.from + " · " : "") + (l.name || (l.from ? "장보기 목록" : "받은 목록 · " + mdate(l.at))); }
 function saveCQ(){
   for (const p of Object.keys(CQ)) if (!inCart(p) || !(CQ[p] > 1)) delete CQ[p];
@@ -3177,6 +3190,7 @@ function backFromCart(){
 
 function restorePrev(){
   const p = PREV; PREV = null;
+  setTimeout(oldNameBox, 300);                              // 찜 화면에서 시작한 방문이면 목록으로 나올 때 이름 상자 (2026-10-09)
   $("#q").value = p ? p.q : "";
   BIG = p ? p.big : "전체";
   SUB = p && p.sub || "";
@@ -3676,24 +3690,34 @@ function startCard(){
     VR.hit("first-show");
   }
 }
+const NM_OFF_DAYS = 15;
 function oldNameBox(){
   if ($("#nmbox")) return;
-  let seen = true; try { seen = !!(localStorage.getItem("gmpx-nmseen") || localStorage.getItem("gmpx-nmold")); } catch(e){ return; }
   const sc = $("#startcard");
-  if (seen || (sc && !sc.hidden) || homeHave() || matchMedia("(display-mode: standalone)").matches || SHOP || ONLY || WLIST
-      || $("#view").value === "cart" || (visitsN() <= 1 && !stampN())) return;
-  try { localStorage.setItem("gmpx-nmold", "1"); } catch(e){ return; }
+  if ((sc && !sc.hidden) || SHOP || ONLY || WLIST || $("#view").value === "cart" || (visitsN() <= 1 && !stampN())) return;
+  const home = homeHave() || matchMedia("(display-mode: standalone)").matches;
+  try {
+    if (sessionStorage.getItem("gmpx-nmsess")) return;                                          // 이번 방문엔 이미 보였다
+    const off = Number(localStorage.getItem("gmpx-nmoff") || 0);
+    if (off && Date.now() - off < NM_OFF_DAYS * 864e5) return;                                    // 다시 보지 않기 — 15일 쉰다
+    if (home && localStorage.getItem("gmpx-nmhome")) return;                                      // 홈 화면 아이콘 손님은 한 번만
+    sessionStorage.setItem("gmpx-nmsess", "1");
+    if (home) localStorage.setItem("gmpx-nmhome", "1");
+  } catch(e){ return; }
   const el = document.createElement("div"); el.id = "nmbox"; el.setAttribute("role", "note");
   el.innerHTML = '<button class="x" type="button" aria-label="닫기">✕</button><div class="t">피엑스픽만 기억하세요</div>' + pxPills() +
     '<div class="sub">네이버나 구글에 검색하면 바로 나와요</div>' +
     '<div class="r"><button class="go" type="button">알겠어요</button>' +
-    (homeHave() ? "" : '<button class="hm" type="button">📲 홈 화면에 추가</button>') + '</div>';
+    (home ? "" : '<button class="hm" type="button">📲 홈 화면에 추가</button>') +
+    '<button class="no off" type="button">다시 보지 않기</button></div>';
   const l = $("#list"); l.parentNode.insertBefore(el, l);
-  pxSwap(el); VR.hit("nmold");
+  pxSwap(el); VR.hit("nmold", null, null, home ? "h" : "v" + Math.min(visitsN(), 99));
   el.addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
     el.remove();
-    if (b.classList.contains("hm")){ VR.hit("nmoldhome"); openInstall(); } else VR.hit("nmoldx");
+    if (b.classList.contains("hm")){ VR.hit("nmoldhome"); openInstall(); }
+    else if (b.classList.contains("off")){ VR.hit("nmoff"); try { localStorage.setItem("gmpx-nmoff", String(Date.now())); } catch(e){} }
+    else VR.hit("nmoldx");
   });
 }
 function visitsN(){ try { return Number(localStorage.getItem("gmpx-visits") || 0); } catch(e){ return 0; } }
