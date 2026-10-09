@@ -710,7 +710,7 @@ html.wishview #nmbox{display:none}
 #startcard .ic,#tour .ic{flex:none;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px}
 #startcard .ic.n,#tour .ic.n{background:#03c75a;color:#fff;font:900 15px/1 Arial,sans-serif}
 #startcard .ic.gg,#tour .ic.gg{background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
-.q .w{display:inline-block;min-width:5.4em;text-align:center;font-weight:800;letter-spacing:.01em}
+.q .w{display:inline-block;min-width:5.4em;text-align:center;font-weight:800;letter-spacing:.01em;height:1.3em;line-height:1.3em}   /* ★ 높이를 박아 둔다 — 두 칸 글자가 다 지워진 순간 높이가 0 이 되어 카드가 22px 줄었다 늘며 아래 상품이 통째로 튀었다(깜빡임) */
 .q .w .v{position:relative}.q .w .h{display:none}   /* 2026-10-09 사장님 B — 가운데에서 양옆으로 퍼지며 친다 */
 #startcard .q,#tour .q,#nmbox .q{position:relative;justify-content:center;padding:6px 24px 6px 36px}   /* 칸 정가운데보다 6px 오른쪽 — 사장님이 눈으로 고른 가운데 */
 #startcard .q .ic,#tour .q .ic,#nmbox .q .ic{position:absolute;left:6px;top:50%;transform:translateY(-50%)}
@@ -3916,7 +3916,7 @@ function pxPills(){
 function pxSwap(box){
   if (!box || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   let f = 0;
-  const put = (w, shown, rest) => { w.innerHTML = '<span class="v">' + esc(shown) + '</span><span class="h">' + esc(rest) + "</span>"; };
+  const put = (w, shown, rest) => { w.innerHTML = '<span class="v">' + (shown ? esc(shown) : "\u200b") + '</span><span class="h">' + esc(rest) + "</span>"; };
   const type = (w, to) => {
     const cur = Array.from(w.textContent.replace(/\u200b/g, "")), tgt = Array.from(to);
     w.classList.add("typing");
