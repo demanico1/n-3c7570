@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://pxpick.com/sitemap.xml
+
+#DaumWebMasterTool:c24051970bd759ec3ec30f3a9677386ef4806d1b1523c4f7fe0b6b38cbea88aa:zID9jBSaLiXAiLfpMlnHUA==
