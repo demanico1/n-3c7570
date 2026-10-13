@@ -3147,8 +3147,13 @@ $("#sheet").addEventListener("click", e => {
       });
     return;
   }
+  if (act === "imp-new") return importTo("@new");
+  if (act === "imp-to") return importTo(b.dataset.to);
   if (act === "impdo"){
-    const r = importText(($("#impbox") || {}).value);
+    const raw = ($("#impbox") || {}).value;
+    const rd = readImport(raw);              // 목록이면 어디에 담을지 먼저 묻는다 (2026-10-13)
+    if (rd){ closeSheet(); return setTimeout(() => askImport(rd), 260); }
+    const r = importText(raw);               // #import= 꾸러미(앱 안 브라우저 → 브라우저로 옮기기)는 예전처럼 내 찜으로
     if (!r){
       const er = $("#imperr");
       er.textContent = "찜 주소를 찾지 못했어요. 받은 주소나 장보기 목록 글을 통째로 붙여 넣어 주세요.";
@@ -3283,12 +3288,76 @@ function restorePrev(){
 function openImport(){
   openSheet("<h3>목록 가져오기</h3>" +
     '<p class="note">받은 찜 주소나 장보기 목록 글을 통째로 붙여 넣으세요. ' +
-      "지금 찜은 그대로 두고 더해요.</p>" +
+      "다음 화면에서 어느 목록에 담을지 고를 수 있어요.</p>" +
     '<textarea id="impbox" rows="4" placeholder="여기에 붙여 넣기"></textarea>' +
     '<p id="imperr" class="note" style="color:var(--bad);margin:8px 0 0;display:none"></p>' +
     (navigator.clipboard && navigator.clipboard.readText
       ? '<button data-act="imppaste">복사해 둔 것 붙여넣기</button>' : "") +
     '<button class="go" data-act="impdo">가져오기</button>');
+}
+let IMP = null;
+function readImport(t){
+  t = String(t || "");
+  const have = new Set(DATA.map(x => x.p));
+  const codes = [], q = {}, meta = {};
+  const mz = t.match(/[?&]z=([0-9a-z_~]+)/);
+  if (mz) for (const [p, qn] of zUnpack(mz[1])) if (have.has(p)){ codes.push(p); if (qn > 1) q[p] = qn; }
+  if (!codes.length){
+    const m = t.match(/(?:[?&]c=|#w=)([0-9x-]+)/);
+    if (m) for (const tok of m[1].split("-")){
+      const k = tok.match(/^([0-9]+)(?:x([0-9]{1,2}))?$/);
+      if (k && have.has(k[1])){ codes.push(k[1]); if (k[2] && Number(k[2]) > 1) q[k[1]] = Number(k[2]); }
+    }
+  }
+  if (!codes.length){
+    const one = t.match(/(?:\/s\/|\/p\/|#p=)([0-9]+)/);
+    if (one && have.has(one[1])) codes.push(one[1]);
+  }
+  const mm = t.match(/[?&]m=([A-Za-z0-9_-]{1,400})/);
+  if (mm) try { const s = b64dec(mm[1]).split("\n"); meta.f = cleanName(s[0] || "", 10); meta.n = cleanName(s[1] || "", 16);
+                if (/^[0-9a-z]{3,12}\.[0-9]{1,4}$/.test(s[2] || "")) meta.k = s[2]; } catch(e){}
+  const pf = t.match(/[?&]f=([^&\s]+)/), pn = t.match(/[?&]n=([^&\s]+)/), pk = t.match(/[?&]k=([0-9a-z]{3,12}\.[0-9]{1,4})/);
+  try { if (pf && !meta.f) meta.f = cleanName(decodeURIComponent(pf[1]), 10); if (pn && !meta.n) meta.n = cleanName(decodeURIComponent(pn[1]), 16); } catch(e){}
+  if (pk && !meta.k) meta.k = pk[1];
+  const uniq = [...new Set(codes)];
+  return uniq.length ? {codes: uniq, q: q, meta: meta} : null;
+}
+function askImport(r){
+  IMP = r;
+  const who = r.meta.f ? r.meta.f + "님의 " : "", nm = r.meta.n || (r.meta.f ? "장보기 목록" : "");
+  const here = CUR && LISTS.find(l => l.id === CUR && !l.arch);
+  const others = LISTS.filter(l => !l.arch && l !== here);
+  const row = (to, label, n, tag) => '<button class="pk" data-act="imp-to" data-to="' + to + '">' + esc(label) +
+                                     "<i>" + n + (tag ? " · " + tag : "") + "</i></button>";
+  openSheet("<h3>어디에 담을까요?</h3>" +
+    '<p class="note">' + esc(who + (nm ? "'" + nm + "' · " : "")) + r.codes.length + "가지를 찾았어요</p>" +
+    '<button class="go" data-act="imp-new">새 목록으로 따로 저장</button>' +
+    (here ? row(here.id, lname(here), here.items.length + "가지", "지금 보는 목록") : "") +
+    others.map(l => row(l.id, lname(l), l.items.length + "가지")).join("") +
+    row("@mine", "내 찜", CART.length + "개", CUR ? "" : "지금 보는 곳"));
+}
+function importTo(to){
+  const r = IMP; IMP = null; if (!r) return closeSheet();
+  if (to === "@new"){                      // 받은 링크를 열고 '따로 저장' 한 것과 같은 길 — 같은 사람의 같은 목록이면 바뀐 것을 보여 준다
+    closeSheet();
+    return setTimeout(() => { WLIST = r.codes; WQ = r.q; WMETA = r.meta; saveReceived(); }, 260);
+  }
+  UNDO = JSON.stringify([CART, CQ, LISTS]);
+  const T = to === "@mine" ? null : LISTS.find(l => l.id === to);
+  if (to !== "@mine" && !T) return closeSheet();
+  let add = 0;
+  for (const p of r.codes){
+    if (T){ if (T.items.indexOf(p) < 0){ T.items.push(p); add++; } const n = Math.max(T.q[p] || 1, r.q[p] || 1); if (n > 1) T.q[p] = n; }
+    else  { if (!inCart(p)){ CART.push(p); add++; } const n = Math.max(CQ[p] || 1, r.q[p] || 1); if (n > 1) CQ[p] = n; }
+  }
+  saveCart(); saveCQ(); saveLists(); stamp("recv"); VR.hit(T ? "impl" : "impm");
+  closeSheet();
+  const where = T ? "'" + lname(T) + "' 목록" : "내 찜";
+  setTimeout(() => {
+    if (T) openList(T.id); else { CUR = ""; if ($("#view").value === "cart") run(); else if (CART.length) openCart(); }
+    undoToast(add ? add + "개를 " + where + "에 더했어요" + (r.codes.length > add ? " · 이미 있던 " + (r.codes.length - add) + "개는 수량만 맞췄어요" : "")
+                  : "이미 다 " + where + "에 있어요");
+  }, 300);
 }
 function importText(t){
   t = String(t || "");
@@ -4336,6 +4405,7 @@ function openListMenu(){
     (L.items.length ? '<button class="ssub" data-act="sel-start"><i class="ico">☑</i><span class="mt"><b>골라서 옮기기</b><s>여러 개를 한 번에 다른 목록으로</s></span></button>' : "") +
     '<button data-act="l-share">목록 공유하기</button>' +
     '<button data-act="l-rename">이름 바꾸기</button>' +
+    '<button data-act="l-import">목록 가져오기</button>' +
     '<button data-act="l-move">내 찜으로 옮겨 담기</button>' +
     (L.arch ? '<button data-act="l-unarch">보관함에서 꺼내기</button>'
             : '<button data-act="l-arch">장보기 끝 — 보관하기</button>') +
