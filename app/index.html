@@ -686,6 +686,9 @@ html.cart-on.wgs:not(.shop) #cartsum > :not(.wsl){display:none}
 html.cart-on.wgs:not(.shop) #cartsum .wsl{display:flex;width:100%;height:50px;align-items:center;justify-content:space-between;gap:8px;white-space:nowrap;color:#fff;font-size:15px}
 #cartsum .wsl b{font-size:18px}#cartsum .wsl .s{font-size:12.5px;opacity:.92;overflow:hidden;text-overflow:ellipsis;min-width:0}
 #cartsum .wsl .pxgo{flex:none;margin:0;padding:7px 11px;font-size:14px}
+#cartsum .gsl .gl, #cartsum .wsl .gl{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#cartsum .gsl .gr, #cartsum .wsl .gr{flex:none;display:flex;align-items:center;gap:8px}
+#cartsum .gsl .gr b, #cartsum .wsl .gr b{font-size:20px}
 html.cart-on.wgs:not(.shop) body{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
 html.cart-on.wgs:not(.shop) #toast{bottom:calc(62px + env(safe-area-inset-bottom))}
 #sheet .bkqrow{display:flex;align-items:center;justify-content:center;gap:18px;margin:10px 0 14px;font-size:22px;font-weight:800;color:var(--ink)}
@@ -708,7 +711,7 @@ html.wishview #addbar{display:none!important}
 .gz .col{flex:1;min-width:0}
 .gz .lb{font-size:12px;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gz .amt{white-space:nowrap;font-size:24px;font-weight:800;letter-spacing:-.4px;line-height:1.2}
-.gz .amt.sm{font-size:20px}
+.gz .amt.amts{font-size:20px}   /* 10/15 — 이름을 sm 으로 두면 작은 단추(.sm) 모양이 덮어 하얀 상자가 됐다(10만 원 넘을 때) */
 .gz .pct{font-size:12px;font-weight:800;background:rgba(255,255,255,.2);border-radius:8px;padding:2px 6px;margin-left:5px;vertical-align:4px}
 .gz .sv{white-space:nowrap;display:inline-block;font-size:11px;font-weight:800;color:#0b7a4b;background:#BDEFCF;border-radius:6px;padding:1px 6px;margin-top:2px}
 .gz .fin{flex:none;background:#fff;color:#0b7a4b;font-weight:800;border:0;border-radius:12px;padding:10px 11px;font-size:13px;
@@ -953,6 +956,11 @@ html.shop .cq{justify-content:flex-end}
 #list .item .nm .tag{font-size:calc(var(--c-sub) - 1px);font-weight:400}
 #list .item .qg .qn{font-size:var(--c-ctl);font-weight:800;color:var(--ink)}
 #list .item .qg .qb{font-size:var(--c-ctl);font-weight:400;color:var(--dim)}
+#list .item .qg .qb{width:26px}
+#list .item .qg .qn{min-width:34px;height:29px;line-height:29px;border-radius:0;border-left:1px solid var(--line);border-right:1px solid var(--line)}   /* C안 — − │ 숫자 │ + 세 칸 (10/15 사장님) */
+#sheet .qepick{display:flex;gap:8px;justify-content:center;margin:0 0 14px}
+#sheet .qepick button{flex:none;width:auto;min-width:44px;height:38px;margin:0;padding:0 10px;justify-content:center;border:1.5px solid var(--line);border-radius:10px;background:var(--card);font-size:16px;font-weight:700;color:var(--ink)}
+#sheet .bkqrow .qein{width:84px;height:46px;font-size:24px;font-weight:800;text-align:center;border:1.5px solid var(--good);border-radius:12px}
 #list .item .cq .bkb{font-size:calc(var(--c-ctl) - 1px);font-weight:800}
 .gtg{display:none}
 #list.gal .item .left{position:relative}
@@ -2380,6 +2388,7 @@ function card(it, raw){
   const mine = !WLIST && $("#view").value === "cart";
   const inL = mine && listOn();
   const sh = mine && shopOn(), inb = sh && inBasket(it.p), member = mine && inCur(it.p);
+  const ck = sh && CARD_K != null ? CARD_K : null, tk = inb && (ck == null || ck === "@here" || srcKey(it.p) === ck);
   const tags = [];
   if (it.df) tags.push('<span class="tag tag-df" title="' +
       esc(it.df === 2 ? "해외파병용이에요. 일반 판매 상품이 아니에요."
@@ -2393,8 +2402,8 @@ function card(it, raw){
     sl.push('<span class="tag tag-src">✓ ' + (SHOP.q[it.p] || 1) + "개 · " + esc(keyName(srcKey(it.p))) + "</span>");   // 수량을 앞에 — 목록 이름이 길면 이름 쪽이 … 로 잘린다
   if (mine && !sh && !CUR && HERE[it.p] && Date.now() - HERE[it.p] < 30 * 864e5) tags.push('<span class="tag tag-here">현장</span>');
   if (it.sub && !sh) tags.push('<span class="tag stag" title="' + esc(it.sub) + ' 만 보기">' + esc(it.sub) + "</span>");
-  const bkb = sh ? '<button class="bkb' + (inb ? " on" : "") + '" aria-label="' + (inb ? "카트에서 빼기" : "카트에 담기") + '">' +
-      (inb ? "✓ 담음" : CARTI + "담기") + "</button>" : "";
+  const bkb = sh ? '<button class="bkb' + (tk ? " on" : "") + '" aria-label="' + (tk ? "카트에서 빼기" : "카트에 담기") + '">' +
+      (tk ? "✓ 담음" : CARTI + "담기") + "</button>" : "";
   const cq = member || sh ? '<div class="cq"><span class="qg"><button class="qb" data-q="-1" aria-label="하나 빼기">&minus;</button>' +
       '<span class="qn">' + qtyOf(it.p) + '</span>' +
       '<button class="qb" data-q="1" aria-label="하나 더">&#43;</button></span>' + bkb + "</div>" : "";
@@ -2413,7 +2422,7 @@ function card(it, raw){
   const rf = '<div class="rf"><span class="rl">' + ref + "</span>" +
       (dif ? '<span class="df">' + dif + "</span>" : "") +
       (cq || '<i class="mv" aria-hidden="true">›</i>') + "</div>";
-  return '<article class="item' + (inb ? " inb" : "") + (cq ? " hasq" : "") + (sh ? " insh" : "") + '" data-p="' + it.p + '">' +
+  return '<article class="item' + (tk ? " inb" : "") + (cq ? " hasq" : "") + (sh ? " insh" : "") + '" data-p="' + it.p + '">' +
     icon + '<div class="left">' + img + (sl.length ? '<div class="srcl">' + sl.join("") + "</div>" : "") +
     (it.sub && !sh ? '<span class="gtg"><span class="tag stag" title="' + esc(it.sub) + ' 만 보기">' + esc(it.sub) + "</span></span>" : "") +
     "</div>" +
@@ -2750,7 +2759,9 @@ function inShopView(p){
   return inKey(p, SHOP.v) || (here && (SHOP.v || "") === (SHOP.cur || ""));
 }
 function shopQty(p, key){
-  if (inBasket(p)) return SHOP.q[p] || 1;
+  if (inBasket(p) && (key == null || key === SH_ALL || key === "@here" || srcKey(p) === key)) return SHOP.q[p] || 1;
+  if (key == null || key === "@here") key = SHOP.v;
+  if (inBasket(p)) return (SHOP.pk && SHOP.pk[key + "|" + p]) || qKey(p, key) || 1;
   if (SHOP.pq && SHOP.pq[p]) return SHOP.pq[p];
   if (key === SH_ALL){ const k = firstKey(p); return k === null ? 1 : qKey(p, k) || 1; }
   return qKey(p, key) || qKey(p, SHOP.cur || "") || 1;
@@ -2758,7 +2769,7 @@ function shopQty(p, key){
 function aimList(){ return (!SHOP && !WLIST && !ONLY && $("#view").value !== "cart") ? curList() : null; }
 function qtyOf(p){
   if (WLIST) return WQ[p] || 1;
-  if (SHOP && !WLIST && listOnOrMine()) return shopQty(p, CARD_K != null && CARD_K !== "@here" ? CARD_K : SHOP.v);   // 장보기 중 — 바구니 수량 · 담기 전 수량 · 보는 목록 수량
+  if (SHOP && !WLIST && listOnOrMine()) return shopQty(p, CARD_K != null ? CARD_K : null);   // 장보기 중 — 바구니 수량 · 담기 전 수량 · 보는 목록 수량
   const L = listOn();
   return (L ? L.q[p] : CQ[p]) || 1;
 }
@@ -3015,9 +3026,9 @@ function cartSum(){
   const wish = !WLIST && $("#view").value === "cart";
   box.innerHTML = '<span class="l">' + l + "</span>" + '<span class="tot">' + tot + "</span>" +
     (wish ? '<button class="pxgo">🛒 장보기 시작</button>' : "") +
-    (wish ? '<div class="wsl"><span>♥ <b>' + cnt + " · " + won(gotN ? left : px) + "</b></span>" +
-      '<span class="s">' + (cp ? (gap >= 0 ? won(gap) + " 아낌" : won(-gap) + " 더 비쌈") : "") + "</span>" +
-      '<button class="pxgo">🛒 장보기</button></div>' : "");
+    (wish ? '<div class="wsl"><span class="gl">♥ <b>' + cnt + "</b>" +
+      (cp ? ' <span class="s">· ' + (gap >= 0 ? won(gap) + " 아낌" : won(-gap) + " 더 비쌈") + "</span>" : "") + "</span>" +
+      '<span class="gr"><b>' + won(gotN ? left : px) + '</b><button class="pxgo">🛒 장보기</button></span></div>' : "");
 }
 var CARTSUM = null;   // var — 첫 화면이 이 줄보다 먼저 cartSum 을 부를 수 있다
 function openCartSum(){
@@ -3325,6 +3336,7 @@ $("#sheet").addEventListener("click", e => {
       });
     return;
   }
+  if (act === "qe" || act === "qeset" || act === "qeok") return qeAct(act, b);   // 수량 창 (2026-10-15)
   if (act === "bkq" || act === "bkqin" || act === "bk-more" || act === "bk-keep" || act === "bk-out") return bkAct(act, b);   // '이미 담았어요' 창 (2026-10-14)
   if (act === "imp-new") return importTo("@new");
   if (act === "imp-to") return importTo(b.dataset.to);
@@ -4142,7 +4154,7 @@ function bkRedraw(it){
 var BKQ = null;
 function askMore(it, vk){
   const p = it.p, had = SHOP.q[p] || 1, here = qKey(p, vk);   // vk = 지금 누른 칸
-  BKQ = {p: p, n: here || 1};
+  BKQ = {p: p, n: here ? shopQty(p, vk) : 1};
   openSheet("<h3>이미 바구니에 있어요</h3>" +
     '<p class="note"><b>' + esc(dName(it)) + "</b><br><b>" + esc(keyName(srcKey(p))) + "</b>에서 <b>" + had + "개</b> 담았어요." +
       (here ? " ‘" + esc(keyName(vk)) + "’에는 " + here + "개 있어요." : "") + "</p>" +
@@ -4254,12 +4266,13 @@ function gauge(box){
   const s = shopStat();
   box.innerHTML = '<div class="gz"><div class="row"><div class="art">' + cartArt(s.th) + "</div>" +
     '<div class="col"><div class="lb">넣은 ' + s.kin + "가지 · 계산할 돈</div>" +
-    '<div class="amt' + (s.amt >= 100000 ? " sm" : "") + '">' + won(s.amt) + '<span class="pct">' + s.pct + "%</span></div>" +
+    '<div class="amt' + (s.amt >= 100000 ? " amts" : "") + '">' + won(s.amt) + '<span class="pct">' + s.pct + "%</span></div>" +
     (s.save > 0 ? '<span class="sv"><span class="svw">' + ONL + "보다 </span>" + won(s.save) + " 아낌</span>" : "") + "</div>" +
     '<button class="fin"><i>🧾</i>장보기 종료</button></div>' +
     '<div class="bt"><span>남은 <b>' + s.left + "가지</b> · " + won(s.lamt) + '</span><span class="all">다 사면<b>' + won(s.tot) + "</b></span></div></div>" +
-    '<div class="gsl"><span>🛒 <b><span class="k' + (GS_K != null && GS_K !== s.kin ? " bump" : "") + '">' + s.kin + "가지</span> · " + won(s.amt) + "</b></span>" +
-    '<span class="s">' + (s.save > 0 ? won(s.save) + " 아낌" : "") + "</span><i>▴</i></div>";
+    '<div class="gsl"><span class="gl">🛒 <b><span class="k' + (GS_K != null && GS_K !== s.kin ? " bump" : "") + '">' + s.kin + "가지</span></b>" +
+    (s.save > 0 ? ' <span class="s">· ' + won(s.save) + " 아낌</span>" : "") + "</span>" +
+    '<span class="gr"><b>' + won(s.amt) + "</b><i>▴</i></span></div>";
   if (GS_K !== s.kin){ GS_K = s.kin; setTimeout(() => { const k = box.querySelector(".gsl .k"); if (k) k.classList.remove("bump"); }, 1300); }
 }
 var GS_K = null;
@@ -4913,23 +4926,47 @@ function setQtyOn(card, p, n){
   clearTimeout(QTY_T); QTY_T = setTimeout(() => VR.hit("qty", null, null, shopOn() ? "shop" : "wish", p), 1500);
   const L = listOn();
   if ($("#view").value === "cart") stamp("qty");
-  if (shopOn()){ if (inBasket(p)) SHOP.q[p] = n; else { SHOP.pq = SHOP.pq || {}; SHOP.pq[p] = n; } saveShop(); }
+  if (shopOn()){
+    const ck = card && card.dataset.k != null ? card.dataset.k : null;
+    if (inBasket(p) && (ck == null || ck === "@here" || ck === srcKey(p))){
+      SHOP.q[p] = n;
+      const it = DATA.find(x => x.p === p), raw = $("#q").value.trim();
+      if (it) document.querySelectorAll('.item[data-p="' + p + '"]').forEach(el => { if (el !== card && el.dataset.k != null) el.outerHTML = cardK(it, raw, el.dataset.k); });
+    } else if (inBasket(p)){ SHOP.pk = SHOP.pk || {}; SHOP.pk[ck + "|" + p] = n; }   // 다른 목록 칸 — 바구니는 안 건드린다
+    else { SHOP.pq = SHOP.pq || {}; SHOP.pq[p] = n; }
+    saveShop();
+  }
   else if (L){ if (n > 1) L.q[p] = n; else delete L.q[p]; saveLists(); }
   else { CQ[p] = n; saveCQ(); }
   const qn = card.querySelector(".qn"); if (qn) qn.textContent = n;
   return cartSum();
 }
 function qtyEdit(card, p){
-  const qn = card.querySelector(".qn"); if (!qn || qn.querySelector("input")) return;
   if (card.dataset.k != null) CARD_K = card.dataset.k;
   const cur = qtyOf(p); CARD_K = null;
-  qn.innerHTML = '<input class="qin" type="number" inputmode="numeric" pattern="[0-9]*" min="1" max="99" value="' + cur + '" aria-label="수량">';
-  const inp = qn.firstChild; inp.focus(); inp.select();
-  let fin = false;
-  const done = () => { if (fin) return; fin = true; const v = parseInt(inp.value, 10); setQtyOn(card, p, isNaN(v) ? cur : v); VR.hit("qtytype", null, null, "", p); };
-  inp.addEventListener("blur", done);
-  inp.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); inp.blur(); } });
-  inp.addEventListener("click", e => e.stopPropagation());
+  const it = DATA.find(x => x.p === p);
+  QED = {p: p, k: card.dataset.k != null ? card.dataset.k : null};
+  openSheet("<h3>몇 개로 할까요?</h3>" + (it ? '<p class="note"><b>' + esc(dName(it)) + "</b></p>" : "") +
+    '<div class="bkqrow"><button data-act="qe" data-d="-1" aria-label="하나 빼기">&minus;</button>' +
+    '<input id="qein" class="qin qein" type="number" inputmode="numeric" pattern="[0-9]*" min="1" max="99" value="' + cur + '" aria-label="수량">' +
+    '<button data-act="qe" data-d="1" aria-label="하나 더">&#43;</button></div>' +
+    '<div class="qepick">' + [1, 2, 3, 5, 10, 20].map(n => '<button data-act="qeset" data-n="' + n + '">' + n + "</button>").join("") + "</div>" +
+    '<button class="go" data-act="qeok">이 수량으로</button>');
+  const inp = $("#qein");
+  if (inp){ setTimeout(() => { try { inp.focus(); inp.select(); } catch(e){} }, 60);
+    inp.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); qeAct("qeok"); } }); }
+}
+var QED = null;
+function qeAct(act, b){
+  const inp = $("#qein"); if (!QED || !inp) return closeSheet();
+  const v = Math.min(99, Math.max(1, parseInt(inp.value, 10) || 1));
+  if (act === "qe"){ inp.value = Math.min(99, Math.max(1, v + Number(b.dataset.d))); return; }
+  if (act === "qeset"){ inp.value = b.dataset.n; }
+  const n = Math.min(99, Math.max(1, parseInt(inp.value, 10) || 1)), q = QED;
+  const card = document.querySelector('.item[data-p="' + q.p + '"]' + (q.k != null ? '[data-k="' + q.k.replace(/"/g, "") + '"]' : ""));
+  QED = null; closeSheet();
+  if (card) setQtyOn(card, q.p, n);
+  VR.hit("qtytype", null, null, act === "qeset" ? "pick" : "", q.p);
 }
 $("#list").addEventListener("click", e => {
   const card = e.target.closest(".item"); if (!card) return;
