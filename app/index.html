@@ -668,6 +668,14 @@ html.shop.gs #cartsum .gsl{display:flex;height:50px;align-items:center;justify-c
 .gsl .k{border-radius:8px;transition:background .3s}.gsl .k.bump{background:#ffd400;color:#191919;padding:1px 6px}
 html.shop.gs body{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
 html.shop.gs #toast, html.shop.gs #stoast{bottom:calc(62px + env(safe-area-inset-bottom))}
+#cartsum .wsl{display:none}
+html.cart-on.wgs:not(.shop) #cartsum{display:flex;height:calc(50px + env(safe-area-inset-bottom));padding:0 12px env(safe-area-inset-bottom) 16px}
+html.cart-on.wgs:not(.shop) #cartsum > :not(.wsl){display:none}
+html.cart-on.wgs:not(.shop) #cartsum .wsl{display:flex;width:100%;height:50px;align-items:center;justify-content:space-between;gap:8px;white-space:nowrap;color:#fff;font-size:15px}
+#cartsum .wsl b{font-size:18px}#cartsum .wsl .s{font-size:12.5px;opacity:.92;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#cartsum .wsl .pxgo{flex:none;margin:0;padding:7px 11px;font-size:14px}
+html.cart-on.wgs:not(.shop) body{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
+html.cart-on.wgs:not(.shop) #toast{bottom:calc(62px + env(safe-area-inset-bottom))}
 #sheet .bkqrow{display:flex;align-items:center;justify-content:center;gap:18px;margin:10px 0 14px;font-size:22px;font-weight:800;color:var(--ink)}
 #sheet .bkqrow button{width:46px;height:46px;margin:0;padding:0;border:1.5px solid var(--line);border-radius:12px;background:var(--card);font-size:22px;color:var(--ink)}
 #sheet .bkqt{text-align:center;font-weight:800;margin:14px 0 0;color:var(--ink)}
@@ -2025,25 +2033,25 @@ function run(){
   if (SHOP && SHOP.v && SHOP.v !== SH_ALL && !listOf(SHOP.v)) SHOP.v = "";      // 보던 목록이 지워졌으면 내 찜으로
   if (SHOP && view === "cart" && !WLIST) CUR = shopCur();
   if (CUR && !curList()) CUR = "";
-  SECT = null;
+  SECT = null; SK = null;
   if (SHOP && view === "cart" && !WLIST && !raw){
     const isHere = i => SHOP.x.indexOf(i.p) >= 0 && inBasket(i.p);
-    const here = VIEW.filter(isHere), done = VIEW.filter(i => inBasket(i.p) && !isHere(i)), rest = VIEW.filter(i => !inBasket(i.p));
+    const movedHere = (i, k) => inBasket(i.p) && !isHere(i) && srcKey(i.p) === k;    // 이 칸에서 담아 아래로 내려간 것
     const hd = (cls, t, s) => '<div class="sechd ' + cls + '">' + t + "<span>" + s + "</span></div>";
-    let out = []; SECT = {};
-    if (here.length){ SECT[0] = hd("here", "🔎 현장에서 담은 것", here.length + "가지 · 끝나면 내 찜에 남아요"); out = out.concat(here); }
-    if (SHOP.v === SH_ALL){
-      const seen = new Set();
-      for (const k of shopKeys()){
-        const g = rest.filter(i => !seen.has(i.p) && inKey(i.p, k)); g.forEach(i => seen.add(i.p));
-        if (!g.length) continue;
-        SECT[out.length] = hd("", esc(keyName(k)), "남은 " + g.length + "가지"); out = out.concat(g);
-      }
-    } else {
-      if (here.length && rest.length) SECT[out.length] = hd("", esc(keyName(SHOP.v)), "남은 " + rest.length + "가지");
-      out = out.concat(rest);
+    let out = []; SECT = {}; SK = [];
+    const put = (arr, k) => { arr.forEach(i => { out.push(i); SK.push(k); }); };
+    const here = VIEW.filter(isHere);
+    if (here.length){ SECT[0] = hd("here", "🔎 현장에서 담은 것", here.length + "가지 · 끝나면 내 찜에 남아요"); put(here, "@here"); }
+    const keys = SHOP.v === SH_ALL ? shopKeys() : [SHOP.v || ""];
+    for (const k of keys){
+      const g = VIEW.filter(i => inKey(i.p, k) && !isHere(i) && !movedHere(i, k));
+      if (!g.length) continue;
+      if (SHOP.v === SH_ALL || here.length)
+        SECT[out.length] = hd("", esc(keyName(k)), "남은 " + g.filter(i => !inBasket(i.p)).length + "가지");
+      put(g, k);
     }
-    if (done.length){ SECT[out.length] = hd("done", "✓ 바구니에 담은 것", done.length + "가지"); out = out.concat(done); }
+    const done = VIEW.filter(i => inBasket(i.p) && !isHere(i) && keys.indexOf(srcKey(i.p)) >= 0);
+    if (done.length){ SECT[out.length] = hd("done", "✓ 바구니에 담은 것", done.length + "가지"); done.forEach(i => { out.push(i); SK.push(srcKey(i.p)); }); }
     VIEW = out;
   }
   document.documentElement.classList.toggle("shop", shopOn());
@@ -2052,6 +2060,7 @@ function run(){
                                : view === "cart" && !WLIST ? "찜 안에서 찾기 — ㅅㄹㅁ, 닥터지…" : PH0;
   if (shopOn()){ const L = listOf(SHOP.cur || ""); $("#shopname").textContent = L ? "📋 " + lname(L) : "내 찜"; }
   if (!shopOn()) document.documentElement.classList.remove("gs");
+  if (shopOn() || view !== "cart" || WLIST) document.documentElement.classList.remove("wgs");
   listTabs(view);
   shopChips(); aimBar();
   const bar = $("#cartbar");
@@ -2102,6 +2111,7 @@ function run(){
   fltMark();
 }
 var FLT_ON = false, FLT_T = 0;
+var SK = null, CARD_K = null;   // 장보기 카드마다 어느 목록 칸인지 · 그릴 때 그 칸 (2026-10-14)
 var SECT = null;        // 장보기 칸 제목 {VIEW 몇 번째 앞: 제목 HTML} — run() 이 만들고 more() 가 끼운다 (2026-10-14)
 function shopChips(){
   const box = $("#shopchips"); if (!box) return;
@@ -2131,20 +2141,26 @@ $("#aimbar").addEventListener("click", e => {
   VR.hit("aimoff"); CUR = ""; run();
 });
 var GS_Y = 0, GS_HOLD = -1, GS_T0 = null, GS_SW = 0;
+function gsCls(){
+  const h = document.documentElement;
+  if (h.classList.contains("shop")) return "gs";
+  return h.classList.contains("cart-on") && !WLIST && $("#view").value === "cart" ? "wgs" : null;
+}
 addEventListener("scroll", () => {
-  const h = document.documentElement, y = scrollY;
-  if (!h.classList.contains("shop")){ GS_Y = y; return; }
-  if (y < 80){ h.classList.remove("gs"); GS_HOLD = -1; }
-  else if (y > GS_Y + 6 && y > 140 && (GS_HOLD < 0 || y > GS_HOLD + 160)){ h.classList.add("gs"); GS_HOLD = -1; }
+  const h = document.documentElement, y = scrollY, c = gsCls();
+  if (!c){ GS_Y = y; return; }
+  if (y < 80){ h.classList.remove(c); GS_HOLD = -1; }
+  else if (y > GS_Y + 6 && y > 140 && (GS_HOLD < 0 || y > GS_HOLD + 160)){ h.classList.add(c); GS_HOLD = -1; }
   GS_Y = y;
 }, {passive: true});
 $("#cartsum").addEventListener("touchstart", e => { GS_T0 = e.touches[0].clientY; }, {passive: true});
 $("#cartsum").addEventListener("touchend", e => {
-  if (GS_T0 == null || !shopOn()) return;
+  const c = gsCls();
+  if (GS_T0 == null || !c) return;
   const dy = e.changedTouches[0].clientY - GS_T0; GS_T0 = null;
   const h = document.documentElement;
-  if (dy > 25){ h.classList.add("gs"); GS_HOLD = -1; GS_SW = Date.now(); VR.hit("gsdown"); }
-  else if (dy < -25){ h.classList.remove("gs"); GS_HOLD = scrollY; GS_SW = Date.now(); VR.hit("gsup"); }
+  if (dy > 25){ h.classList.add(c); GS_HOLD = -1; GS_SW = Date.now(); VR.hit("gsdown", null, null, c); }
+  else if (dy < -25){ h.classList.remove(c); GS_HOLD = scrollY; GS_SW = Date.now(); VR.hit("gsup", null, null, c); }
 }, {passive: true});
 function filtered(){ return !!$("#q").value.trim() || BIG !== "전체" || !!SUB; }
 function fltMark(){
@@ -2360,8 +2376,8 @@ function card(it, raw){
   if (it.mine) tags.push('<span class="tag tag-mine">폰에서 넣음</span>');
   if (WLIST && qtyOf(it.p) > 1) tags.push('<span class="tag tag-qty">' + qtyOf(it.p) + "개</span>");
   if (inb && SHOP.x.indexOf(it.p) >= 0) tags.push('<span class="tag tag-here">현장</span>');
-  else if (inb && SHOP.src[it.p] != null && SHOP.src[it.p] !== (SHOP.v || ""))
-    tags.push('<span class="tag tag-src">✓ ' + esc((n => n.length > 12 ? n.slice(0, 11) + "…" : n)(keyName(SHOP.src[it.p]))) + "에서 " + (SHOP.q[it.p] || 1) + "개</span>");
+  else if (inb && srcKey(it.p) !== (CARD_K != null ? CARD_K : (SHOP.v || "")))
+    tags.push('<span class="tag tag-src">✓ ' + esc((n => n.length > 12 ? n.slice(0, 11) + "…" : n)(keyName(srcKey(it.p)))) + "에서 " + (SHOP.q[it.p] || 1) + "개</span>");
   if (mine && !sh && !CUR && HERE[it.p] && Date.now() - HERE[it.p] < 30 * 864e5) tags.push('<span class="tag tag-here">현장</span>');
   if (it.sub && !sh) tags.push('<span class="tag stag" title="' + esc(it.sub) + ' 만 보기">' + esc(it.sub) + "</span>");
   const bkb = sh ? '<button class="bkb' + (inb ? " on" : "") + '" aria-label="' + (inb ? "카트에서 빼기" : "카트에 담기") + '">' +
@@ -2401,7 +2417,7 @@ function more(){
   const tips = tipsOK();
   $("#list").insertAdjacentHTML("beforeend", chunk.map((i, n) => {
     const at = tipAt(SHOWN + n);
-    return (SECT && SECT[SHOWN + n] || "") + (tips && at >= 0 ? tipCard(at) : "") + card(i, raw);
+    return (SECT && SECT[SHOWN + n] || "") + (tips && at >= 0 ? tipCard(at) : "") + cardK(i, raw, SK ? SK[SHOWN + n] : null);
   }).join(""));
   SHOWN += chunk.length;
   if (TIP_EYE) document.querySelectorAll("#list .tipc:not([data-eye])").forEach(t => { t.dataset.eye = 1; TIP_EYE.observe(t); });
@@ -2707,6 +2723,13 @@ function shopKeys(){                                   // 시작한 목록이 �
 }
 function keyName(key){ if (key === "@here") return "현장"; const L = listOf(key); return L ? lname(L) : "내 찜"; }
 function shopCur(){ return !SHOP || SHOP.v === SH_ALL ? "" : (SHOP.v || ""); }
+function srcKey(p){ return SHOP.src[p] == null ? (SHOP.cur || "") : SHOP.src[p]; }
+function cardK(it, raw, k){
+  if (k == null) return card(it, raw);
+  CARD_K = k; let h;
+  try { h = card(it, raw); } finally { CARD_K = null; }
+  return h.replace('<article class="item', '<article data-k="' + esc(k) + '" class="item');
+}
 function firstKey(p){ const ks = shopKeys(); for (const k of ks) if (inKey(p, k)) return k; return null; }
 function inShopView(p){
   const here = SHOP.x.indexOf(p) >= 0 && inBasket(p);
@@ -2722,7 +2745,7 @@ function shopQty(p, key){
 function aimList(){ return (!SHOP && !WLIST && !ONLY && $("#view").value !== "cart") ? curList() : null; }
 function qtyOf(p){
   if (WLIST) return WQ[p] || 1;
-  if (SHOP && !WLIST && listOnOrMine()) return shopQty(p, SHOP.v);   // 장보기 중 — 바구니 수량 · 담기 전 수량 · 보는 목록 수량
+  if (SHOP && !WLIST && listOnOrMine()) return shopQty(p, CARD_K != null && CARD_K !== "@here" ? CARD_K : SHOP.v);   // 장보기 중 — 바구니 수량 · 담기 전 수량 · 보는 목록 수량
   const L = listOn();
   return (L ? L.q[p] : CQ[p]) || 1;
 }
@@ -2976,8 +2999,12 @@ function cartSum(){
       : '<b class="ov">' + about + won(-gap) + " 더 비싸요</b>");
   const tot = (gotN ? "<small>남은</small>" + won(left) : won(px)) + "<i>›</i>";
   if (shopOn()) return gauge(box);
+  const wish = !WLIST && $("#view").value === "cart";
   box.innerHTML = '<span class="l">' + l + "</span>" + '<span class="tot">' + tot + "</span>" +
-    (!WLIST && $("#view").value === "cart" ? '<button class="pxgo">🛒 장보기 시작</button>' : "");
+    (wish ? '<button class="pxgo">🛒 장보기 시작</button>' : "") +
+    (wish ? '<div class="wsl"><span>♥ <b>' + cnt + " · " + won(gotN ? left : px) + "</b></span>" +
+      '<span class="s">' + (cp ? (gap >= 0 ? won(gap) + " 아낌" : won(-gap) + " 더 비쌈") : "") + "</span>" +
+      '<button class="pxgo">🛒 장보기</button></div>' : "");
 }
 var CARTSUM = null;   // var — 첫 화면이 이 줄보다 먼저 cartSum 을 부를 수 있다
 function openCartSum(){
@@ -4057,7 +4084,7 @@ function shopItems(){
 function startShop(){
   if (WLIST) return;
   SHOP = {cur: CUR || "", v: CUR || "", b: {}, q: {}, src: {}, x: [], t: Date.now()};
-  GS_K = null; document.documentElement.classList.remove("gs");
+  GS_K = null; document.documentElement.classList.remove("gs", "wgs");
   saveShop(); VR.hit("shopgo");
   $("#q").value = ""; run(); toTop();
   const d = document.createElement("div");
@@ -4071,16 +4098,16 @@ function startShop(){
   document.body.appendChild(d);
   d.querySelector("button").addEventListener("click", () => d.remove());
 }
-function basketTap(it){
-  const p = it.p, raw = $("#q").value.trim();
+function basketTap(it, el){
+  const p = it.p, raw = $("#q").value.trim(), ek = el && el.dataset.k != null ? el.dataset.k : null;
   const fk = firstKey(p);
-  const vk = (raw && !inShopView(p)) ? (fk === null ? "@here" : fk)
+  const vk = ek != null ? ek : (raw && !inShopView(p)) ? (fk === null ? "@here" : fk)
            : SHOP.v === SH_ALL ? (fk === null ? (SHOP.x.indexOf(p) >= 0 ? "@here" : SHOP.cur || "") : fk) : (SHOP.v || "");
   if (inBasket(p)){
-    if ((SHOP.src[p] == null ? vk : SHOP.src[p]) !== vk) return askMore(it, vk);
+    if (srcKey(p) !== vk && vk !== "@here") return askMore(it, vk);
     bkOut(p); VR.hit("bkx", null, null, "", p);
   } else {
-    const q = qtyOf(p);
+    const q = vk === "@here" ? qtyOf(p) : shopQty(p, vk);
     VR.hit("bk", null, null, vk === "@here" ? "here" : vk === (SHOP.cur || "") ? "" : "other", p);
     if (vk === "@here" && SHOP.x.indexOf(p) < 0) SHOP.x.push(p);
     SHOP.b[p] = 1; SHOP.q[p] = q; SHOP.src[p] = vk;
@@ -4094,15 +4121,17 @@ function bkOut(p){
   SHOP.x = SHOP.x.filter(x => x !== p); saveShop();
 }
 function bkRedraw(it){
-  const el = document.querySelector('.item[data-p="' + it.p + '"]');
-  if (el){ el.outerHTML = card(it, $("#q").value.trim()); sharpen_all(); cartSum(); shopChips(); } else run();
+  const els = document.querySelectorAll('.item[data-p="' + it.p + '"]'), raw = $("#q").value.trim();
+  if (!els.length) return run();
+  els.forEach(el => { const k = el.dataset.k; el.outerHTML = k != null ? cardK(it, raw, k) : card(it, raw); });
+  sharpen_all(); cartSum(); shopChips();
 }
 var BKQ = null;
 function askMore(it, vk){
-  const p = it.p, had = SHOP.q[p] || 1, here = qKey(p, vk);
+  const p = it.p, had = SHOP.q[p] || 1, here = qKey(p, vk);   // vk = 지금 누른 칸
   BKQ = {p: p, n: here || 1};
   openSheet("<h3>이미 바구니에 있어요</h3>" +
-    '<p class="note"><b>' + esc(dName(it)) + "</b><br><b>" + esc(keyName(SHOP.src[p] == null ? "" : SHOP.src[p])) + "</b>에서 <b>" + had + "개</b> 담았어요." +
+    '<p class="note"><b>' + esc(dName(it)) + "</b><br><b>" + esc(keyName(srcKey(p))) + "</b>에서 <b>" + had + "개</b> 담았어요." +
       (here ? " ‘" + esc(keyName(vk)) + "’에는 " + here + "개 있어요." : "") + "</p>" +
     '<p class="bkqt">몇 개 더 담을까요?</p>' +
     '<div class="bkqrow"><button data-act="bkq" data-d="-1" aria-label="하나 빼기">&minus;</button><b id="bkqn">' + BKQ.n + '</b>' +
@@ -4735,9 +4764,10 @@ $("#cartbtn").insertAdjacentHTML("afterbegin", HEART);
 $("#cartbtn").addEventListener("click", openCart);
 $("#cartsum").addEventListener("click", e => {
   if (e.target.closest(".pxgo")) return startShop();
-  if (shopOn() && Date.now() - GS_SW < 500) return;                    // 방금 밀어서 접고 펼쳤다 — 눌림으로 또 바꾸지 않는다
-  if (shopOn() && document.documentElement.classList.contains("gs")){   // 얇은 띠를 누르면 다시 크게 (2026-10-14)
-    document.documentElement.classList.remove("gs"); GS_HOLD = scrollY; VR.hit("gsopen"); return;
+  const gc = gsCls();
+  if (gc && Date.now() - GS_SW < 500) return;                          // 방금 밀어서 접고 펼쳤다 — 눌림으로 또 바꾸지 않는다
+  if (gc && document.documentElement.classList.contains(gc)){           // 얇은 띠를 누르면 다시 크게 (2026-10-14)
+    document.documentElement.classList.remove(gc); GS_HOLD = scrollY; VR.hit("gsopen", null, null, gc); return;
   }
   if (e.target.closest(".fin")) return finishShop();
   if (shopOn()) return;
@@ -4865,7 +4895,9 @@ $("#list").addEventListener("click", e => {
   const qb = e.target.closest(".qb");
   if (qb || e.target.closest(".got")) tipUsed("cartq");
   if (qb){
+    if (card.dataset.k != null) CARD_K = card.dataset.k;
     const n = Math.min(99, Math.max(1, qtyOf(p) + Number(qb.dataset.q)));
+    CARD_K = null;
     clearTimeout(QTY_T); QTY_T = setTimeout(() => VR.hit("qty", null, null, shopOn() ? "shop" : "wish", p), 1500);
     const L = listOn();
     if ($("#view").value === "cart") stamp("qty");
@@ -4883,10 +4915,10 @@ $("#list").addEventListener("click", e => {
     card.querySelector(".got").textContent = isGot(p) ? "샀어요 ✓" : "샀어요";
     return cartSum();
   }
-  if (e.target.closest(".bkb")) return basketTap(it);
+  if (e.target.closest(".bkb")) return basketTap(it, card);
   if (e.target.closest(".cq")) return;
   const cartIcon = e.target.closest(".cart");
-  if (cartIcon && shopOn()) return basketTap(it);
+  if (cartIcon && shopOn()) return basketTap(it, card);
   if (cartIcon && listOn()){          // 받은 목록 칸에서는 그 목록에서 뺀다 (내 찜은 안 건드린다)
     const L = listOn();
     const i0 = L.items.indexOf(p), q0 = L.q[p];
