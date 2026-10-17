@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded",function(){var b=document.createEle
 }catch(e){}})();</script>
 <script>/* 처음부터 밝게 — 다크를 고른 사람만 어둡게 (2026-10-04 사장님: 아래쪽에서 박으면 느린 폰에서 까만 화면이 번쩍일 수 있다) */try{document.documentElement.setAttribute("data-theme",localStorage.getItem("gmpx-theme")==="dark"?"dark":"light")}catch(e){document.documentElement.setAttribute("data-theme","light")}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="preload" href="/data.json?v=829d88d548" as="fetch" crossorigin="anonymous" referrerpolicy="same-origin">
+<link rel="preload" href="/data.json?v=abf58d4882" as="fetch" crossorigin="anonymous" referrerpolicy="same-origin">
 <link rel="preload" href="/big/28438.jpg" as="image">
 <link rel="preload" href="/big/35032.jpg" as="image">
 <link rel="preload" href="/big/3098.jpg" as="image">
@@ -1182,7 +1182,7 @@ document.addEventListener("click",function(e){var pa=document.getElementById("pr
     <div class="searchwrap">
       <span class="mag">🔍</span>
       <input id="q" type="search" placeholder="선크림, ㅅㅋㄹ, 닥터지…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
-      <span id="hits">2,240개</span>
+      <span id="hits">2,235개</span>
       <button id="curtag" aria-label="지금 보는 종류"><span class="t"></span><i aria-label="전체 보기">✕</i></button>
       <button id="clr" aria-label="지우기" style="display: none;">×</button>
     </div>
@@ -1211,8 +1211,8 @@ document.addEventListener("click",function(e){var pa=document.getElementById("pr
   </div>
 
   <div class="sum">
-    <div><b id="s1">2,240 / 2,240</b><span id="c1">가격비교 완료</span></div>
-    <div><b id="s2">-22.9%</b><span id="c2">보통 이만큼 싸요</span></div>
+    <div><b id="s1">2,235 / 2,235</b><span id="c1">가격비교 완료</span></div>
+    <div><b id="s2">-22.8%</b><span id="c2">보통 이만큼 싸요</span></div>
     <div><b id="s3">78%</b><span id="c3">온라인보다 싼 것</span></div>
   </div>
 
@@ -1253,7 +1253,7 @@ async function derive(pw, salt){
 let KEY = null;
 
 async function unlock(pw, remember){
-  if (OPEN) return await (await fetch("/data.json?v=829d88d548",
+  if (OPEN) return await (await fetch("/data.json?v=abf58d4882",
                                       {referrerPolicy: "same-origin"})).json();
   const buf = await (await fetch("data.bin", {cache:"no-cache"})).arrayBuffer();
   const raw = new Uint8Array(buf);
@@ -1520,8 +1520,11 @@ function appKinds(items){
     i._k = 1;
     if (i.as){ i.sub0 = i.sub; i.sub = i.as; }
     if (i.ab){ i.big0 = i.big; i.big = i.ab; }
+    if (i.ag != null){ i.g0 = i.g; i.g = i.ag; if (i.ar != null){ i.rate = i.ar; i.diff = i.ad; } }
+    if (i.an){ i.name = i.an; if (i.adn && i.adn !== i.an) i.dn = i.adn; else delete i.dn; }
+    if (i.aspec != null) i.spec = i.aspec;
   }
-  return items;
+  return items.filter(i => !i.ago);
 }
 var PH0 = "";
 function start(d){
