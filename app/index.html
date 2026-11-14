@@ -1284,7 +1284,13 @@ async function loadPics(){
           }
         } catch (e) {}
       }
-      if (!seen && !back) await new Promise(ok => setTimeout(ok, 3000));
+      if (!seen && !back) await Promise.all([
+        fetch("/pics1.json?v=e47a9d7a04").then(r => r.ok ? r.json() : null).then(j => {
+          if (!j || PICSDONE) return;
+          Object.assign(PICS, j); apFix();
+          for (const el of document.querySelectorAll("img.thumb:not([src])")) paint(el);
+        }).catch(() => {}),
+        new Promise(ok => setTimeout(ok, 3000))]);
       PICS = await (await fetch(u, seen || back ? {referrerPolicy: "same-origin"}
                                                 : {referrerPolicy: "same-origin", priority: "low"})).json();
       apFix();
